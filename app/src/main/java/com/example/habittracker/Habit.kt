@@ -7,5 +7,6 @@ import androidx.room.PrimaryKey
 data class Habit (
     @PrimaryKey(autoGenerate = true)
     val habitId: Int = 0,
-    val name: String = "test"
+    val name: String = "test",
+    val frequency: Int = 1
 )
