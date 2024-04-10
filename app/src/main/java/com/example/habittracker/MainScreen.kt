@@ -15,13 +15,13 @@ fun MainScreen (
 
     Column()
     {
-        Text(text = state.name)
+
         for (habit in state.habits){
-            Text(text = habit.habit.name)
-            Text(text = habit.habit.frequency.toString())
+            Text(text = habit.habit.value.name)
+            Text(text = habit.habit.value.frequency.toString())
             Text(text = habit.done.toString())
-            for (n in 0..<habit.habit.frequency){
-                Text(text = habit.completion[n].toString())
+            for (n in 0..<habit.habit.value.frequency){
+                Text(text = habit.completion[n].value.toString())
                 CheckBoxDemo(habit, n, onEvent)
             }
 
@@ -36,7 +36,7 @@ fun MainScreen (
 @Composable
 fun CheckBoxDemo(habit: DisplayHabit, n: Int, onEvent: (HabitEvent) -> Unit) {
     Checkbox(
-        checked = habit.completion[n],
+        checked = habit.completion[n].value,
         onCheckedChange = { onEvent(HabitEvent.BoxChecked(habit, n))}
     )
 }

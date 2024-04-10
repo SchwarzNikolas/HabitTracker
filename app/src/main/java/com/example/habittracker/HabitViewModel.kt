@@ -1,7 +1,8 @@
 package com.example.habittracker
 
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
@@ -14,22 +15,21 @@ import java.time.LocalDate
 class HabitViewModel (
     private val dao: HabitDao
 ): ViewModel(){
-    private  val _state = MutableStateFlow(HabitState())
-    private val state2 = mutableStateListOf<DisplayHabit>()
+    private val _state = MutableStateFlow(HabitState())
     val state = _state
 
     init {
         viewModelScope.launch {
 
-            //inserHabit(Habit(name = "test1", frequency = 3))
+            inserHabit(Habit(name = "test1", frequency = 3))
 
-            val habits = mapHabit(fetchHabits())
+            state.value.habits
 
-            _state.update { it.copy(
-                habits = habits
-            )
+            dao.fetchHabits().collect{habits -> run{
+                val hablist = habits.stream().map { x -> DisplayHabit(habit = mutableStateOf(x))}.toList()
+                _state.update { it.copy(habits = hablist) }
+                }
             }
-            state2.addAll(_state.value.habits)
         }
     }
 
@@ -37,12 +37,12 @@ class HabitViewModel (
         when(event){
             is HabitEvent.ModifyHabit -> {
                 viewModelScope.launch {
-                    inserHabit(event.habit.habit.copy(frequency = event.frequency))
+                    inserHabit(event.habit.habit.value.copy(frequency = event.frequency))
                 }
             }
 
             is HabitEvent.RecordHabitCompletion -> {
-                val record = HabitRecord(habitId = event.habit.habit.habitId, date = LocalDate.now().toString())
+                val record = HabitRecord(habitId = event.habit.habit.value.habitId, date = LocalDate.now().toString())
                 viewModelScope.launch {
                     dao.insertRecord(record)
                 }
@@ -50,32 +50,33 @@ class HabitViewModel (
 
             is HabitEvent.BoxChecked -> {
 
-                val index = state2.indexOf(event.habit)
-                state2.get(index).completion.set(event.n, false)
+                val index = state.value.habits.indexOf(event.habit)
+                state.value.habits[index].completion[event.n].value = state.value.habits[index].completion[event.n].value.not()
 
-                state.update { it.copy(habits = state2) }
 
+
+                }
             }
         }
-    }
 
 
     private suspend fun inserHabit(habit: Habit){
         dao.insertHabit(habit)
     }
 
-    private fun mapHabit(habits: List<Habit>):MutableList<DisplayHabit>{
-        val mapedHabits = mutableListOf<DisplayHabit>()
-        for (habit in habits){
-            mapedHabits.add(DisplayHabit(habit))
+
+    private fun mapHabit(habits: MutableStateFlow<List<Habit>>):SnapshotStateList<DisplayHabit>{
+        val mapedHabits = listOf<DisplayHabit>().toMutableList()
+
+        for (habit in habits.value){
+            mapedHabits.add(DisplayHabit(mutableStateOf(habit)))
         }
-        return mapedHabits
+        return mapedHabits.toMutableStateList()
     }
 
-    private suspend fun fetchHabits():List<Habit>{
-        return withContext(Dispatchers.IO){
-            dao.fetchHabits()
-        }
+
+    private suspend fun fetchHabits(test: MutableStateFlow<List<Habit>>) {
+            dao.fetchHabits().collect(){habits -> test.value = habits}
     }
 }
 
