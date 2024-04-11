@@ -3,6 +3,7 @@ package com.example.habittracker
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+// An entity represents a table
 @Entity
 data class Habit (
     @PrimaryKey(autoGenerate = true)

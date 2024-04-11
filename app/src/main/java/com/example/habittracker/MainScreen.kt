@@ -13,6 +13,8 @@ import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -37,16 +39,12 @@ fun MainScreen (
             Text(text = habit.habit.value.name)
             Text(text = habit.habit.value.frequency.toString())
             Text(text = habit.done.toString())
-            for (n in 0..<habit.habit.frequency){
-                Text(text = habit.completion[n].toString())
-                // CheckBoxDemo(habit, n, onEvent)
-            /*for (n in 0..<habit.habit.value.frequency){
+            for (n in 0..<habit.habit.value.frequency){
                 Text(text = habit.completion[n].value.toString())
-                CheckBoxDemo(habit, n, onEvent)
-             */
+                //CheckBoxDemo(habit.completion[n], onEvent)
             }
 
-            Button(onClick = {onEvent(HabitEvent.ModifyHabit(habit, 1))}) {
+            Button(onClick = {onEvent(HabitEvent.ModifyHabit(habit, 3))}) {
                 Text(text = "edit")
             }
         }

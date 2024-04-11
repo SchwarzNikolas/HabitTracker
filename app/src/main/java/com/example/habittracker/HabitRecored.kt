@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.time.LocalDate
 
+// An entity represents a table
 @Entity
 data class HabitRecord(
     @PrimaryKey(autoGenerate = true)
