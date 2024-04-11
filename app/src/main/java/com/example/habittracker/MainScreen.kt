@@ -5,6 +5,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 
 
 @Composable
@@ -22,10 +23,10 @@ fun MainScreen (
             Text(text = habit.done.toString())
             for (n in 0..<habit.habit.value.frequency){
                 Text(text = habit.completion[n].value.toString())
-                CheckBoxDemo(habit, n, onEvent)
+                CheckBoxDemo(habit.completion[n], onEvent)
             }
 
-            Button(onClick = {onEvent(HabitEvent.ModifyHabit(habit, 1))}) {
+            Button(onClick = {onEvent(HabitEvent.ModifyHabit(habit, 3))}) {
                 Text(text = "edit")
             }
         }
@@ -33,10 +34,11 @@ fun MainScreen (
 }
 
 
+
 @Composable
-fun CheckBoxDemo(habit: DisplayHabit, n: Int, onEvent: (HabitEvent) -> Unit) {
+fun CheckBoxDemo(habit: MutableState<Boolean>, onEvent: (HabitEvent) -> Unit) {
     Checkbox(
-        checked = habit.completion[n].value,
-        onCheckedChange = { onEvent(HabitEvent.BoxChecked(habit, n))}
+        checked = habit.value,
+        onCheckedChange = { onEvent(HabitEvent.BoxChecked(habit))}
     )
 }

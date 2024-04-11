@@ -20,6 +20,7 @@ import com.example.habittracker.ui.theme.HabitTrackerTheme
 
 class MainActivity : ComponentActivity() {
 
+    // Creating data base
     private val db by lazy{
         Room.databaseBuilder(
             applicationContext,
@@ -28,6 +29,7 @@ class MainActivity : ComponentActivity() {
         ).build()
     }
 
+    // Create view model
     private val viewModel by viewModels<HabitViewModel>(
         factoryProducer = {
             object : ViewModelProvider.Factory{
