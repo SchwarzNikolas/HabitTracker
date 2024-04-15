@@ -101,13 +101,17 @@ class HabitViewModel (
 
                 insertHabit(
                     state.value.editHabit.copy(
-                        frequency = state.value.editFreq
+                        frequency = state.value.editFreq,
+                        name = state.value.editString
                     )
                 )
 
             }
 
-            is HabitEvent.BoxChecked -> {}
+            is HabitEvent.BoxChecked -> {
+                event.displayHabit.completion[event.index].value = event.displayHabit.completion[event.index].value.not()
+                checkHabitCompletion(event.displayHabit)
+            }
 
             is HabitEvent.EditHabit -> {
                 state.update {
@@ -128,7 +132,13 @@ class HabitViewModel (
                 }
             }
 
-            is HabitEvent.UpDateEditString -> {}
+            is HabitEvent.UpDateEditString -> {
+                state.update {
+                    it.copy(
+                        editString = event.newString
+                    )
+                }
+            }
 
             is HabitEvent.CancelEdit -> {
                 state.update {
@@ -138,7 +148,41 @@ class HabitViewModel (
                 }
             }
 
-            is HabitEvent.DeleteHabit -> {}
+            is HabitEvent.DeleteHabit -> {
+                viewModelScope.launch {
+                    dao.deleteHabit(event.displayHabit.habit.value)
+                }
+            }
+        }
+    }
+
+    private fun checkHabitCompletion(displayHabit: DisplayHabit){
+        //val test = displayHabit.completion.stream().map { x-> x.value }.count()
+        //displayHabit.completion.stream().map { x-> x.value }.count().toInt() == 1
+        val habitRecord = HabitRecord(
+            habitName = displayHabit.habit.value.name,
+            date = LocalDate.now().toString()
+        )
+
+        if (displayHabit.completion.stream().map { x -> x.value }
+                    .allMatch { x -> x == true } && !displayHabit.done.value) {
+            displayHabit.done.value = displayHabit.done.value.not()
+            insertRecord(habitRecord)
+        } else if (displayHabit.done.value) {
+            displayHabit.done.value = displayHabit.done.value.not()
+            removeRecord(habitRecord)
+        }
+    }
+
+    private fun insertRecord(record: HabitRecord){
+        viewModelScope.launch {
+            dao.insertRecord(record)
+        }
+    }
+
+    private fun removeRecord(record: HabitRecord){
+        viewModelScope.launch {
+            dao.deleteRecord(record.habitName, record.date)
         }
     }
 
