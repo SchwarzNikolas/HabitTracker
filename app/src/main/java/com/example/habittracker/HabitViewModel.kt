@@ -21,7 +21,7 @@ class HabitViewModel (
         viewModelScope.launch {
 
 
-            //insertHabit(Habit(name = "test1", frequency = 2))
+            insertHabit(Habit(name = "test1", frequency = 2))
 
             // sync data base and state
             // will clean up later
@@ -106,8 +106,6 @@ class HabitViewModel (
 
             }
 
-            is HabitEvent.BoxChecked -> {}
-
             is HabitEvent.EditHabit -> {
                 state.update {
                     it.copy(
@@ -143,14 +141,12 @@ class HabitViewModel (
                 }
             }
 
-            is HabitEvent.DeleteHabit -> {}
+            is HabitEvent.DeleteHabit -> {
+                viewModelScope.launch {
+                    dao.deleteHabit(event.displayHabit.habit.value)
+                }
+            }
         }
-    }
-
-
-
-    private suspend fun fetchHabits(test: MutableStateFlow<List<Habit>>) {
-        dao.fetchHabits().collect() { habits -> test.value = habits }
     }
 
     private fun checkHabitCompletion(displayHabit: DisplayHabit) {

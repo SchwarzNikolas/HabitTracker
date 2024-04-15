@@ -96,6 +96,9 @@ fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit) {
                 Button(onClick = { onEvent(HabitEvent.EditHabit(displayHabit)) }) {
                     Text(text = "edit")
                 }
+                Button(onClick = { onEvent(HabitEvent.DeleteHabit(displayHabit)) }) {
+                    Text(text = "delete")
+                }
             }
         }
     }
