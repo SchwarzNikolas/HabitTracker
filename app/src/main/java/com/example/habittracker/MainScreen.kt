@@ -119,10 +119,17 @@ fun EditWindow(onEvent: (HabitEvent) -> Unit, state: HabitState){
     Column {
 
         CustomTextField(
+            value = state.editString,
+            label = "Name:",
+            onchange = { onEvent(HabitEvent.UpDateEditString(it)) },
+            manager = focusManager
+        )
+        CustomTextField(
             value = state.editFreq.toString(),
             label = "Frequency:",
             onchange = { onEvent(HabitEvent.UpDateEditFreq(it.toInt())) },
             manager = focusManager)
+
 
         Button(onClick = { onEvent(HabitEvent.ModifyHabit) }) {
             Text(text = "Execute edit")

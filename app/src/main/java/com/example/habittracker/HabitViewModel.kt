@@ -100,10 +100,10 @@ class HabitViewModel (
 
                 insertHabit(
                     state.value.editHabit.copy(
-                        frequency = state.value.editFreq
+                        frequency = state.value.editFreq,
+                        name = state.value.editString
                     )
                 )
-
             }
 
             is HabitEvent.EditHabit -> {
@@ -131,7 +131,13 @@ class HabitViewModel (
                 }
             }
 
-            is HabitEvent.UpDateEditString -> {}
+            is HabitEvent.UpDateEditString -> {
+                state.update {
+                    it.copy(
+                        editString = event.newString
+                    )
+                }
+            }
 
             is HabitEvent.CancelEdit -> {
                 state.update {
