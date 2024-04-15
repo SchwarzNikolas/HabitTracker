@@ -34,16 +34,8 @@ fun MainScreen (
         horizontalAlignment = Alignment.CenterHorizontally
     )
     {
-        ElevatedHabit("Go for a walk")
         for (habit in state.habits){
-            Text(text = habit.habit.value.name)
-            Text(text = habit.habit.value.frequency.toString())
-            Text(text = habit.done.toString())
-            for (n in 0..<habit.habit.value.frequency){
-                Text(text = habit.completion[n].value.toString())
-                //CheckBoxDemo(habit.completion[n], onEvent)
-            }
-
+            ElevatedHabit(habit, onEvent)
             Button(onClick = {onEvent(HabitEvent.ModifyHabit(habit, 3))}) {
                 Text(text = "edit")
             }
@@ -53,41 +45,46 @@ fun MainScreen (
 
 
 @Composable
-fun HabitCheckBox(){
-    Row(
-    ){
-        val checkedState = remember {
-            mutableStateOf(false)
-        }
-            Checkbox(
-                checked = checkedState.value,
-                onCheckedChange = {checkedState.value = it},
-                modifier = Modifier.padding(5.dp),
-                colors = CheckboxDefaults.colors(Color.Green)
-            )
-
-    }
-}
-
-
-@Composable
-fun ElevatedHabit(text: String) {
+fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit) {
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
         ),
         modifier = Modifier
-            .size(width = 380.dp, height = 65.dp)
+            .size(width = 380.dp, height = 100.dp),
+        colors = CardDefaults.cardColors(Color.Green)
 
     ) {
-        Row{
-            HabitCheckBox()
-            Text(
-            text = text,
-            modifier = Modifier
-                .padding(16.dp),
-            textAlign = TextAlign.Center
-            )
+        Column {
+
+            Row {
+                for (n in 0..<displayHabit.habit.value.frequency) {
+                    HabitCheckBox(displayHabit, n, onEvent)
+                }
+                Text(
+                    text = displayHabit.habit.value.name,
+                    modifier = Modifier
+                        .padding(16.dp),
+                    textAlign = TextAlign.Center
+                )
+            }
+            Text(text = "test")
+            Row {
+                Button(onClick = { onEvent(HabitEvent.EditHabit(displayHabit)) }) {
+                    Text(text = "edit")
+                }
+
+            }
         }
     }
+}
+
+@Composable
+fun HabitCheckBox(displayHabit: DisplayHabit, index:Int, onEvent: (HabitEvent) -> Unit){
+    Checkbox(
+        checked = displayHabit.completion[index].value,
+        onCheckedChange = {onEvent(HabitEvent.BoxChecked(displayHabit, index))},
+        modifier = Modifier.padding(5.dp),
+        colors = CheckboxDefaults.colors(Color.Green)
+    )
 }

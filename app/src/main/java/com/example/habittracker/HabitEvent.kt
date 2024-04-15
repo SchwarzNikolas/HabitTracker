@@ -7,5 +7,5 @@ import androidx.compose.runtime.MutableState
 sealed interface HabitEvent {
     data class ModifyHabit(val habit: DisplayHabit, val frequency: Int): HabitEvent
     data class RecordHabitCompletion(val habit: DisplayHabit): HabitEvent
-    data class BoxChecked(val habit: MutableState<Boolean>): HabitEvent
+    data class BoxChecked(val displayHabit: DisplayHabit, val index: Int): HabitEvent
 }

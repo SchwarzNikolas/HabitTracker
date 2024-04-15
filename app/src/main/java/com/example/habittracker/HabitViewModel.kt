@@ -17,7 +17,7 @@ import java.time.LocalDate
 // modifies the state of the Habitstate
 class HabitViewModel (
     private val dao: HabitDao
-): ViewModel(){
+): ViewModel() {
     private val _state = MutableStateFlow(HabitState())
     val state = _state
 
@@ -25,46 +25,64 @@ class HabitViewModel (
         // On initiation
         viewModelScope.launch {
 
-            insertHabit(Habit(name = "test1", frequency = 2))
+            //insertHabit(Habit(name = "test1", frequency = 2))
 
 
             // sycs data base and state
             // will clean up later
-            dao.fetchHabits().collect{habits -> run{
-                val displayHabitList: MutableList<DisplayHabit> = mutableListOf()
-                for (habit in habits) {
-                    var wasFound = false
-                    for (displayHabit in state.value.habits){
-                        if (habit in displayHabit){
-                            if (habit.frequency != displayHabit.completion.size){
-                                val newCompletion: MutableList<MutableState<Boolean>> = if (habit.frequency < displayHabit.completion.size){
-                                    displayHabit.completion.subList(0, habit.frequency)
-                                }else{
-                                    val n = habit.frequency - displayHabit.completion.size
-                                    displayHabit.completion.addAll(MutableList(size = n){ mutableStateOf(false) })
-                                    displayHabit.completion
+            dao.fetchHabits().collect { habits ->
+                run {
+                    val displayHabitList: MutableList<DisplayHabit> = mutableListOf()
+                    for (habit in habits) {
+                        var wasFound = false
+                        for (displayHabit in state.value.habits) {
+                            if (habit in displayHabit) {
+                                if (habit.frequency != displayHabit.completion.size) {
+                                    val newCompletion: MutableList<MutableState<Boolean>> =
+                                        if (habit.frequency < displayHabit.completion.size) {
+                                            displayHabit.completion.subList(0, habit.frequency)
+                                        } else {
+                                            val n = habit.frequency - displayHabit.completion.size
+                                            displayHabit.completion.addAll(MutableList(size = n) {
+                                                mutableStateOf(
+                                                    false
+                                                )
+                                            })
+                                            displayHabit.completion
+                                        }
+                                    displayHabitList.add(
+                                        displayHabit.copy(
+                                            habit = mutableStateOf(
+                                                habit
+                                            ), completion = newCompletion
+                                        )
+                                    )
+                                } else {
+                                    displayHabitList.add(
+                                        displayHabit.copy(
+                                            habit = mutableStateOf(
+                                                habit
+                                            )
+                                        )
+                                    )
                                 }
-                                displayHabitList.add(displayHabit.copy(habit = mutableStateOf(habit), completion = newCompletion))
-                            }else {
-                                displayHabitList.add(displayHabit.copy(habit = mutableStateOf(habit)))
+                                wasFound = true
+                                break
                             }
-                            wasFound = true
-                            break
+                        }
+                        if (wasFound.not()) {
+                            displayHabitList.add(DisplayHabit(habit = mutableStateOf(habit)))
                         }
                     }
-                    if (wasFound.not()){
-                        displayHabitList.add(DisplayHabit(habit = mutableStateOf(habit)))
-                    }
-                }
-                _state.update { it.copy(habits = displayHabitList) }
+                    _state.update { it.copy(habits = displayHabitList) }
                 }
             }
         }
     }
 
     // Handles the events triggered by the UI
-    fun onEvent(event: HabitEvent){
-        when(event){
+    fun onEvent(event: HabitEvent) {
+        when (event) {
             is HabitEvent.ModifyHabit -> {
                 viewModelScope.launch {
                     insertHabit(event.habit.habit.value.copy(frequency = event.frequency))
@@ -72,36 +90,71 @@ class HabitViewModel (
             }
 
             is HabitEvent.RecordHabitCompletion -> {
-                val record = HabitRecord(habitId = event.habit.habit.value.habitId, date = LocalDate.now().toString())
+                val record = HabitRecord(
+                    habitId = event.habit.habit.value.habitId,
+                    date = LocalDate.now().toString()
+                )
                 viewModelScope.launch {
                     dao.insertRecord(record)
                 }
             }
 
             is HabitEvent.BoxChecked -> {
-                event.habit.value = event.habit.value.not()
-                }
+                event.displayHabit.completion[event.index].value =
+                    event.displayHabit.completion[event.index].value.not()
+                checkHabitCompletion(event.displayHabit)
             }
         }
-
-
-    private suspend fun insertHabit(habit: Habit){
-        dao.insertHabit(habit)
     }
 
+    private fun mapHabit(habits: MutableStateFlow<List<Habit>>): SnapshotStateList<DisplayHabit> {
+        val mappedHabits = listOf<DisplayHabit>().toMutableList()
 
-    private fun mapHabit(habits: MutableStateFlow<List<Habit>>):SnapshotStateList<DisplayHabit>{
-        val mapedHabits = listOf<DisplayHabit>().toMutableList()
-
-        for (habit in habits.value){
-            mapedHabits.add(DisplayHabit(mutableStateOf(habit)))
+        for (habit in habits.value) {
+            mappedHabits.add(DisplayHabit(mutableStateOf(habit)))
         }
-        return mapedHabits.toMutableStateList()
+        return mappedHabits.toMutableStateList()
     }
 
 
     private suspend fun fetchHabits(test: MutableStateFlow<List<Habit>>) {
-            dao.fetchHabits().collect(){habits -> test.value = habits}
+        dao.fetchHabits().collect() { habits -> test.value = habits }
+    }
+
+    private fun checkHabitCompletion(displayHabit: DisplayHabit) {
+        val habitRecord = HabitRecord(
+            habitName = displayHabit.habit.value.name,
+            date = LocalDate.now().toString()
+        )
+
+        if (displayHabit.completion.stream()
+                .map { x -> x.value }
+                .allMatch { x -> x == true }
+            && !displayHabit.done.value
+        ) {
+            displayHabit.done.value = displayHabit.done.value.not()
+            insertRecord(habitRecord)
+        } else if (displayHabit.done.value) {
+            displayHabit.done.value = displayHabit.done.value.not()
+            removeRecord(habitRecord)
+        }
+    }
+
+
+
+    private fun removeRecord(record: HabitRecord) {
+        viewModelScope.launch {
+            dao.deleteRecord(record.habitName, record.date)
+        }
+    }
+    private fun insertHabit(habit: Habit) {
+        viewModelScope.launch {
+            dao.insertHabit(habit)
+        }
+    }
+    private fun insertRecord(record: HabitRecord){
+        viewModelScope.launch {
+            dao.insertRecord(record)
+        }
     }
 }
-
