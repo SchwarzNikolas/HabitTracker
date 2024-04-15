@@ -20,8 +20,8 @@ class HabitViewModel (
         // On initiation
         viewModelScope.launch {
 
-            insertHabit(Habit(name = "test1", frequency = 2))
-            //dao.insertRecord(HabitRecord(habitName = "test", date = LocalDate.now().toString()))
+
+            insertHabit(Habit(name = "testMeeeeee", frequency = 2))
 
             // sync data base and state
             // will clean up later
@@ -38,7 +38,6 @@ class HabitViewModel (
                                             displayHabit.completion.subList(0, habit.frequency)
                                         } else {
                                             val n = habit.frequency - displayHabit.completion.size
-
                                             displayHabit.completion.addAll(MutableList(size = n) {
                                                 mutableStateOf(
                                                     displayHabit.done.value
@@ -92,25 +91,19 @@ class HabitViewModel (
     // Handles the events triggered by the UI
     fun onEvent(event: HabitEvent) {
         when (event) {
+            // handles ModifyHabit event
             is HabitEvent.ModifyHabit -> {
                 state.update {
                     it.copy(
                         showEdit = false
                     )
                 }
-
                 insertHabit(
                     state.value.editHabit.copy(
                         frequency = state.value.editFreq,
                         name = state.value.editString
                     )
                 )
-
-            }
-
-            is HabitEvent.BoxChecked -> {
-                event.displayHabit.completion[event.index].value = event.displayHabit.completion[event.index].value.not()
-                checkHabitCompletion(event.displayHabit)
             }
 
             is HabitEvent.EditHabit -> {
@@ -124,6 +117,15 @@ class HabitViewModel (
                 }
             }
 
+            is HabitEvent.BoxChecked -> {
+                //if box is checked, it becomes unchecked and vice versa
+                event.displayHabit.completion[event.index].value =
+                    event.displayHabit.completion[event.index].value.not()
+                // accesses if habit is completed
+                checkHabitCompletion(event.displayHabit)
+            }
+
+            // when text is entered by the user into the text field is updated here and temporarily stored in the habit state.
             is HabitEvent.UpDateEditFreq -> {
                 state.update {
                     it.copy(
@@ -132,6 +134,7 @@ class HabitViewModel (
                 }
             }
 
+            // when text is entered by the user into the text field is updated here and temporarily stored in the habit state.
             is HabitEvent.UpDateEditString -> {
                 state.update {
                     it.copy(
@@ -139,7 +142,7 @@ class HabitViewModel (
                     )
                 }
             }
-
+            // closes the edit window
             is HabitEvent.CancelEdit -> {
                 state.update {
                     it.copy(
@@ -148,6 +151,7 @@ class HabitViewModel (
                 }
             }
 
+            // deletes habit from database (is also automatically removed from UI)(gone forever)
             is HabitEvent.DeleteHabit -> {
                 viewModelScope.launch {
                     dao.deleteHabit(event.displayHabit.habit.value)
@@ -155,40 +159,48 @@ class HabitViewModel (
             }
         }
     }
-
-    private fun checkHabitCompletion(displayHabit: DisplayHabit){
-        //val test = displayHabit.completion.stream().map { x-> x.value }.count()
-        //displayHabit.completion.stream().map { x-> x.value }.count().toInt() == 1
+    
+    // logic for habit completion, components are explained individually below
+    private fun checkHabitCompletion(displayHabit: DisplayHabit) {
         val habitRecord = HabitRecord(
             habitName = displayHabit.habit.value.name,
             date = LocalDate.now().toString()
         )
 
-        if (displayHabit.completion.stream().map { x -> x.value }
-                    .allMatch { x -> x == true } && !displayHabit.done.value) {
+        // if all the the boxes are ticked AND the habit is not marked as completed,
+        // the habit is marked as completed and a record is inserted into the database.
+        // else if, the habit is marked as completed,
+        // the habit is marked as uncompleted and the record of completion is remove from the database.
+        if (displayHabit.completion.stream()
+                .map { x -> x.value }
+                .allMatch { x -> x == true }
+            && !displayHabit.done.value
+        ) {
             displayHabit.done.value = displayHabit.done.value.not()
             insertRecord(habitRecord)
+
         } else if (displayHabit.done.value) {
             displayHabit.done.value = displayHabit.done.value.not()
             removeRecord(habitRecord)
         }
     }
 
-    private fun insertRecord(record: HabitRecord){
-        viewModelScope.launch {
-            dao.insertRecord(record)
-        }
-    }
-
-    private fun removeRecord(record: HabitRecord){
+    // removes record from the database using the dao (database access object)
+    private fun removeRecord(record: HabitRecord) {
         viewModelScope.launch {
             dao.deleteRecord(record.habitName, record.date)
         }
     }
-
+    // insert habit into the database using the dao (database access object)
     private fun insertHabit(habit: Habit) {
         viewModelScope.launch {
             dao.insertHabit(habit)
+        }
+    }
+    // insert record into the database using the dao (database access object)
+    private fun insertRecord(record: HabitRecord) {
+        viewModelScope.launch {
+            dao.insertRecord(record)
         }
     }
 }

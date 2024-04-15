@@ -35,6 +35,7 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 
+// details about compose available at https://developer.android.com/develop/ui/compose/layouts/basics
 @Composable
 fun MainScreen (
     state: HabitState,
@@ -66,35 +67,39 @@ fun MainScreen (
         Text(text = state.habitRecord.size.toString())
         for (habitRecord in state.habitRecord){
             Text(text = habitRecord.habitName)
+            Text(text = habitRecord.date)
+
         }
     }
 }
 
+
 @Composable
 fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit) {
     ElevatedCard(
+
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
         ),
-        modifier = Modifier
-            .size(width = 380.dp, height = 100.dp),
+        modifier = Modifier.size(width = 380.dp, height = 130.dp),
         colors = CardDefaults.cardColors(Color.Green)
 
     ) {
-        Column {
+        Column(horizontalAlignment = Alignment.Start) {
 
-            Row {
+            Row (modifier = Modifier.size(width = 380.dp, height = 30.dp)){
                 for (n in 0..<displayHabit.habit.value.frequency) {
                     HabitCheckBox(displayHabit, n, onEvent)
                 }
-                Text(
-                    text = displayHabit.habit.value.name,
-                    modifier = Modifier
-                        .padding(16.dp),
-                    textAlign = TextAlign.Center
-                )
+
             }
-            Text(text = "test")
+            Text(
+                text = displayHabit.habit.value.name,
+                modifier = Modifier
+                    .padding(16.dp),
+                textAlign = TextAlign.Center
+            )
+
             Row {
                 Button(onClick = { onEvent(HabitEvent.EditHabit(displayHabit)) }) {
                     Text(text = "edit")
@@ -106,33 +111,33 @@ fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit) {
         }
     }
 }
-
 @Composable
-fun HabitCheckBox(displayHabit: DisplayHabit, n:Int, onEvent: (HabitEvent) -> Unit){
-        Checkbox(
-            checked = displayHabit.completion[n].value,
-            onCheckedChange = {onEvent(HabitEvent.BoxChecked(displayHabit, n))},
-            modifier = Modifier.padding(5.dp),
-            colors = CheckboxDefaults.colors(Color.Green)
-        )
+fun HabitCheckBox(displayHabit: DisplayHabit, index:Int, onEvent: (HabitEvent) -> Unit){
+    Checkbox(
+        checked = displayHabit.completion[index].value,
+        onCheckedChange = {onEvent(HabitEvent.BoxChecked(displayHabit, index))},
+        modifier = Modifier.padding(5.dp),
+        colors = CheckboxDefaults.colors(Color.Green)
+    )
 }
-
-
 @Composable
 fun EditWindow(onEvent: (HabitEvent) -> Unit, state: HabitState){
     val focusManager = LocalFocusManager.current
     Column {
-        customTextField(
+
+        CustomTextField(
             value = state.editString,
             label = "Name:",
             onchange = { onEvent(HabitEvent.UpDateEditString(it)) },
             manager = focusManager
         )
-        customTextField(
+
+        CustomTextField(
             value = state.editFreq.toString(),
             label = "Frequency:",
             onchange = { onEvent(HabitEvent.UpDateEditFreq(it.toInt())) },
             manager = focusManager)
+
 
         Button(onClick = { onEvent(HabitEvent.ModifyHabit) }) {
             Text(text = "Execute edit")
@@ -141,7 +146,7 @@ fun EditWindow(onEvent: (HabitEvent) -> Unit, state: HabitState){
 }
 
 @Composable
-fun customTextField(value : String, label : String, onchange: (String) -> Unit, manager: FocusManager){
+fun CustomTextField(value : String, label : String, onchange: (String) -> Unit, manager: FocusManager){
     TextField(
         value = value,
         onValueChange = { onchange(it) },
