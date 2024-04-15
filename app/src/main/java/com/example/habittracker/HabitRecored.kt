@@ -9,6 +9,6 @@ import java.time.LocalDate
 data class HabitRecord(
     @PrimaryKey(autoGenerate = true)
     val recordId: Int = 0,
-    val habitId: Int,
+    val habitName: String,
     val date: String,
 )
