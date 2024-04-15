@@ -35,6 +35,7 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 
+// details about compose available at https://developer.android.com/develop/ui/compose/layouts/basics
 @Composable
 fun MainScreen (
     state: HabitState,
@@ -61,6 +62,7 @@ fun MainScreen (
         Text(text = state.habitRecord.size.toString())
         for (habitRecord in state.habitRecord){
             Text(text = habitRecord.habitName)
+            Text(text = habitRecord.date)
 
         }
     }
@@ -70,28 +72,29 @@ fun MainScreen (
 @Composable
 fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit) {
     ElevatedCard(
+
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
         ),
-        modifier = Modifier
-            .size(width = 380.dp, height = 100.dp),
+        modifier = Modifier.size(width = 380.dp, height = 130.dp),
         colors = CardDefaults.cardColors(Color.Green)
 
     ) {
-        Column {
+        Column(horizontalAlignment = Alignment.Start) {
 
-            Row {
+            Row (modifier = Modifier.size(width = 380.dp, height = 30.dp)){
                 for (n in 0..<displayHabit.habit.value.frequency) {
                     HabitCheckBox(displayHabit, n, onEvent)
                 }
-                Text(
-                    text = displayHabit.habit.value.name,
-                    modifier = Modifier
-                        .padding(16.dp),
-                    textAlign = TextAlign.Center
-                )
+
             }
-            Text(text = "test")
+            Text(
+                text = displayHabit.habit.value.name,
+                modifier = Modifier
+                    .padding(16.dp),
+                textAlign = TextAlign.Center
+            )
+
             Row {
                 Button(onClick = { onEvent(HabitEvent.EditHabit(displayHabit)) }) {
                     Text(text = "edit")
@@ -112,7 +115,6 @@ fun HabitCheckBox(displayHabit: DisplayHabit, index:Int, onEvent: (HabitEvent) -
         colors = CheckboxDefaults.colors(Color.Green)
     )
 }
-
 @Composable
 fun EditWindow(onEvent: (HabitEvent) -> Unit, state: HabitState){
     val focusManager = LocalFocusManager.current
@@ -179,5 +181,3 @@ fun PopupBox(popupWidth: Float, popupHeight:Float, showPopup:Boolean, onClickOut
         }
     }
 }
-
-

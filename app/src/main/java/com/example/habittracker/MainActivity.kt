@@ -20,7 +20,7 @@ import com.example.habittracker.ui.theme.HabitTrackerTheme
 
 class MainActivity : ComponentActivity() {
 
-    // Creating data base
+    // Creating database
     private val db by lazy{
         Room.databaseBuilder(
             applicationContext,
@@ -29,17 +29,18 @@ class MainActivity : ComponentActivity() {
         ).build()
     }
 
-    // Create view model
+    // Creating view model
     private val viewModel by viewModels<HabitViewModel>(
         factoryProducer = {
             object : ViewModelProvider.Factory{
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return HabitViewModel(db.dae) as T
+                    return HabitViewModel(db.dao) as T
                 }
             }
         }
     )
 
+    // when app launches runs continuously and handles UI theme and connects Viewmodel to the UI
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
