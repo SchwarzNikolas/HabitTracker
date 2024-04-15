@@ -2,19 +2,14 @@ package com.example.habittracker
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.time.LocalDate
 
-
-// modifies the state of the Habitstate
+// modifies the state of the HabitState
 class HabitViewModel (
     private val dao: HabitDao
 ): ViewModel() {
@@ -25,10 +20,10 @@ class HabitViewModel (
         // On initiation
         viewModelScope.launch {
 
+
             //insertHabit(Habit(name = "test1", frequency = 2))
 
-
-            // sycs data base and state
+            // sync data base and state
             // will clean up later
             dao.fetchHabits().collect { habits ->
                 run {
@@ -45,7 +40,7 @@ class HabitViewModel (
                                             val n = habit.frequency - displayHabit.completion.size
                                             displayHabit.completion.addAll(MutableList(size = n) {
                                                 mutableStateOf(
-                                                    false
+                                                    displayHabit.done.value
                                                 )
                                             })
                                             displayHabit.completion
@@ -78,24 +73,49 @@ class HabitViewModel (
                 }
             }
         }
+        viewModelScope.launch {
+            dao.fetchHabitRecords().collect{habitRecords -> run{
+                val displayHabitRecordList: MutableList<HabitRecord> = mutableListOf()
+                for (habit in habitRecords){
+                    displayHabitRecordList.add(habit)
+                }
+                _state.update { it.copy(
+                    habitRecord = displayHabitRecordList
+                )
+                }
+            }
+            }
+        }
     }
 
     // Handles the events triggered by the UI
     fun onEvent(event: HabitEvent) {
         when (event) {
             is HabitEvent.ModifyHabit -> {
-                viewModelScope.launch {
-                    insertHabit(event.habit.habit.value.copy(frequency = event.frequency))
+                state.update {
+                    it.copy(
+                        showEdit = false
+                    )
                 }
+
+                insertHabit(
+                    state.value.editHabit.copy(
+                        frequency = state.value.editFreq
+                    )
+                )
+
             }
 
-            is HabitEvent.RecordHabitCompletion -> {
-                val record = HabitRecord(
-                    habitId = event.habit.habit.value.habitId,
-                    date = LocalDate.now().toString()
-                )
-                viewModelScope.launch {
-                    dao.insertRecord(record)
+            is HabitEvent.BoxChecked -> {}
+
+            is HabitEvent.EditHabit -> {
+                state.update {
+                    it.copy(
+                        showEdit = true,
+                        editString = event.displayHabit.habit.value.name,
+                        editFreq = event.displayHabit.habit.value.frequency,
+                        editHabit = event.displayHabit.habit.value
+                    )
                 }
             }
 
@@ -104,17 +124,29 @@ class HabitViewModel (
                     event.displayHabit.completion[event.index].value.not()
                 checkHabitCompletion(event.displayHabit)
             }
+
+            is HabitEvent.UpDateEditFreq -> {
+                state.update {
+                    it.copy(
+                        editFreq = event.newFreq
+                    )
+                }
+            }
+
+            is HabitEvent.UpDateEditString -> {}
+
+            is HabitEvent.CancelEdit -> {
+                state.update {
+                    it.copy(
+                        showEdit = false
+                    )
+                }
+            }
+
+            is HabitEvent.DeleteHabit -> {}
         }
     }
 
-    private fun mapHabit(habits: MutableStateFlow<List<Habit>>): SnapshotStateList<DisplayHabit> {
-        val mappedHabits = listOf<DisplayHabit>().toMutableList()
-
-        for (habit in habits.value) {
-            mappedHabits.add(DisplayHabit(mutableStateOf(habit)))
-        }
-        return mappedHabits.toMutableStateList()
-    }
 
 
     private suspend fun fetchHabits(test: MutableStateFlow<List<Habit>>) {
@@ -139,22 +171,22 @@ class HabitViewModel (
             removeRecord(habitRecord)
         }
     }
-
-
-
     private fun removeRecord(record: HabitRecord) {
         viewModelScope.launch {
             dao.deleteRecord(record.habitName, record.date)
         }
     }
+
     private fun insertHabit(habit: Habit) {
         viewModelScope.launch {
             dao.insertHabit(habit)
         }
     }
-    private fun insertRecord(record: HabitRecord){
+
+    private fun insertRecord(record: HabitRecord) {
         viewModelScope.launch {
             dao.insertRecord(record)
         }
     }
 }
+
