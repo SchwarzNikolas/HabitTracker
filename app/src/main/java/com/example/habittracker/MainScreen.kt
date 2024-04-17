@@ -68,7 +68,6 @@ fun MainScreen (
         for (habitRecord in state.habitRecord){
             Text(text = habitRecord.habitName)
             Text(text = habitRecord.date)
-
         }
     }
 }
@@ -151,7 +150,7 @@ fun CustomTextField(value : String, label : String, onchange: (String) -> Unit, 
         value = value,
         onValueChange = { onchange(it) },
         label = { Text(label) },
-        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+        //keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(onDone = { manager.clearFocus() })
     )
 }
