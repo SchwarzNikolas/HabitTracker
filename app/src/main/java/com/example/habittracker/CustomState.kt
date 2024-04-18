@@ -4,17 +4,16 @@ import androidx.compose.runtime.mutableStateListOf
 
 data class CustomState(
 
-    val name: String = "testCustomState",
-    // list of all the habits that will be displayed
-    val cusHabits: MutableList<CustomDisplayHabit> = mutableStateListOf(),
-    // contains what habits were completed on which dates
-    // val habitRecord: MutableList<HabitRecord> = mutableStateListOf(),
-    // string that will be displayed by the edit window
-    val editString: String = "",
-    // int that will be displayed by the edit window
-    val editFreq: Int = 0,
-    // habit that is currently being edited
-    val editCusHabit: CustomHabit = CustomHabit(),
-    // bool of whether or not the edit window is being displayed
-    val showEdit: Boolean = false
+    // Indicate if a user is in Custom screen or not
+    val customMode: Boolean = true,
+    // Name of the Custom screen
+    val name: String = "Custom",
+    // Bool to indicate if it's weekly or daily habit by the switch
+    val isWeekly: Boolean = false,
+    // Habit name that will be displayed by the edit box
+    val habitName: String = "badminton",
+    // Frequency that will be displayed by the edit box
+    val habitFrequency: Int = 2,
+    // A list to store the custom habits, which will not be displayed by the screen in Custom
+    val weeklyHabitList: MutableList<DisplayHabit> = mutableStateListOf(),
 )
