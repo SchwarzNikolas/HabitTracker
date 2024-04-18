@@ -3,7 +3,6 @@ package com.example.habittracker
 import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.update
 import org.junit.After
@@ -21,7 +20,7 @@ import java.io.IOException
  * See [testing documentation](http://d.android.com/tools/testing).
  */
 @RunWith(AndroidJUnit4::class)
-class ExampleInstrumentedTest {
+class HabitViewModelTest {
     private lateinit var dao: HabitDao
     private lateinit var db: HabitDatabase
     private lateinit var viewModel: HabitViewModel
@@ -32,6 +31,7 @@ class ExampleInstrumentedTest {
             context, HabitDatabase::class.java).build()
         dao = db.dao
         viewModel = HabitViewModel(dao)
+
     }
 
     @After
@@ -65,6 +65,15 @@ class ExampleInstrumentedTest {
         assertTrue(viewModel.state.value.showEdit)
         viewModel.onEvent(event)
         assertFalse(viewModel.state.value.showEdit)
+    }
+
+    @Test
+    fun deleteHabit(){
+        val displayHabit = DisplayHabit()
+
+
+        // event = HabitEvent.DeleteHabit(displayHabit)
+
     }
 
 }

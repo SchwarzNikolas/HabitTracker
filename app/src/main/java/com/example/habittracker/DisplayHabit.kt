@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 // associates each habit with additional information needed for UI
 data class DisplayHabit (
     // habit information from the database
-    val habit: MutableState<Habit>,
+    val habit: MutableState<Habit> = mutableStateOf(Habit()),
     // bool of habit completion
     val done: MutableState<Boolean> = mutableStateOf(false),
     // state of the check boxes (list of bools)

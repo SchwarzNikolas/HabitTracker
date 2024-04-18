@@ -1,14 +1,39 @@
 package com.example.habittracker
 
-import org.junit.jupiter.api.Assertions.*
+import android.app.Application
+import android.content.Context
+import androidx.room.Room
+import androidx.test.core.app.ApplicationProvider
+import org.junit.After
+import org.junit.Before
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
+import java.io.IOException
 
 class HabitViewModelTest {
 
-    @org.junit.jupiter.api.Test
-    fun getState() {
+    private  lateinit var dao: HabitDao
+    private lateinit var db:HabitDatabase
+    private var viewModel = HabitViewModel(dao)
+    @Before
+    fun createDB(){
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        db = Room.inMemoryDatabaseBuilder(
+            context, HabitDatabase::class.java).build()
+        dao = db.dao
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun onEvent() {
+        assertEquals("test", viewModel.state.value.name)
     }
+
+    @After
+    @Throws(IOException::class)
+    fun closeDB(){
+        db.close()
+    }
+
+
 }

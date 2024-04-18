@@ -135,7 +135,7 @@ fun EditWindow(onEvent: (HabitEvent) -> Unit, state: HabitState){
         CustomTextField(
             value = state.editFreq.toString(),
             label = "Frequency:",
-            onchange = { onEvent(HabitEvent.UpDateEditFreq(it.toInt())) },
+            onchange = { onEvent(HabitEvent.UpDateEditFreq(it)) },
             manager = focusManager)
 
 
