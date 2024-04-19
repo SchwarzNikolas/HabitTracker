@@ -55,7 +55,7 @@ class CustomViewModel(
                 }
 
                 val newCusHabit = Habit(
-                    //isWeekly = isWeekly,      // We need to insert a field in Habit entity for this
+                    //isDaily = isDaily,      // We need to insert a field in Habit entity for this
                     name = habitName,
                     frequency = habitFrequency,
                 )

@@ -14,27 +14,27 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.habittracker.CustomHabitEvent
 import com.example.habittracker.CustomScreen
-import com.example.habittracker.CustomState
 import com.example.habittracker.CustomViewModel
-import com.example.habittracker.HabitEvent
-import com.example.habittracker.HabitState
 import com.example.habittracker.HabitViewModel
 import com.example.habittracker.MainScreen
 
+// Navigation Bar to switch to different screens
 @Composable
 fun AppNavigation(
+    // get the viewmodels from the MainActivity
     customViewModel: CustomViewModel,
     habitViewModel: HabitViewModel
 ){
-    val navController = rememberNavController()
+    val navController = rememberNavController() // The navcontroller is responsible to handle the page navigation
     Scaffold(
         bottomBar = {
             NavigationBar{
+                // get the state of the navcontroller
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
 
+                // go trough each navigation Destination and set their Icon and Action
                 destinationList.forEach { navigationDestination ->
                     NavigationBarItem(
                         selected = currentDestination?.hierarchy?.any {it.route == navigationDestination.label} == true,
@@ -55,19 +55,22 @@ fun AppNavigation(
     {paddingValues ->
         NavHost(
             navController = navController,
-            startDestination = "Home",
+            startDestination = "Home", // set the default page, when the app is started
             modifier = Modifier
                 .padding(paddingValues)
         ){
             composable(route = "Home"){
+                // link the MainScreen to the first button
                 val habitState by habitViewModel.state.collectAsState()
                 MainScreen(state = habitState, onEvent = habitViewModel::onEvent)
             }
             composable(route = "Add"){
+                // link the CustomScreen to the second button
                 val customState by customViewModel.state.collectAsState()
                 CustomScreen(state = customState, onEvent = customViewModel::onEvent)
             }
             composable(route = "History"){
+                // link the HistoryScreen to the third button
                 val customState by customViewModel.state.collectAsState() // Change to history state
                 CustomScreen(state = customState, onEvent = customViewModel::onEvent) // Change to history screen later
             }
