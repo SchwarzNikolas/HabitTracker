@@ -5,17 +5,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -24,7 +22,7 @@ fun CustomScreen(
     onEvent: (CustomHabitEvent) -> Unit
 ){
     Column {
-        Text(text = "Place options to create habits in this column")
+        Text(text = "Create Habit Here!")
         Row (
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
@@ -35,9 +33,49 @@ fun CustomScreen(
             Text(text = "Daily Habit")
             SwitchHabit(state, onEvent)
         }
+        Row (
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            EditWindow(onEvent, state)
+        }
         
     }
 }
+
+@Composable
+fun EditWindow(onEvent: (CustomHabitEvent) -> Unit, state: CustomState) {
+    val focusManager = LocalFocusManager.current
+    Column {
+
+        CustomTextField(
+            value = state.habitName,
+            label = "Name",
+            onchange = {onEvent(CustomHabitEvent.EditName(it))},
+            manager = focusManager
+        )
+
+        CustomTextField(
+            value = state.habitFrequency,
+            label = "Frequency",
+            onchange = {onEvent(CustomHabitEvent.EditFreq(it))},
+            manager = focusManager
+        )
+
+        Button(onClick = { onEvent(CustomHabitEvent.SaveEdit)}) {
+            Text(text = "Save")
+        }
+
+        Button(onClick = { onEvent(CustomHabitEvent.CancelEdit)}) {
+            Text(text = "Cancel")
+        }
+    }
+}
+
+
 @Composable
 fun SwitchHabit(state: CustomState, onEvent: (CustomHabitEvent) -> Unit) {
     Switch(
