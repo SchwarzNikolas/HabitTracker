@@ -7,8 +7,6 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -29,12 +27,23 @@ class MainActivity : ComponentActivity() {
         ).build()
     }
 
-    // Creating view model
-    private val viewModel by viewModels<HabitViewModel>(
+    // Creating view model for Habits
+    private val habitViewModel by viewModels<HabitViewModel>(
         factoryProducer = {
             object : ViewModelProvider.Factory{
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return HabitViewModel(db.dao) as T
+                }
+            }
+        }
+    )
+
+    // Creating view model for Habit-Creation
+    private val customViewModel by viewModels<CustomViewModel>(
+        factoryProducer = {
+            object : ViewModelProvider.Factory{
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return CustomViewModel(db.dao) as T
                 }
             }
         }
@@ -50,8 +59,10 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
 
-                    val state by viewModel.state.collectAsState()
-                    AppNavigation(state = state, onEvent = viewModel::onEvent)
+                    AppNavigation(
+                        customViewModel = customViewModel,
+                        habitViewModel = habitViewModel
+                    )
                 }
             }
         }

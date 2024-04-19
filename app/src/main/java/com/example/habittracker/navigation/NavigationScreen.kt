@@ -6,6 +6,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -14,22 +15,26 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.habittracker.CustomScreen
-import com.example.habittracker.habit.HabitEvent
-import com.example.habittracker.habit.HabitState
 import com.example.habittracker.habit.MainScreen
+import com.example.habittracker.CustomViewModel
+import com.example.habittracker.habit.HabitViewModel
 
+// Navigation Bar to switch to different screens
 @Composable
 fun AppNavigation(
-    state: HabitState,
-    onEvent: (HabitEvent) -> Unit
+    // get the viewmodels from the MainActivity
+    customViewModel: CustomViewModel,
+    habitViewModel: HabitViewModel
 ){
-    val navController = rememberNavController()
+    val navController = rememberNavController() // The navcontroller is responsible to handle the page navigation
     Scaffold(
         bottomBar = {
             NavigationBar{
+                // get the state of the navcontroller
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
 
+                // go trough each navigation Destination and set their Icon and Action
                 destinationList.forEach { navigationDestination ->
                     NavigationBarItem(
                         selected = currentDestination?.hierarchy?.any {it.route == navigationDestination.label} == true,
@@ -50,18 +55,24 @@ fun AppNavigation(
     {paddingValues ->
         NavHost(
             navController = navController,
-            startDestination = "Home",
+            startDestination = "Home", // set the default page, when the app is started
             modifier = Modifier
                 .padding(paddingValues)
         ){
             composable(route = "Home"){
-                MainScreen(state = state, onEvent = onEvent)
+                // link the MainScreen to the first button
+                val habitState by habitViewModel.state.collectAsState()
+                MainScreen(state = habitState, onEvent = habitViewModel::onEvent)
             }
             composable(route = "Add"){
-                CustomScreen()
+                // link the CustomScreen to the second button
+                val customState by customViewModel.state.collectAsState()
+                CustomScreen(state = customState, onEvent = customViewModel::onEvent)
             }
             composable(route = "History"){
-                CustomScreen() // Change to history screen later
+                // link the HistoryScreen to the third button
+                val customState by customViewModel.state.collectAsState() // Change to history state
+                CustomScreen(state = customState, onEvent = customViewModel::onEvent) // Change to history screen later
             }
         }
     }

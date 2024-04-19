@@ -5,8 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.habittracker.database.HabitDao
 import com.example.habittracker.database.Habit
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -15,16 +13,15 @@ class CustomViewModel(
 ): ViewModel() {
     private val _state = MutableStateFlow(CustomState())
     // Why do we need this?
-    val state = _state.stateIn(
-        viewModelScope, SharingStarted.WhileSubscribed(5000),CustomState())
+    val state = _state
 
     fun onEvent(event: CustomHabitEvent) {
         when (event) {
-            is CustomHabitEvent.switchSwitched -> {
+            is CustomHabitEvent.UpdateDaily -> {
                 _state.update {
                     it.copy(
-                        // here event.isWeekly returns true, see CustomHabitEvent
-                        isWeekly = state.value.isWeekly.not()
+                        // toggle the state of isDaily
+                        isDaily = _state.value.isDaily.not()
                     )
                 }
             }
@@ -51,8 +48,7 @@ class CustomViewModel(
                 }
             }
             is CustomHabitEvent.SaveEdit -> {
-                //
-                val isWeekly = state.value.isWeekly
+                val isDaily = state.value.isDaily
                 val habitName = state.value.habitName
                 val habitFrequency = state.value.habitFrequency
 
@@ -61,13 +57,16 @@ class CustomViewModel(
                 }
 
                 val newCusHabit = Habit(
-                    //isWeekly = isWeekly,      // We need to insert a field in Habit entity for this
+                    //isDaily = isDaily,      // We need to insert a field in Habit entity for this
                     name = habitName,
                     frequency = habitFrequency,
                 )
                 viewModelScope.launch {
                     dao.insertHabit(newCusHabit)
                 }
+
+                // Create an instance to DisplayHabit
+
                 // customMode = false
             }
         }
