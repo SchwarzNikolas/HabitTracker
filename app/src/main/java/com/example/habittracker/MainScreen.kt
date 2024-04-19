@@ -132,7 +132,7 @@ fun EditWindow(onEvent: (HabitEvent) -> Unit, state: HabitState){
         )
 
         CustomTextField(
-            value = state.editFreq.toString(),
+            value = state.editFreq,
             label = "Frequency:",
             onchange = { onEvent(HabitEvent.UpDateEditFreq(it)) },
             manager = focusManager)
@@ -150,7 +150,11 @@ fun CustomTextField(value : String, label : String, onchange: (String) -> Unit, 
         value = value,
         onValueChange = { onchange(it) },
         label = { Text(label) },
-        //keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+        keyboardOptions = KeyboardOptions.Default.copy(
+            autoCorrectEnabled = true,
+            imeAction = ImeAction.Done,
+            showKeyboardOnFocus = null ?: true
+        ),
         keyboardActions = KeyboardActions(onDone = { manager.clearFocus() })
     )
 }
