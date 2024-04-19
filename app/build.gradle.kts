@@ -60,10 +60,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-
-    //implementation(libs.core.ktx)
     implementation(libs.androidx.navigation.compose)
-    //implementation(libs.androidx.room.common)
     testImplementation(libs.junit)
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")

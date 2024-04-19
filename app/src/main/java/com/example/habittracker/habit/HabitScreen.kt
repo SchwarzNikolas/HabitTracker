@@ -1,4 +1,4 @@
-package com.example.habittracker
+package com.example.habittracker.habit
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

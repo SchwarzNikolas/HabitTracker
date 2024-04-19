@@ -5,20 +5,18 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.habittracker.CustomScreen
-import com.example.habittracker.HabitEvent
-import com.example.habittracker.HabitState
-import com.example.habittracker.MainScreen
+import com.example.habittracker.habit.HabitEvent
+import com.example.habittracker.habit.HabitState
+import com.example.habittracker.habit.MainScreen
 
 @Composable
 fun AppNavigation(

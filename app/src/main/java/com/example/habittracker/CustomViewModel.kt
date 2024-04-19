@@ -2,6 +2,8 @@ package com.example.habittracker
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.habittracker.database.HabitDao
+import com.example.habittracker.database.Habit
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn

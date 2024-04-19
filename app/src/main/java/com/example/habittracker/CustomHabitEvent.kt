@@ -1,5 +1,7 @@
 package com.example.habittracker
 
+import com.example.habittracker.habit.DisplayHabit
+
 sealed interface CustomHabitEvent {
     //User actions
 

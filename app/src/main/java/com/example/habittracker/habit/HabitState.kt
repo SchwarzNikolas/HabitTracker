@@ -1,8 +1,9 @@
-package com.example.habittracker
+package com.example.habittracker.habit
 
 
 import androidx.compose.runtime.mutableStateListOf
-
+import com.example.habittracker.database.Habit
+import com.example.habittracker.database.HabitRecord
 
 
 // This contains all the data that the UI displays

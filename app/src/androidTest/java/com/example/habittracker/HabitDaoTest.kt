@@ -5,6 +5,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.habittracker.database.HabitDao
+import com.example.habittracker.database.HabitDatabase
+import com.example.habittracker.database.Habit
+import com.example.habittracker.habit.HabitViewModel
 import kotlinx.coroutines.launch
 import org.junit.After
 import org.junit.Assert.assertTrue

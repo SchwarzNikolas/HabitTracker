@@ -4,6 +4,11 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.habittracker.database.HabitDao
+import com.example.habittracker.database.HabitDatabase
+import com.example.habittracker.habit.DisplayHabit
+import com.example.habittracker.habit.HabitEvent
+import com.example.habittracker.habit.HabitViewModel
 import kotlinx.coroutines.flow.update
 import org.junit.After
 

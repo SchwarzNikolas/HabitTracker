@@ -1,9 +1,12 @@
-package com.example.habittracker
+package com.example.habittracker.habit
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.habittracker.database.Habit
+import com.example.habittracker.database.HabitDao
+import com.example.habittracker.database.HabitRecord
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch

@@ -1,5 +1,4 @@
-package com.example.habittracker
-
+package com.example.habittracker.habit
 
 
 // defines events that can be triggered by the UI
