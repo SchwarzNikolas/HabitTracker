@@ -15,7 +15,7 @@ data class HabitState(
     // string that will be displayed by the edit window
     val editString: String = "",
     // int that will be displayed by the edit window
-    val editFreq: Int = 0,
+    val editFreq: String = "",
     // habit that is currently being edited
     val editHabit: Habit = Habit(),
     // bool of whether or not the edit window is being displayed

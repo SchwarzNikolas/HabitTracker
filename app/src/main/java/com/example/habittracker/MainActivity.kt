@@ -16,6 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
+import com.example.habittracker.navigation.AppNavigation
 import com.example.habittracker.ui.theme.HabitTrackerTheme
 
 class MainActivity : ComponentActivity() {
@@ -51,7 +52,7 @@ class MainActivity : ComponentActivity() {
                 ) {
 
                     val state by viewModel.state.collectAsState()
-                    MainScreen(state = state, onEvent = viewModel::onEvent)
+                    AppNavigation(state = state, onEvent = viewModel::onEvent)
                 }
             }
         }

@@ -17,14 +17,16 @@ class HabitViewModel (
     val state = _state
 
     init {
+
+
         // On initiation
         viewModelScope.launch {
 
 
-            insertHabit(Habit(name = "testMeeeeee", frequency = 2))
-
             // sync data base and state
             // will clean up later
+            dao.insertHabit(Habit(name = "test", frequency = 2))
+
             dao.fetchHabits().collect { habits ->
                 run {
                     val displayHabitList: MutableList<DisplayHabit> = mutableListOf()
@@ -100,7 +102,7 @@ class HabitViewModel (
                 }
                 insertHabit(
                     state.value.editHabit.copy(
-                        frequency = state.value.editFreq,
+                        frequency = state.value.editFreq.toInt(),
                         name = state.value.editString
                     )
                 )
@@ -111,7 +113,7 @@ class HabitViewModel (
                     it.copy(
                         showEdit = true,
                         editString = event.displayHabit.habit.value.name,
-                        editFreq = event.displayHabit.habit.value.frequency,
+                        editFreq = event.displayHabit.habit.value.frequency.toString(),
                         editHabit = event.displayHabit.habit.value
                     )
                 }
@@ -159,7 +161,7 @@ class HabitViewModel (
             }
         }
     }
-    
+
     // logic for habit completion, components are explained individually below
     private fun checkHabitCompletion(displayHabit: DisplayHabit) {
         val habitRecord = HabitRecord(

@@ -10,6 +10,6 @@ import androidx.room.RoomDatabase
     version = 1
 )
 abstract class HabitDatabase:RoomDatabase(){
-    // defines which dao belongs to this database
+    // defines which daos belongs to this database
     abstract val dao:HabitDao
 }
