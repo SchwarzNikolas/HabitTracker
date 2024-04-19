@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -64,13 +65,14 @@ fun EditWindow(onEvent: (CustomHabitEvent) -> Unit, state: CustomState) {
             onchange = {onEvent(CustomHabitEvent.EditFreq(it))},
             manager = focusManager
         )
+        Row (modifier = Modifier.size(width = 380.dp, height = 30.dp)) {
+            Button(onClick = { onEvent(CustomHabitEvent.CancelEdit)}) {
+                Text(text = "Cancel")
+            }
+            Button(onClick = { onEvent(CustomHabitEvent.SaveEdit)}) {
+                Text(text = "Save")
+            }
 
-        Button(onClick = { onEvent(CustomHabitEvent.SaveEdit)}) {
-            Text(text = "Save")
-        }
-
-        Button(onClick = { onEvent(CustomHabitEvent.CancelEdit)}) {
-            Text(text = "Cancel")
         }
     }
 }
