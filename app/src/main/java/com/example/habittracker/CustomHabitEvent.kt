@@ -3,10 +3,8 @@ package com.example.habittracker
 sealed interface CustomHabitEvent {
     //User actions
 
-    //switch to weekly habit
-    data class switchToWeekly(val isWeekly: Boolean = true): CustomHabitEvent
-    //switch to daily habit
-    data class switchToDaily(val isWeekly: Boolean = false): CustomHabitEvent
+    //switch to weekly habit or daily habit
+    data object switchSwitched: CustomHabitEvent
     // Edit Name
     data class EditName(val name: String): CustomHabitEvent
     // Edit frequency

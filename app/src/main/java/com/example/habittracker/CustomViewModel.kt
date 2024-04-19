@@ -13,23 +13,16 @@ class CustomViewModel(
 ): ViewModel() {
     private val _state = MutableStateFlow(CustomState())
     // Why do we need this?
-    val state = _state.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000),CustomState())
+    val state = _state.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000),CustomState())
 
     fun onEvent(event: CustomHabitEvent) {
         when (event) {
-            is CustomHabitEvent.switchToWeekly -> {
+            is CustomHabitEvent.switchSwitched -> {
                 _state.update {
                     it.copy(
                         // here event.isWeekly returns true, see CustomHabitEvent
-                        isWeekly = event.isWeekly
-                    )
-                }
-            }
-            is CustomHabitEvent.switchToDaily -> {
-                _state.update {
-                    it.copy(
-                        // here event.isWeekly returns false, see CustomHabitEvent
-                        isWeekly = event.isWeekly
+                        isWeekly = state.value.isWeekly.not()
                     )
                 }
             }
@@ -56,6 +49,7 @@ class CustomViewModel(
                 }
             }
             is CustomHabitEvent.SaveEdit -> {
+                //
                 val isWeekly = state.value.isWeekly
                 val habitName = state.value.habitName
                 val habitFrequency = state.value.habitFrequency
@@ -65,16 +59,13 @@ class CustomViewModel(
                 }
 
                 val newCusHabit = Habit(
-                    isWeekly = isWeekly,      // We need to insert a field in Habit entity for this
+                    //isWeekly = isWeekly,      // We need to insert a field in Habit entity for this
                     name = habitName,
                     frequency = habitFrequency,
                 )
                 viewModelScope.launch {
                     dao.insertHabit(newCusHabit)
                 }
-
-                // Create an instance to DisplayHabit
-
                 // customMode = false
             }
         }
