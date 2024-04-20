@@ -1,12 +1,10 @@
 package com.example.habittracker.habit
 
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -23,7 +21,6 @@ import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,14 +30,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
-import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
-
-
 
 // details about compose available at https://developer.android.com/develop/ui/compose/layouts/basics
 @Composable
@@ -48,23 +42,18 @@ fun MainScreen (
     state: HabitState,
     onEvent: (HabitEvent) -> Unit
 ){
-
-
     PopupBox(
         popupWidth = 300f,
-        popupHeight = 200f,
+        popupHeight = 300f,
         showPopup = state.showEdit,
         onClickOutside = { onEvent(HabitEvent.CancelEdit)},
         content = { EditWindow(onEvent, state) }
     )
     Column(
-        modifier = Modifier
-            .verticalScroll(rememberScrollState())
-            .fillMaxWidth(),
+        modifier = Modifier.verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
     )
     {
-
             for (habit in state.habits) {
                 ElevatedHabit(habit, onEvent)
                 Text(text = habit.done.value.toString())
@@ -77,14 +66,9 @@ fun MainScreen (
         }
     }
 
-
-
-
-
 @Composable
 fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit) {
     ElevatedCard(
-
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
         ),
@@ -93,12 +77,10 @@ fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit) {
 
     ) {
         Column(horizontalAlignment = Alignment.Start) {
-
             Row (modifier = Modifier.size(width = 380.dp, height = 30.dp)){
                 for (n in 0..<displayHabit.habit.value.frequency) {
                     HabitCheckBox(displayHabit, n, onEvent)
                 }
-
             }
             Text(
                 text = displayHabit.habit.value.name,
@@ -106,7 +88,6 @@ fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit) {
                     .padding(16.dp),
                 textAlign = TextAlign.Center
             )
-
             Row {
                 Button(onClick = { onEvent(HabitEvent.EditHabit(displayHabit)) }) {
                     Text(text = "edit")
@@ -118,6 +99,7 @@ fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit) {
         }
     }
 }
+
 @Composable
 fun HabitCheckBox(displayHabit: DisplayHabit, index:Int, onEvent: (HabitEvent) -> Unit){
     Checkbox(
@@ -125,35 +107,30 @@ fun HabitCheckBox(displayHabit: DisplayHabit, index:Int, onEvent: (HabitEvent) -
         onCheckedChange = {onEvent(HabitEvent.BoxChecked(displayHabit, index))},
         modifier = Modifier.padding(5.dp),
         colors = CheckboxDefaults.colors(Color.Green),
-
     )
 }
+
 @Composable
 fun EditWindow(onEvent: (HabitEvent) -> Unit, state: HabitState){
-    Column (horizontalAlignment = Alignment.CenterHorizontally) {
-        val focusManager = LocalFocusManager.current
+    val focusManager = LocalFocusManager.current
+    Column {
         CustomTextField(
             value = state.editString,
             label = "Name:",
             onchange = { onEvent(HabitEvent.UpDateEditString(it)) },
             manager = focusManager,
-
         )
-
         CustomTextField(
             value = state.editFreq,
             label = "Frequency:",
             onchange = { onEvent(HabitEvent.UpDateEditFreq(it)) },
             manager = focusManager,
             )
-
-
         Button(onClick = { onEvent(HabitEvent.ModifyHabit) }) {
             Text(text = "Execute edit")
         }
     }
 }
-
 
 @Composable
 fun CustomTextField(value: String, label: String, onchange: (String) -> Unit, manager: FocusManager){
@@ -161,19 +138,9 @@ fun CustomTextField(value: String, label: String, onchange: (String) -> Unit, ma
         value = value,
         onValueChange = { onchange(it) },
         label = { Text(label) },
-        colors = TextFieldDefaults.colors(
-            focusedIndicatorColor = Color.Transparent,
-            //cursorColor = Color.Transparent,
-
-        ),
-        keyboardOptions = KeyboardOptions.Default.copy(
-            autoCorrectEnabled = true,
-            imeAction = ImeAction.Done,
-            showKeyboardOnFocus = null ?: true,
-
-        ),
-        keyboardActions = KeyboardActions(onDone = {manager.moveFocus(FocusDirection.Down)}),
-        singleLine = true,
+        keyboardOptions = KeyboardOptions.Default.copy(autoCorrectEnabled = true, imeAction = ImeAction.Done),
+        keyboardActions = KeyboardActions(onDone = { manager.moveFocus(FocusDirection.Down) }),
+        singleLine = true
     )
 }
 
@@ -190,8 +157,7 @@ fun PopupBox(popupWidth: Float, popupHeight:Float, showPopup:Boolean, onClickOut
                 alignment = Alignment.Center,
                 properties = PopupProperties(
                     excludeFromSystemGesture  = true,
-                    focusable = true,
-                    dismissOnClickOutside = true
+                    focusable = true
                 ),
                 onDismissRequest = {onClickOutside()},
             ) {
@@ -199,7 +165,7 @@ fun PopupBox(popupWidth: Float, popupHeight:Float, showPopup:Boolean, onClickOut
                     Modifier
                         .width(popupWidth.dp)
                         .height(popupHeight.dp)
-                        .background(Color.White)
+                        .background(Color.Blue)
                         .clip(RoundedCornerShape(4.dp)),
                     contentAlignment = Alignment.Center
                 ){
