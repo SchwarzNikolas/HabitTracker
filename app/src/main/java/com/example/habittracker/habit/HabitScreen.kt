@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -30,7 +31,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.window.Popup
@@ -62,18 +65,18 @@ fun MainScreen (
     )
     {
 
-
-        for (habit in state.habits) {
-            ElevatedHabit(habit, onEvent)
-            Text(text = habit.done.value.toString())
-        }
-        Text(text = state.habitRecord.size.toString())
-        for (habitRecord in state.habitRecord) {
-            Text(text = habitRecord.habitName)
-            Text(text = habitRecord.date)
+            for (habit in state.habits) {
+                ElevatedHabit(habit, onEvent)
+                Text(text = habit.done.value.toString())
+            }
+            Text(text = state.habitRecord.size.toString())
+            for (habitRecord in state.habitRecord) {
+                Text(text = habitRecord.habitName)
+                Text(text = habitRecord.date)
+            }
         }
     }
-}
+
 
 
 
@@ -121,14 +124,14 @@ fun HabitCheckBox(displayHabit: DisplayHabit, index:Int, onEvent: (HabitEvent) -
         checked = displayHabit.completion[index].value,
         onCheckedChange = {onEvent(HabitEvent.BoxChecked(displayHabit, index))},
         modifier = Modifier.padding(5.dp),
-        colors = CheckboxDefaults.colors(Color.Green)
+        colors = CheckboxDefaults.colors(Color.Green),
+
     )
 }
 @Composable
 fun EditWindow(onEvent: (HabitEvent) -> Unit, state: HabitState){
-    val focusManager = LocalFocusManager.current
     Column (horizontalAlignment = Alignment.CenterHorizontally) {
-
+        val focusManager = LocalFocusManager.current
         CustomTextField(
             value = state.editString,
             label = "Name:",
@@ -169,7 +172,8 @@ fun CustomTextField(value: String, label: String, onchange: (String) -> Unit, ma
             showKeyboardOnFocus = null ?: true,
 
         ),
-        singleLine = true
+        keyboardActions = KeyboardActions(onDone = {manager.moveFocus(FocusDirection.Down)}),
+        singleLine = true,
     )
 }
 
