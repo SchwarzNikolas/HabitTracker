@@ -1,5 +1,6 @@
 package com.example.habittracker.habit
 
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -22,6 +22,7 @@ import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,12 +30,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusManager
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
+
+
 
 // details about compose available at https://developer.android.com/develop/ui/compose/layouts/basics
 @Composable
@@ -42,14 +43,15 @@ fun MainScreen (
     state: HabitState,
     onEvent: (HabitEvent) -> Unit
 ){
+
+
     PopupBox(
         popupWidth = 300f,
-        popupHeight = 300f,
+        popupHeight = 200f,
         showPopup = state.showEdit,
         onClickOutside = { onEvent(HabitEvent.CancelEdit)},
         content = { EditWindow(onEvent, state) }
     )
-
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
@@ -57,22 +59,21 @@ fun MainScreen (
         horizontalAlignment = Alignment.CenterHorizontally,
     )
     {
-        for (habit in state.habits){
+
+
+        for (habit in state.habits) {
             ElevatedHabit(habit, onEvent)
-//
-//            for (n in 0..<habit.habit.value.frequency){
-//                Text(text = habit.completion[n].value.toString())
-//                //CheckBoxDemo(habit.completion[n], onEvent)
-//            }
             Text(text = habit.done.value.toString())
         }
         Text(text = state.habitRecord.size.toString())
-        for (habitRecord in state.habitRecord){
+        for (habitRecord in state.habitRecord) {
             Text(text = habitRecord.habitName)
             Text(text = habitRecord.date)
         }
     }
 }
+
+
 
 
 @Composable
@@ -123,21 +124,20 @@ fun HabitCheckBox(displayHabit: DisplayHabit, index:Int, onEvent: (HabitEvent) -
 }
 @Composable
 fun EditWindow(onEvent: (HabitEvent) -> Unit, state: HabitState){
-    val focusManager = LocalFocusManager.current
-    Column {
+    Column (horizontalAlignment = Alignment.CenterHorizontally) {
 
         CustomTextField(
             value = state.editString,
             label = "Name:",
             onchange = { onEvent(HabitEvent.UpDateEditString(it)) },
-            manager = focusManager
+
         )
 
         CustomTextField(
             value = state.editFreq,
             label = "Frequency:",
             onchange = { onEvent(HabitEvent.UpDateEditFreq(it)) },
-            manager = focusManager)
+            )
 
 
         Button(onClick = { onEvent(HabitEvent.ModifyHabit) }) {
@@ -146,18 +146,24 @@ fun EditWindow(onEvent: (HabitEvent) -> Unit, state: HabitState){
     }
 }
 
+
 @Composable
-fun CustomTextField(value : String, label : String, onchange: (String) -> Unit, manager: FocusManager){
+fun CustomTextField(value : String, label : String, onchange: (String) -> Unit){
     TextField(
         value = value,
         onValueChange = { onchange(it) },
         label = { Text(label) },
+        colors = TextFieldDefaults.colors(
+            focusedIndicatorColor = Color.Transparent,
+            //cursorColor = Color.Transparent,
+
+        ),
         keyboardOptions = KeyboardOptions.Default.copy(
             autoCorrectEnabled = true,
             imeAction = ImeAction.Done,
             showKeyboardOnFocus = null ?: true
         ),
-        keyboardActions = KeyboardActions(onDone = { manager.clearFocus() })
+        singleLine = true
     )
 }
 
@@ -174,7 +180,8 @@ fun PopupBox(popupWidth: Float, popupHeight:Float, showPopup:Boolean, onClickOut
                 alignment = Alignment.Center,
                 properties = PopupProperties(
                     excludeFromSystemGesture  = true,
-                    focusable = true
+                    focusable = true,
+                    dismissOnClickOutside = true
                 ),
                 onDismissRequest = {onClickOutside()},
             ) {
@@ -182,7 +189,7 @@ fun PopupBox(popupWidth: Float, popupHeight:Float, showPopup:Boolean, onClickOut
                     Modifier
                         .width(popupWidth.dp)
                         .height(popupHeight.dp)
-                        .background(Color.Blue)
+                        .background(Color.White)
                         .clip(RoundedCornerShape(4.dp)),
                     contentAlignment = Alignment.Center
                 ){
