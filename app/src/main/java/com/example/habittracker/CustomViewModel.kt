@@ -52,22 +52,24 @@ class CustomViewModel(
                 val habitName = state.value.habitName
                 val habitFrequency = state.value.habitFrequency
 
-                if (habitName.isBlank() || habitFrequency == 0) {
+                if (habitName.isBlank() || habitFrequency.isBlank()) {
                     return
                 }
 
                 val newCusHabit = Habit(
                     //isDaily = isDaily,      // We need to insert a field in Habit entity for this
                     name = habitName,
-                    frequency = habitFrequency,
+                    frequency = habitFrequency.toInt(),
                 )
                 viewModelScope.launch {
                     dao.insertHabit(newCusHabit)
                 }
 
-                // Create an instance to DisplayHabit
-
-                // customMode = false
+                _state.update {
+                    it.copy(
+                        customMode = false
+                    )
+                }
             }
         }
     }

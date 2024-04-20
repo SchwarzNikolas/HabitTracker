@@ -10,10 +10,10 @@ sealed interface CustomHabitEvent {
     // Edit Name
     data class EditName(val name: String): CustomHabitEvent
     // Edit frequency
-    data class EditFreq(val frequency: Int): CustomHabitEvent
+    data class EditFreq(val frequency: String): CustomHabitEvent
     // CancelEdit
     data object CancelEdit: CustomHabitEvent
     // SaveEdit
-    data class SaveEdit(val displayHabit: DisplayHabit): CustomHabitEvent
+    data object SaveEdit: CustomHabitEvent
 
 }

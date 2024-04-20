@@ -11,5 +11,5 @@ data class CustomState(
     // Habit name that will be displayed by the edit box
     val habitName: String = "badminton",
     // Frequency that will be displayed by the edit box
-    val habitFrequency: Int = 2,
+    val habitFrequency: String = "2",
 )

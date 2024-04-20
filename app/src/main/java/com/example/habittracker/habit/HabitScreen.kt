@@ -30,6 +30,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
@@ -124,12 +126,14 @@ fun HabitCheckBox(displayHabit: DisplayHabit, index:Int, onEvent: (HabitEvent) -
 }
 @Composable
 fun EditWindow(onEvent: (HabitEvent) -> Unit, state: HabitState){
+    val focusManager = LocalFocusManager.current
     Column (horizontalAlignment = Alignment.CenterHorizontally) {
 
         CustomTextField(
             value = state.editString,
             label = "Name:",
             onchange = { onEvent(HabitEvent.UpDateEditString(it)) },
+            manager = focusManager,
 
         )
 
@@ -137,6 +141,7 @@ fun EditWindow(onEvent: (HabitEvent) -> Unit, state: HabitState){
             value = state.editFreq,
             label = "Frequency:",
             onchange = { onEvent(HabitEvent.UpDateEditFreq(it)) },
+            manager = focusManager,
             )
 
 
@@ -148,7 +153,7 @@ fun EditWindow(onEvent: (HabitEvent) -> Unit, state: HabitState){
 
 
 @Composable
-fun CustomTextField(value : String, label : String, onchange: (String) -> Unit){
+fun CustomTextField(value: String, label: String, onchange: (String) -> Unit, manager: FocusManager){
     TextField(
         value = value,
         onValueChange = { onchange(it) },
@@ -161,7 +166,8 @@ fun CustomTextField(value : String, label : String, onchange: (String) -> Unit){
         keyboardOptions = KeyboardOptions.Default.copy(
             autoCorrectEnabled = true,
             imeAction = ImeAction.Done,
-            showKeyboardOnFocus = null ?: true
+            showKeyboardOnFocus = null ?: true,
+
         ),
         singleLine = true
     )
