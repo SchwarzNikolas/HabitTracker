@@ -41,16 +41,16 @@ class MainActivity : ComponentActivity() {
         }
     )
 
-    // Creating view model for Habit-Creation
-//    private val customViewModel by viewModels<CustomViewModel>(
-//        factoryProducer = {
-//            object : ViewModelProvider.Factory{
-//                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-//                    return CustomViewModel(db.dao) as T
-//                }
-//            }
-//        }
-//    )
+//     Creating view model for Habit-Creation
+    private val customViewModel by viewModels<CustomViewModel>(
+        factoryProducer = {
+            object : ViewModelProvider.Factory{
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return CustomViewModel(db.dao) as T
+                }
+            }
+        }
+    )
 
     // when app launches runs continuously and handles UI theme and connects Viewmodel to the UI
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,12 +61,12 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val habitState by habitViewModel.state.collectAsState()
-                    MainScreen(state = habitState, onEvent = habitViewModel::onEvent)
-//                    AppNavigation(
-//                        customViewModel = customViewModel,
-//                        habitViewModel = habitViewModel
-//                    )
+//                    val habitState by habitViewModel.state.collectAsState()
+//                    MainScreen(state = habitState, onEvent = habitViewModel::onEvent)
+                    AppNavigation(
+                        customViewModel = customViewModel,
+                        habitViewModel = habitViewModel
+                    )
                 }
             }
         }

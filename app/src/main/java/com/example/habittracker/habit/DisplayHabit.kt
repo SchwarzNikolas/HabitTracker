@@ -11,8 +11,8 @@ data class DisplayHabit (
     // bool of habit completion
     val done: MutableState<Boolean> = mutableStateOf(false),
     // state of the check boxes (list of bools)
-    val completion: MutableList<MutableState<Boolean>> = MutableList(size = habit.value.frequency){ mutableStateOf(false) }
-
+    val completion: MutableList<MutableState<Boolean>> = MutableList(size = habit.value.frequency){ mutableStateOf(false) },
+    val isMenuVisible: MutableState<Boolean> = mutableStateOf(false)
 ) {
     // check if this display habit contains a habit
     // if display habit is a box, this checks if a specific habit is inside this box

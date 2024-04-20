@@ -162,6 +162,9 @@ class HabitViewModel (
                     dao.deleteHabit(event.displayHabit.habit.value)
                 }
             }
+            is HabitEvent.ContextMenuVisibility -> {
+                event.displayHabit.isMenuVisible.value = event.displayHabit.isMenuVisible.value.not()
+            }
         }
     }
 
