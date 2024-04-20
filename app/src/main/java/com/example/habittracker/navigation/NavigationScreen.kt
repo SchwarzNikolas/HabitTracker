@@ -9,6 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -27,7 +29,11 @@ fun AppNavigation(
     habitViewModel: HabitViewModel
 ){
     val navController = rememberNavController() // The navcontroller is responsible to handle the page navigation
+    val habitState by habitViewModel.state.collectAsState()
+
     Scaffold(
+        modifier = Modifier.blur( if(habitState.showEdit) {2.dp}
+            else{0.dp}),
         bottomBar = {
             NavigationBar{
                 // get the state of the navcontroller
@@ -39,7 +45,11 @@ fun AppNavigation(
                     NavigationBarItem(
                         selected = currentDestination?.hierarchy?.any {it.route == navigationDestination.label} == true,
                         onClick = {
-                            navController.navigate(navigationDestination.label)
+                            navController.navigate(navigationDestination.label){
+                                popUpTo(navigationDestination.label){
+                                    inclusive = true
+                                }
+                            }
                         },
                         icon = {
                                Icon(
@@ -61,7 +71,6 @@ fun AppNavigation(
         ){
             composable(route = "Home"){
                 // link the MainScreen to the first button
-                val habitState by habitViewModel.state.collectAsState()
                 MainScreen(state = habitState, onEvent = habitViewModel::onEvent)
             }
             composable(route = "Add"){

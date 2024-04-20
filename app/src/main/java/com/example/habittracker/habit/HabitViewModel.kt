@@ -20,15 +20,13 @@ class HabitViewModel (
     val state = _state
 
     init {
-
-
         // On initiation
         viewModelScope.launch {
 
 
             // sync data base and state
             // will clean up later
-            dao.insertHabit(Habit(name = "test", frequency = 2))
+            //dao.insertHabit(Habit(name = "test", frequency = 2))
 
             dao.fetchHabits().collect { habits ->
                 run {

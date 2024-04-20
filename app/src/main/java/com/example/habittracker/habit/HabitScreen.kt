@@ -1,5 +1,6 @@
 package com.example.habittracker.habit
 
+import android.graphics.BlurMaskFilter.Blur
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -35,14 +36,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.graphics.BlurEffect
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
@@ -66,7 +70,8 @@ fun MainScreen (
         content = { EditWindow(onEvent, state) }
     )
     Column(
-        modifier = Modifier.verticalScroll(rememberScrollState())
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
             .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     )
@@ -96,7 +101,7 @@ fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit) {
         modifier = Modifier
             .size(width = 380.dp, height = 130.dp)
             .padding(vertical = 5.dp),
-        colors = CardDefaults.cardColors(Color.Green)
+        colors = CardDefaults.cardColors(Color.Gray)
 
     ) {
         Box(
@@ -219,7 +224,7 @@ fun PopupBox(popupWidth: Float, popupHeight:Float, showPopup:Boolean, onClickOut
                     Modifier
                         .width(popupWidth.dp)
                         .height(popupHeight.dp)
-                        .background(Color.Blue)
+                        .background(Color.Gray)
                         .clip(RoundedCornerShape(4.dp)),
                     contentAlignment = Alignment.Center
                 ) {
