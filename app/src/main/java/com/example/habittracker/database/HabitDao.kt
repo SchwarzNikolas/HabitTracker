@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 
@@ -35,4 +36,15 @@ interface HabitDao{
     @Delete
     suspend fun deleteHabit(habit: Habit)
 
+    @Query("SELECT * FROM Habit JOIN HabitCompletion ON Habit.habitId = HabitCompletion.habitID")
+     fun getHabit(): Flow<List<HabitJoin>>
+
+     @Insert
+     suspend fun insertCompletion(habitCompletion: HabitCompletion)
+
+     @Update
+     suspend fun updateCompletion(completion: HabitCompletion)
+
+     @Query("UPDATE HabitCompletion SET completion = 0")
+     suspend fun resetCompletion()
 }

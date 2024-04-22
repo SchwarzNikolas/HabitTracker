@@ -4,13 +4,17 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.habittracker.database.Habit
+import com.example.habittracker.database.HabitCompletion
 import com.example.habittracker.database.HabitDao
+import com.example.habittracker.database.HabitJoin
 import com.example.habittracker.database.HabitRecord
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import kotlin.concurrent.thread
 
 // modifies the state of the HabitState
 class HabitViewModel (
@@ -20,13 +24,15 @@ class HabitViewModel (
     val state = _state
 
     init {
+
         // On initiation
         viewModelScope.launch {
 
 
             // sync data base and state
             // will clean up later
-            //dao.insertHabit(Habit(name = "test", frequency = 2))
+            //dao.insertHabit(Habit(name = "test2", frequency = 3))
+            //dao.insertCompletion(HabitCompletion())
 
             dao.fetchHabits().collect { habits ->
                 run {
@@ -89,6 +95,19 @@ class HabitViewModel (
             }
             }
         }
+        viewModelScope.launch {
+            dao.getHabit().collect{habitJoin -> run{
+                val displayHabitRecordList: MutableList<HabitJoin> = mutableListOf()
+                for (habit in habitJoin){
+                    displayHabitRecordList.add(habit)
+                }
+                _state.update { it.copy(
+                    habitJoin = displayHabitRecordList
+                )
+                }
+            }
+            }
+        }
     }
 
     // Handles the events triggered by the UI
@@ -113,9 +132,9 @@ class HabitViewModel (
                 state.update {
                     it.copy(
                         showEdit = true,
-                        editString = event.displayHabit.habit.value.name,
-                        editFreq = event.displayHabit.habit.value.frequency.toString(),
-                        editHabit = event.displayHabit.habit.value
+                        editString = event.displayHabit.value.name,
+                        editFreq = event.displayHabit.value.frequency.toString(),
+                        editHabit = event.displayHabit.value
                     )
                 }
             }
@@ -163,6 +182,24 @@ class HabitViewModel (
             is HabitEvent.ContextMenuVisibility -> {
                 event.displayHabit.isMenuVisible.value = event.displayHabit.isMenuVisible.value.not()
             }
+
+            is HabitEvent.incCompletion -> {
+                viewModelScope.launch {
+                dao.updateCompletion(event.completion.copy(completion = event.completion.completion.inc()))
+                }
+            }
+
+            is HabitEvent.decComletion -> {
+                viewModelScope.launch {
+                    dao.updateCompletion(event.completion.copy(completion = event.completion.completion.dec()))
+                }
+            }
+
+            HabitEvent.resetCompletion -> {
+                viewModelScope.launch {
+                    resetCompletion()
+                }
+            }
         }
     }
 
@@ -208,6 +245,10 @@ class HabitViewModel (
         viewModelScope.launch {
             dao.insertRecord(record)
         }
+    }
+
+    private suspend fun resetCompletion(){
+        dao.resetCompletion()
     }
 }
 

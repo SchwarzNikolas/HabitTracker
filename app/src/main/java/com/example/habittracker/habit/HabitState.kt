@@ -3,6 +3,7 @@ package com.example.habittracker.habit
 
 import androidx.compose.runtime.mutableStateListOf
 import com.example.habittracker.database.Habit
+import com.example.habittracker.database.HabitJoin
 import com.example.habittracker.database.HabitRecord
 
 
@@ -20,5 +21,6 @@ data class HabitState(
     // habit that is currently being edited
     val editHabit: Habit = Habit(),
     // bool of whether or not the edit window is being displayed
-    val showEdit: Boolean = false
+    val showEdit: Boolean = false,
+    val habitJoin: MutableList<HabitJoin> = mutableListOf()
 )

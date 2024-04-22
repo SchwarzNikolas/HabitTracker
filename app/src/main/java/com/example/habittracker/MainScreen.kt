@@ -92,7 +92,7 @@ fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit) {
                 textAlign = TextAlign.Center
             )
             Row {
-                Button(onClick = { onEvent(HabitEvent.EditHabit(displayHabit)) }) {
+                Button(onClick = { onEvent(HabitEvent.EditHabit(displayHabit.habit)) }) {
                     Text(text = "edit")
                 }
                 Button(onClick = { onEvent(HabitEvent.DeleteHabit(displayHabit)) }) {

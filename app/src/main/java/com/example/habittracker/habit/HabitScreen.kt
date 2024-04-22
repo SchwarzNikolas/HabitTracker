@@ -1,6 +1,5 @@
 package com.example.habittracker.habit
 
-import android.graphics.BlurMaskFilter.Blur
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -13,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -31,25 +31,24 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
-import androidx.compose.ui.graphics.BlurEffect
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
+import com.example.habittracker.database.HabitJoin
 
 // details about compose available at https://developer.android.com/develop/ui/compose/layouts/basics
 
@@ -76,10 +75,20 @@ fun MainScreen (
         horizontalAlignment = Alignment.CenterHorizontally,
     )
     {
-            for (habit in state.habits) {
-                ElevatedHabit(habit, onEvent)
-                //Text(text = habit.done.value.toString())
+
+            for (h in state.habitJoin){
+                ElevatedHabit(displayHabit = DisplayHabit(), onEvent = onEvent, habitJoin = h)
             }
+            Button(onClick = { onEvent(HabitEvent.resetCompletion)}) {
+
+            }
+            Text(text = state.habitJoin.size.toString())
+
+
+//            for (habit in state.habits) {
+//                ElevatedHabit(habit, onEvent)
+//                //Text(text = habit.done.value.toString())
+//            }
             Text(text = state.habitRecord.size.toString())
             for (habitRecord in state.habitRecord) {
                 Text(text = habitRecord.habitName)
@@ -89,11 +98,12 @@ fun MainScreen (
     }
 
 @Composable
-fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit) {
+fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit, habitJoin: HabitJoin) {
     val dropdownItems :List<Item> = listOf(
-        Item(name ="edit", onClick =  {onEvent(HabitEvent.EditHabit(displayHabit))}),
+        Item(name ="edit", onClick =  {onEvent(HabitEvent.EditHabit(mutableStateOf(habitJoin.habit)))}),
+        Item(name = "undo", onClick = {onEvent(HabitEvent.decComletion(habitJoin.completion))}),
         Item(name = "delete", onClick = {onEvent(HabitEvent.DeleteHabit(displayHabit))})
-    )
+       )
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
@@ -121,10 +131,17 @@ fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit) {
                         .padding(16.dp),
                     textAlign = TextAlign.Center
                 )
+                //Text(text = habitJoin.completion.completion.toString())
+                //Text(text = habitJoin.habit.frequency.toString())
                 Row(modifier = Modifier.size(width = 380.dp, height = 30.dp)) {
-                    for (n in 0..<displayHabit.habit.value.frequency) {
-                        HabitCheckBox(displayHabit, n, onEvent)
+                    Box(modifier = Modifier.padding(start = 30.dp)) {
+                        CircularProgressBar(angle = (habitJoin.completion.completion.toFloat() / habitJoin.habit.frequency) * 360)
+                    Button(onClick = { onEvent(HabitEvent.incCompletion(habitJoin.completion))}, modifier = Modifier.size(30.dp), shape = CircleShape) {
+                        }
                     }
+                    //                    for (n in 0..<displayHabit.habit.value.frequency) {
+//                        HabitCheckBox(displayHabit, n, onEvent)
+//                    }
                     IconButton(onClick = { onEvent(HabitEvent.ContextMenuVisibility(displayHabit))}){
                         Icon(imageVector = Icons.Default.MoreVert, contentDescription = "ContextMenu")
                     }
