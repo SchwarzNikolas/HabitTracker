@@ -28,6 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
@@ -48,27 +49,19 @@ fun MainScreen (
         onClickOutside = { onEvent(HabitEvent.CancelEdit)},
         content = { EditWindow(onEvent, state) }
     )
-
     Column(
         modifier = Modifier.verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
-
     )
     {
         for (habit in state.habits){
             ElevatedHabit(habit, onEvent)
-//
-//            for (n in 0..<habit.habit.value.frequency){
-//                Text(text = habit.completion[n].value.toString())
-//                //CheckBoxDemo(habit.completion[n], onEvent)
-//            }
             Text(text = habit.done.value.toString())
         }
         Text(text = state.habitRecord.size.toString())
         for (habitRecord in state.habitRecord){
             Text(text = habitRecord.habitName)
             Text(text = habitRecord.date)
-
         }
     }
 }
@@ -77,21 +70,17 @@ fun MainScreen (
 @Composable
 fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit) {
     ElevatedCard(
-
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
         ),
         modifier = Modifier.size(width = 380.dp, height = 130.dp),
         colors = CardDefaults.cardColors(Color.Green)
-
     ) {
         Column(horizontalAlignment = Alignment.Start) {
-
             Row (modifier = Modifier.size(width = 380.dp, height = 30.dp)){
                 for (n in 0..<displayHabit.habit.value.frequency) {
                     HabitCheckBox(displayHabit, n, onEvent)
                 }
-
             }
             Text(
                 text = displayHabit.habit.value.name,
@@ -99,7 +88,6 @@ fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit) {
                     .padding(16.dp),
                 textAlign = TextAlign.Center
             )
-
             Row {
                 Button(onClick = { onEvent(HabitEvent.EditHabit(displayHabit)) }) {
                     Text(text = "edit")
@@ -111,6 +99,7 @@ fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit) {
         }
     }
 }
+
 @Composable
 fun HabitCheckBox(displayHabit: DisplayHabit, index:Int, onEvent: (HabitEvent) -> Unit){
     Checkbox(
@@ -120,25 +109,23 @@ fun HabitCheckBox(displayHabit: DisplayHabit, index:Int, onEvent: (HabitEvent) -
         colors = CheckboxDefaults.colors(Color.Green)
     )
 }
+
 @Composable
 fun EditWindow(onEvent: (HabitEvent) -> Unit, state: HabitState){
     val focusManager = LocalFocusManager.current
     Column {
-
         CustomTextField(
             value = state.editString,
             label = "Name:",
             onchange = { onEvent(HabitEvent.UpDateEditString(it)) },
             manager = focusManager
         )
-
         CustomTextField(
             value = state.editFreq.toString(),
             label = "Frequency:",
             onchange = { onEvent(HabitEvent.UpDateEditFreq(it.toInt())) },
-            manager = focusManager)
-
-
+            manager = focusManager
+        )
         Button(onClick = { onEvent(HabitEvent.ModifyHabit) }) {
             Text(text = "Execute edit")
         }
@@ -151,8 +138,9 @@ fun CustomTextField(value : String, label : String, onchange: (String) -> Unit, 
         value = value,
         onValueChange = { onchange(it) },
         label = { Text(label) },
-        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-        keyboardActions = KeyboardActions(onDone = { manager.clearFocus() })
+        keyboardOptions = KeyboardOptions.Default.copy(autoCorrect = true,imeAction = ImeAction.Done),
+        keyboardActions = KeyboardActions(onDone = { manager.moveFocus(FocusDirection.Down) }),
+        singleLine = true
     )
 }
 
