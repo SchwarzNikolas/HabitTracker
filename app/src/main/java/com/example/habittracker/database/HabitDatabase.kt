@@ -1,4 +1,4 @@
-package com.example.habittracker
+package com.example.habittracker.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
@@ -10,6 +10,6 @@ import androidx.room.RoomDatabase
     version = 1
 )
 abstract class HabitDatabase:RoomDatabase(){
-    // defines which dao belongs to this database
-    abstract val dao:HabitDao
+    // defines which daos belongs to this database
+    abstract val dao: HabitDao
 }

@@ -1,8 +1,9 @@
-package com.example.habittracker
+package com.example.habittracker.habit
 
 
 import androidx.compose.runtime.mutableStateListOf
-
+import com.example.habittracker.database.Habit
+import com.example.habittracker.database.HabitRecord
 
 
 // This contains all the data that the UI displays
@@ -15,7 +16,7 @@ data class HabitState(
     // string that will be displayed by the edit window
     val editString: String = "",
     // int that will be displayed by the edit window
-    val editFreq: Int = 0,
+    val editFreq: String = "",
     // habit that is currently being edited
     val editHabit: Habit = Habit(),
     // bool of whether or not the edit window is being displayed

@@ -1,8 +1,7 @@
-package com.example.habittracker
+package com.example.habittracker.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.time.LocalDate
 
 // An entity represents a table.
 // this entity represents a completed habit for a specific date

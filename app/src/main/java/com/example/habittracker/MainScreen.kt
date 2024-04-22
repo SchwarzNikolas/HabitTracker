@@ -35,6 +35,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
+import com.example.habittracker.habit.DisplayHabit
+import com.example.habittracker.habit.HabitEvent
+import com.example.habittracker.habit.HabitState
 
 // details about compose available at https://developer.android.com/develop/ui/compose/layouts/basics
 @Composable
@@ -123,7 +126,7 @@ fun EditWindow(onEvent: (HabitEvent) -> Unit, state: HabitState){
         CustomTextField(
             value = state.editFreq.toString(),
             label = "Frequency:",
-            onchange = { onEvent(HabitEvent.UpDateEditFreq(it.toInt())) },
+            onchange = { onEvent(HabitEvent.UpDateEditFreq(it)) },
             manager = focusManager
         )
         Button(onClick = { onEvent(HabitEvent.ModifyHabit) }) {
