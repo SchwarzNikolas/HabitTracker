@@ -53,4 +53,7 @@ interface HabitDao{
 
      @Query("UPDATE HabitCompletion SET completion = 0")
      suspend fun resetCompletion()
+
+     @Query("SELECT * FROM Habit JOIN HabitCompletion ON Habit.habitId = HabitCompletion.habitID WHERE Habit.occurrence LIKE '_1_____'")
+     fun fetchHabitByDay(): Flow<List<HabitJoin>>
 }

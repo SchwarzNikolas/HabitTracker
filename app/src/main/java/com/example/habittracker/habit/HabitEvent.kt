@@ -11,7 +11,7 @@ sealed interface HabitEvent {
 
     data class IncCompletion(val habitJoin: HabitJoin): HabitEvent
     data class DecCompletion(val habitJoin: HabitJoin): HabitEvent
-    data class EditHabit(val habitJoin: HabitJoin): HabitEvent
+    data class EditHabit(val displayHabit: DisplayHabit): HabitEvent
     data class UpDateEditString(val newString : String): HabitEvent
     data class UpDateEditFreq(val newFreq : Int): HabitEvent
     data object ModifyHabit: HabitEvent

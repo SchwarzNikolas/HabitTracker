@@ -11,5 +11,5 @@ data class Habit (
     val habitId: Int = 0,
     val name: String = "test123",
     val frequency: Int = 1,
-    //val occurrence: String = "1111111"
+    val occurrence: String = "1111111"
 )

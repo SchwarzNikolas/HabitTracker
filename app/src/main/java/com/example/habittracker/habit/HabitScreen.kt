@@ -85,8 +85,8 @@ fun MainScreen (
     )
     {
             Text(text = state.date.toString())
-            for (h in state.habitJoin){
-                ElevatedHabit(displayHabit = DisplayHabit(), onEvent = onEvent, habitJoin = h, state)
+            for (h in state.displayHabits){
+                ElevatedHabit(displayHabit = h, onEvent = onEvent, habitJoin = h.habitJoin, state)
             }
             Button(onClick = { onEvent(HabitEvent.resetCompletion)}) {
                     Text(text = "test")
@@ -115,7 +115,7 @@ fun MainScreen (
 @Composable
 fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit, habitJoin: HabitJoin, state: HabitState) {
     val dropdownItems :List<Item> = listOf(
-        Item(name ="Edit", onClick =  {onEvent(HabitEvent.EditHabit(habitJoin))}, Icons.Default.Edit),
+        Item(name ="Edit", onClick =  {onEvent(HabitEvent.EditHabit(displayHabit))}, Icons.Default.Edit),
         Item(name = "Undo", onClick = {onEvent(HabitEvent.DecCompletion(habitJoin))}, Icons.Default.ArrowBack),
         Item(name = "Delete", onClick = {onEvent(HabitEvent.DeleteHabit(habitJoin))}, Icons.Default.Delete)
        )
@@ -141,7 +141,7 @@ fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit, hab
         ) {
             val focusManager = LocalFocusManager.current
             Column(horizontalAlignment = Alignment.Start) {
-                if (state.showEdit){
+                if (displayHabit.beingEdited.value){
                     CustomTextField(
                         value = state.editString,
                         label = "",
@@ -175,10 +175,9 @@ fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit, hab
                             Icon(imageVector =  Icons.Rounded.Check, contentDescription = null, modifier = Modifier.size(150.dp))
 
                         }else{
-
                                 Text(text = habitJoin.completion.completion.toString(), modifier = Modifier.padding(end = 20.dp) )
                                 Text(text = "/" ,modifier = Modifier.padding(start = 0.dp))
-                                if (state.showEdit){
+                                if (displayHabit.beingEdited.value){
                                     NumberPicker(value = state.editFreq, onValueChange = { onEvent(HabitEvent.UpDateEditFreq(it)) }, range = 1..10)
 
                                 }
@@ -201,7 +200,7 @@ fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit, hab
 //                        HabitCheckBox(displayHabit, n, onEvent)
 //                    }
 
-                    if (state.showEdit){
+                    if (displayHabit.beingEdited.value){
                         Button(onClick = { onEvent(HabitEvent.ModifyHabit)}) {
                             Text(text = "Edit")
                         }

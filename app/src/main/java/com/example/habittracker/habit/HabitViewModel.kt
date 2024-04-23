@@ -11,6 +11,7 @@ import com.example.habittracker.database.HabitRecord
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.lang.StringBuilder
 import java.time.LocalDate
 
 // modifies the state of the HabitState
@@ -23,10 +24,18 @@ class HabitViewModel (
     val state = _state
 
     init {
+
+          Log.d ("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", LocalDate.now().dayOfWeek.value.toString())
+
+
         viewModelScope.launch {
             // sync data base and state
             // will clean up later
-            dao.insertHabit(Habit(name = "test2", frequency = 3))
+            dao.insertHabit(Habit(name = "test1", frequency = 1))
+            dao.insertCompletion(HabitCompletion())
+            dao.insertHabit(Habit(name = "test2", frequency = 2, occurrence = "1011111"))
+            dao.insertCompletion(HabitCompletion())
+            dao.insertHabit(Habit(name = "test3", frequency = 3, occurrence = "0100000"))
             dao.insertCompletion(HabitCompletion())
         }
 
@@ -108,8 +117,8 @@ class HabitViewModel (
         viewModelScope.launch {
             dao.fetchHabitRecords().collect{habitRecords -> run{
                 val displayHabitRecordList: MutableList<HabitRecord> = mutableListOf()
-                for (habit in habitRecords){
-                    displayHabitRecordList.add(habit)
+                for (record in habitRecords){
+                    displayHabitRecordList.add(record)
                 }
                 _state.update { it.copy(
                     habitRecord = displayHabitRecordList
@@ -118,19 +127,36 @@ class HabitViewModel (
             }
             }
         }
+        val test: String = "_______"
+        val sb = StringBuilder(test)
+        //sb.setCharAt(LocalDate.now().dayOfWeek.value-1, '1').toString()
         viewModelScope.launch {
-            dao.getHabit().collect{habitJoin -> run{
-                val displayHabitRecordList: MutableList<HabitJoin> = mutableListOf()
+            dao.fetchHabitByDay().collect{habitJoin -> run{
+                val displayHabitRecordList: MutableList<DisplayHabit> = mutableListOf()
                 for (habit in habitJoin){
-                    displayHabitRecordList.add(habit)
+                    displayHabitRecordList.add(DisplayHabit(habitJoin = habit))
                 }
                 _state.update { it.copy(
-                    habitJoin = displayHabitRecordList
+                    displayHabits = displayHabitRecordList
                 )
                 }
             }
             }
         }
+
+//        viewModelScope.launch {
+//            dao.getHabit().collect{habitJoin -> run{
+//                val displayHabitRecordList: MutableList<DisplayHabit> = mutableListOf()
+//                for (habit in habitJoin){
+//                    displayHabitRecordList.add(DisplayHabit(habitJoin = habit))
+//                }
+//                _state.update { it.copy(
+//                    displayHabits = displayHabitRecordList
+//                )
+//                }
+//            }
+//            }
+//        }
     }
 
     // Handles the events triggered by the UI
@@ -154,12 +180,13 @@ class HabitViewModel (
             }
 
             is HabitEvent.EditHabit -> {
+                event.displayHabit.beingEdited.value = event.displayHabit.beingEdited.value.not()
                 state.update {
                     it.copy(
                         showEdit = true,
-                        editString = event.habitJoin.habit.name,
-                        editFreq = event.habitJoin.habit.frequency,
-                        edithabitJoin = event.habitJoin
+                        editString = event.displayHabit.habitJoin.habit.name,
+                        editFreq = event.displayHabit.habitJoin.habit.frequency,
+                        edithabitJoin = event.displayHabit.habitJoin
                     )
                 }
             }
@@ -220,8 +247,8 @@ class HabitViewModel (
             is HabitEvent.DecCompletion -> {
                 if(event.habitJoin.completion.completion > 0){
                     viewModelScope.launch {
-                        val habtiCompletion = event.habitJoin.completion.copy(completion = event.habitJoin.completion.completion.dec())
-                        checkHabitCompletion(event.habitJoin, habtiCompletion)
+                        val habitCompletion = event.habitJoin.completion.copy(completion = event.habitJoin.completion.completion.dec())
+                        checkHabitCompletion(event.habitJoin, habitCompletion)
                     }
                 }
             }
