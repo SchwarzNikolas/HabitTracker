@@ -6,6 +6,8 @@ import com.example.habittracker.database.Habit
 import com.example.habittracker.database.HabitCompletion
 import com.example.habittracker.database.HabitJoin
 import com.example.habittracker.database.HabitRecord
+import kotlinx.coroutines.Job
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 
@@ -13,6 +15,7 @@ import java.time.LocalDateTime
 data class HabitState(
     // list of all the habits that will be displayed
     val displayHabits: MutableList<DisplayHabit> = mutableStateListOf(),
+    val weeklyDisplayHabits: MutableList<DisplayHabit> = mutableStateListOf(),
     // contains what habits were completed on which dates
     val habitRecord: MutableList<HabitRecord> = mutableStateListOf(),
     // string that will be displayed by the edit window
@@ -30,5 +33,9 @@ data class HabitState(
 
     val edithabitJoin: HabitJoin = HabitJoin(Habit(), HabitCompletion()),
 
-    var date: LocalDateTime = LocalDateTime.now()
+    var date: LocalDateTime = LocalDateTime.now(),
+
+    val day: Int = LocalDate.now().dayOfWeek.value-1,
+    var job: Job
+
 )

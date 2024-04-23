@@ -1,6 +1,5 @@
 package com.example.habittracker.habit
 
-import com.example.habittracker.database.Habit
 import com.example.habittracker.database.HabitJoin
 
 
@@ -23,4 +22,5 @@ sealed interface HabitEvent {
     data class BoxChecked(val displayHabit: DisplayHabit, val index:Int): HabitEvent
     // Deprecated
     data object resetCompletion: HabitEvent
+    data object nextDay: HabitEvent
 }

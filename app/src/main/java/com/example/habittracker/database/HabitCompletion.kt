@@ -15,5 +15,6 @@ data class HabitCompletion (
     @PrimaryKey(autoGenerate = true)
     val habitID: Int = 0,
     val completion: Int = 0,
-    val done: Boolean = false
+    val done: Boolean = false,
+    val occurrence: String = "1111111"
     )

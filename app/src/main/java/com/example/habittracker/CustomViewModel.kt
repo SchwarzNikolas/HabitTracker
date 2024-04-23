@@ -2,8 +2,9 @@ package com.example.habittracker
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.habittracker.database.HabitDao
 import com.example.habittracker.database.Habit
+import com.example.habittracker.database.HabitCompletion
+import com.example.habittracker.database.HabitDao
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -40,15 +41,16 @@ class CustomViewModel(
                     )
                 }
             }
-            is CustomHabitEvent.CancelEdit -> {
-                _state.update {
-                    it.copy(
-                        customMode = false
-                    )
-                }
-            }
+
             is CustomHabitEvent.SaveEdit -> {
-                val isDaily = state.value.isDaily
+                val test = "1111111"
+                if(state.value.isDaily){
+                    val sb = StringBuilder(test)
+                    sb.clear()
+                    for(day in state.value.completion){
+                        sb.append(day)
+                    }
+                }
                 val habitName = state.value.habitName
                 val habitFrequency = state.value.habitFrequency
 
@@ -63,12 +65,7 @@ class CustomViewModel(
                 )
                 viewModelScope.launch {
                     dao.insertHabit(newCusHabit)
-                }
-
-                _state.update {
-                    it.copy(
-                        customMode = false
-                    )
+                    dao.insertCompletion(HabitCompletion(occurrence = test))
                 }
             }
         }

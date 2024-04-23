@@ -86,9 +86,6 @@ fun EditWindow(onEvent: (CustomHabitEvent) -> Unit, state: CustomState) {
             manager = focusManager
         )
         Row (modifier = Modifier.size(width = 380.dp, height = 30.dp)) {
-            Button(onClick = { onEvent(CustomHabitEvent.CancelEdit)}) {
-                Text(text = "Cancel")
-            }
             Button(onClick = { onEvent(CustomHabitEvent.SaveEdit)}) {
                 Text(text = "Save")
             }

@@ -1,6 +1,5 @@
 package com.example.habittracker.habit
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.habittracker.database.Habit
@@ -8,10 +7,11 @@ import com.example.habittracker.database.HabitCompletion
 import com.example.habittracker.database.HabitDao
 import com.example.habittracker.database.HabitJoin
 import com.example.habittracker.database.HabitRecord
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.lang.StringBuilder
 import java.time.LocalDate
 
 // modifies the state of the HabitState
@@ -20,23 +20,38 @@ import java.time.LocalDate
 class HabitViewModel (
     private val dao: HabitDao
 ): ViewModel() {
-    private val _state = MutableStateFlow(HabitState())
+    private val _state = MutableStateFlow(HabitState(job = Job()))
     val state = _state
+    private val date = fetchdate()
 
     init {
 
-          Log.d ("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", LocalDate.now().dayOfWeek.value.toString())
+        viewModelScope.launch {
+            flowOf(LocalDate.now()).collect{newDate -> run{
+                if (newDate != date){
+                    setDate(newDate)
+                    if(newDate.dayOfWeek.value == 1){
+                        resetCompletion()
+                    }else{
+                        resetDailyCompletion()
+                    }
+                }
+            }
+            }
+        }
 
 
         viewModelScope.launch {
-            // sync data base and state
-            // will clean up later
-            dao.insertHabit(Habit(name = "test1", frequency = 1))
-            dao.insertCompletion(HabitCompletion())
-            dao.insertHabit(Habit(name = "test2", frequency = 2, occurrence = "1011111"))
-            dao.insertCompletion(HabitCompletion())
-            dao.insertHabit(Habit(name = "test3", frequency = 3, occurrence = "0100000"))
-            dao.insertCompletion(HabitCompletion())
+//             sync data base and state
+//             will clean up later
+//            dao.insertHabit(Habit(name = "test1", frequency = 1))
+//            dao.insertCompletion(HabitCompletion())
+//            dao.insertHabit(Habit(name = "test2", frequency = 2,))
+//            dao.insertCompletion(HabitCompletion(occurrence = "1011111"))
+//            dao.insertHabit(Habit(name = "test3", frequency = 3,))
+//            dao.insertCompletion(HabitCompletion(occurrence = "0100000"))
+//            dao.insertHabit(Habit(name = "test4", frequency = 4,))
+//            dao.insertCompletion(HabitCompletion(occurrence = "0010000"))
         }
 
 //        viewModelScope.launch {
@@ -46,7 +61,7 @@ class HabitViewModel (
 //                    if (state.value.date != LocalDateTime.now()) {
 //                        state.update { it.copy(date = LocalDateTime.now()) }
 //                        resetCompletion()
-//                        if (state.value.date.dayOfWeek.toString() == "MONDAY") {
+//                        if (state.value.date.dayOfWeek.value == 1) {
 //                            // reset weekly habit
 //                        }
 //                    }
@@ -127,21 +142,26 @@ class HabitViewModel (
             }
             }
         }
-        val test: String = "_______"
-        val sb = StringBuilder(test)
-        //sb.setCharAt(LocalDate.now().dayOfWeek.value-1, '1').toString()
-        viewModelScope.launch {
-            dao.fetchHabitByDay().collect{habitJoin -> run{
-                val displayHabitRecordList: MutableList<DisplayHabit> = mutableListOf()
-                for (habit in habitJoin){
-                    displayHabitRecordList.add(DisplayHabit(habitJoin = habit))
-                }
-                _state.update { it.copy(
-                    displayHabits = displayHabitRecordList
-                )
-                }
-            }
-            }
+        //val test: String = "_______"
+//        val sb = StringBuilder(test)
+//        sb.setCharAt(LocalDate.now().dayOfWeek.value-1, '1')
+//        Log.d( "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+//            sb.toString()
+//        )
+        _state.value.job = viewModelScope.launch {
+
+            dataSupRoutine()
+//            dao.fetchHabitByDay(dayToString(state.value.day)).collect{habitJoin -> run{
+//                val displayHabitRecordList: MutableList<DisplayHabit> = mutableListOf()
+//                for (habit in habitJoin){
+//                    displayHabitRecordList.add(DisplayHabit(habitJoin = habit))
+//                }
+//                _state.update { it.copy(
+//                    displayHabits = displayHabitRecordList
+//                )
+//                }
+//            }
+//            }
         }
 
 //        viewModelScope.launch {
@@ -169,14 +189,21 @@ class HabitViewModel (
                         showEdit = false
                     )
                 }
+                val habtiCompletion: HabitCompletion
                 if (state.value.editFreq < state.value.edithabitJoin.completion.completion){
-                    updateCompletion(state.value.edithabitJoin.completion.copy(completion = state.value.editFreq))
+                    habtiCompletion = state.value.edithabitJoin.completion.copy(completion = state.value.editFreq)
+                    updateCompletion(habtiCompletion)
+
+                }else{
+                    habtiCompletion = state.value.edithabitJoin.completion
                 }
-                updateHabit(state.value.edithabitJoin.habit.copy(
-                        frequency = state.value.editFreq,
-                        name = state.value.editString
-                    )
+                val habit = state.value.edithabitJoin.habit.copy(
+                    frequency = state.value.editFreq,
+                    name = state.value.editString
                 )
+
+                checkHabitCompletion(habit, habtiCompletion)
+                updateHabit(habit)
             }
 
             is HabitEvent.EditHabit -> {
@@ -239,7 +266,7 @@ class HabitViewModel (
                 if (event.habitJoin.completion.completion < event.habitJoin.habit.frequency) {
                     viewModelScope.launch {
                         val habtiCompletion = event.habitJoin.completion.copy(completion = event.habitJoin.completion.completion.inc())
-                        checkHabitCompletion(event.habitJoin, habtiCompletion)
+                        checkHabitCompletion(event.habitJoin.habit, habtiCompletion)
                     }
                 }
             }
@@ -248,28 +275,35 @@ class HabitViewModel (
                 if(event.habitJoin.completion.completion > 0){
                     viewModelScope.launch {
                         val habitCompletion = event.habitJoin.completion.copy(completion = event.habitJoin.completion.completion.dec())
-                        checkHabitCompletion(event.habitJoin, habitCompletion)
+                        checkHabitCompletion(event.habitJoin.habit, habitCompletion)
                     }
                 }
             }
 
             // Deprecated
             HabitEvent.resetCompletion -> {
-                viewModelScope.launch {
-                    resetCompletion()
-                }
+                resetDailyCompletion()
+            }
+            // Deprecated
+            HabitEvent.nextDay -> {
+
+                state.value.job.cancel()
+                state.update { it.copy(
+                    day = state.value.day.inc(),
+                    job = viewModelScope.launch { dataSupRoutine() }
+                ) }
             }
         }
     }
 
     // logic for habit completion, components are explained individually below
-    private fun checkHabitCompletion(join: HabitJoin, completion: HabitCompletion) {
+    private fun checkHabitCompletion(join: Habit, completion: HabitCompletion) {
         val habitRecord = HabitRecord(
-            habitName = join.habit.name,
+            habitName = join.name,
             date = LocalDate.now().toString()
         )
         var comp: HabitCompletion = completion
-        if (join.habit.frequency == completion.completion && !completion.done){
+        if (join.frequency == completion.completion && !completion.done){
             comp = completion.copy(done = true)
             insertRecord(habitRecord)
         }else if(completion.done){
@@ -334,8 +368,49 @@ class HabitViewModel (
         }
     }
 
-    private suspend fun resetCompletion(){
-        dao.resetCompletion()
+     private suspend fun dataSupRoutine(){
+         dao.fetchHabitByDay(dayToString(state.value.day)).collect{habitJoin -> run{
+             val displayHabitRecordList: MutableList<DisplayHabit> = mutableListOf()
+             val weeklyDisplayHabitRecordList: MutableList<DisplayHabit> = mutableListOf()
+             for (habit in habitJoin){
+                if (habit.completion.occurrence == "1111111"){
+                    displayHabitRecordList.add(DisplayHabit(habitJoin = habit))
+                }else{
+                    weeklyDisplayHabitRecordList.add(DisplayHabit(habitJoin = habit))
+                }
+             }
+                _state.update { it.copy(
+                    displayHabits = displayHabitRecordList,
+                    weeklyDisplayHabits = weeklyDisplayHabitRecordList
+                )
+                }
+         }
+         }
+    }
+
+    private fun dayToString(day : Int): String{
+        val test: String = "_______"
+        val sb = StringBuilder(test)
+        sb.setCharAt(state.value.day, '1')
+        return sb.toString()
+    }
+
+    private fun resetDailyCompletion(){
+        viewModelScope.launch {
+            dao.resetDailyCompletion()
+        }
+    }
+
+    private fun resetCompletion(){
+        viewModelScope.launch {
+            dao.resetCompletion()
+        }
+    }
+    private fun fetchdate():LocalDate{
+        return LocalDate.now()
+    }
+    private fun setDate(date: LocalDate){
+
     }
 }
 
