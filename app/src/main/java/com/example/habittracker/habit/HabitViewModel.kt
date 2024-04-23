@@ -1,9 +1,12 @@
-package com.example.habittracker
+package com.example.habittracker.habit
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.habittracker.database.Habit
+import com.example.habittracker.database.HabitDao
+import com.example.habittracker.database.HabitRecord
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -21,10 +24,10 @@ class HabitViewModel (
         viewModelScope.launch {
 
 
-            insertHabit(Habit(name = "testMeeeeee", frequency = 2))
-
             // sync data base and state
             // will clean up later
+            //dao.insertHabit(Habit(name = "test", frequency = 2))
+
             dao.fetchHabits().collect { habits ->
                 run {
                     val displayHabitList: MutableList<DisplayHabit> = mutableListOf()
@@ -100,7 +103,7 @@ class HabitViewModel (
                 }
                 insertHabit(
                     state.value.editHabit.copy(
-                        frequency = state.value.editFreq,
+                        frequency = state.value.editFreq.toInt(),
                         name = state.value.editString
                     )
                 )
@@ -111,7 +114,7 @@ class HabitViewModel (
                     it.copy(
                         showEdit = true,
                         editString = event.displayHabit.habit.value.name,
-                        editFreq = event.displayHabit.habit.value.frequency,
+                        editFreq = event.displayHabit.habit.value.frequency.toString(),
                         editHabit = event.displayHabit.habit.value
                     )
                 }
@@ -157,9 +160,12 @@ class HabitViewModel (
                     dao.deleteHabit(event.displayHabit.habit.value)
                 }
             }
+            is HabitEvent.ContextMenuVisibility -> {
+                event.displayHabit.isMenuVisible.value = event.displayHabit.isMenuVisible.value.not()
+            }
         }
     }
-    
+
     // logic for habit completion, components are explained individually below
     private fun checkHabitCompletion(displayHabit: DisplayHabit) {
         val habitRecord = HabitRecord(

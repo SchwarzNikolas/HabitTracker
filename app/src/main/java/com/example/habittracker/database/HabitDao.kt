@@ -1,4 +1,4 @@
-package com.example.habittracker
+package com.example.habittracker.database
 
 import androidx.room.Dao
 import androidx.room.Delete
