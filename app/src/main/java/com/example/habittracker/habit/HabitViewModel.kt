@@ -1,10 +1,7 @@
 package com.example.habittracker.habit
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.habittracker.database.Habit
 import com.example.habittracker.database.HabitCompletion
 import com.example.habittracker.database.HabitDao
@@ -14,9 +11,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import kotlin.concurrent.thread
 
 // modifies the state of the HabitState
+
+//TODO update completion on edti
 class HabitViewModel (
     private val dao: HabitDao
 ): ViewModel() {
@@ -24,64 +22,88 @@ class HabitViewModel (
     val state = _state
 
     init {
+//        viewModelScope.launch {
+//            // sync data base and state
+//            // will clean up later
+//            dao.insertHabit(Habit(name = "test2", frequency = 3))
+//            dao.insertCompletion(HabitCompletion())
+//        }
+
+//        viewModelScope.launch {
+//            // get date from percistent storage
+//            viewModelScope.launch {
+//                while (true) {
+//                    if (state.value.date != LocalDateTime.now()) {
+//                        state.update { it.copy(date = LocalDateTime.now()) }
+//                        resetCompletion()
+//                        if (state.value.date.dayOfWeek.toString() == "MONDAY") {
+//                            // reset weekly habit
+//                        }
+//                    }
+//                    delay(2000)
+//                }
+//            }
+//        }
+
+
 
         // On initiation
-        viewModelScope.launch {
-
-
-            // sync data base and state
-            // will clean up later
-            //dao.insertHabit(Habit(name = "test2", frequency = 3))
-            //dao.insertCompletion(HabitCompletion())
-
-            dao.fetchHabits().collect { habits ->
-                run {
-                    val displayHabitList: MutableList<DisplayHabit> = mutableListOf()
-                    for (habit in habits) {
-                        var wasFound = false
-                        for (displayHabit in state.value.habits) {
-                            if (habit in displayHabit) {
-                                if (habit.frequency != displayHabit.completion.size) {
-                                    val newCompletion: MutableList<MutableState<Boolean>> =
-                                        if (habit.frequency < displayHabit.completion.size) {
-                                            displayHabit.completion.subList(0, habit.frequency)
-                                        } else {
-                                            val n = habit.frequency - displayHabit.completion.size
-                                            displayHabit.completion.addAll(MutableList(size = n) {
-                                                mutableStateOf(
-                                                    displayHabit.done.value
-                                                )
-                                            })
-                                            displayHabit.completion
-                                        }
-                                    displayHabitList.add(
-                                        displayHabit.copy(
-                                            habit = mutableStateOf(
-                                                habit
-                                            ), completion = newCompletion
-                                        )
-                                    )
-                                } else {
-                                    displayHabitList.add(
-                                        displayHabit.copy(
-                                            habit = mutableStateOf(
-                                                habit
-                                            )
-                                        )
-                                    )
-                                }
-                                wasFound = true
-                                break
-                            }
-                        }
-                        if (wasFound.not()) {
-                            displayHabitList.add(DisplayHabit(habit = mutableStateOf(habit)))
-                        }
-                    }
-                    _state.update { it.copy(habits = displayHabitList) }
-                }
-            }
-        }
+//        viewModelScope.launch {
+//
+//
+//            // sync data base and state
+//            // will clean up later
+//             dao.insertHabit(Habit(name = "test2", frequency = 3))
+//             dao.insertCompletion(HabitCompletion())
+//
+//            dao.fetchHabits().collect { habits ->
+//                run {
+//                    val displayHabitList: MutableList<DisplayHabit> = mutableListOf()
+//                    for (habit in habits) {
+//                        var wasFound = false
+//                        for (displayHabit in state.value.habits) {
+//                            if (habit in displayHabit) {
+//                                if (habit.frequency != displayHabit.completion.size) {
+//                                    val newCompletion: MutableList<MutableState<Boolean>> =
+//                                        if (habit.frequency < displayHabit.completion.size) {
+//                                            displayHabit.completion.subList(0, habit.frequency)
+//                                        } else {
+//                                            val n = habit.frequency - displayHabit.completion.size
+//                                            displayHabit.completion.addAll(MutableList(size = n) {
+//                                                mutableStateOf(
+//                                                    displayHabit.done.value
+//                                                )
+//                                            })
+//                                            displayHabit.completion
+//                                        }
+//                                    displayHabitList.add(
+//                                        displayHabit.copy(
+//                                            habit = mutableStateOf(
+//                                                habit
+//                                            ), completion = newCompletion
+//                                        )
+//                                    )
+//                                } else {
+//                                    displayHabitList.add(
+//                                        displayHabit.copy(
+//                                            habit = mutableStateOf(
+//                                                habit
+//                                            )
+//                                        )
+//                                    )
+//                                }
+//                                wasFound = true
+//                                break
+//                            }
+//                        }
+//                        if (wasFound.not()) {
+//                            displayHabitList.add(DisplayHabit(habit = mutableStateOf(habit)))
+//                        }
+//                    }
+//                    _state.update { it.copy(habits = displayHabitList) }
+//                }
+//            }
+//        }
         viewModelScope.launch {
             dao.fetchHabitRecords().collect{habitRecords -> run{
                 val displayHabitRecordList: MutableList<HabitRecord> = mutableListOf()
@@ -120,9 +142,12 @@ class HabitViewModel (
                         showEdit = false
                     )
                 }
+                if (state.value.editFreq.toInt() < state.value.edithabitJoin.completion.completion){
+                    updateCompletion(state.value.edithabitJoin.completion.copy(completion = state.value.editFreq))
+                }
                 insertHabit(
-                    state.value.editHabit.copy(
-                        frequency = state.value.editFreq.toInt(),
+                    state.value.edithabitJoin.habit.copy(
+                        frequency = state.value.editFreq,
                         name = state.value.editString
                     )
                 )
@@ -132,19 +157,20 @@ class HabitViewModel (
                 state.update {
                     it.copy(
                         showEdit = true,
-                        editString = event.displayHabit.value.name,
-                        editFreq = event.displayHabit.value.frequency.toString(),
-                        editHabit = event.displayHabit.value
+                        editString = event.habit.name,
+                        editFreq = event.habit.frequency,
+                        editHabit = event.habit
                     )
                 }
             }
 
+            // Deprecated
             is HabitEvent.BoxChecked -> {
                 //if box is checked, it becomes unchecked and vice versa
                 event.displayHabit.completion[event.index].value =
                     event.displayHabit.completion[event.index].value.not()
                 // accesses if habit is completed
-                checkHabitCompletion(event.displayHabit)
+                //checkHabitCompletion(event.displayHabit)
             }
 
             // when text is entered by the user into the text field is updated here and temporarily stored in the habit state.
@@ -175,26 +201,32 @@ class HabitViewModel (
 
             // deletes habit from database (is also automatically removed from UI)(gone forever)
             is HabitEvent.DeleteHabit -> {
-                viewModelScope.launch {
-                    dao.deleteHabit(event.displayHabit.habit.value)
-                }
+                removeHabit(event.habitJoin)
             }
+
             is HabitEvent.ContextMenuVisibility -> {
                 event.displayHabit.isMenuVisible.value = event.displayHabit.isMenuVisible.value.not()
             }
 
-            is HabitEvent.incCompletion -> {
-                viewModelScope.launch {
-                dao.updateCompletion(event.completion.copy(completion = event.completion.completion.inc()))
+            is HabitEvent.IncCompletion -> {
+                if (event.habitJoin.completion.completion < event.habitJoin.habit.frequency) {
+                    viewModelScope.launch {
+                        val habtiCompletion = event.habitJoin.completion.copy(completion = event.habitJoin.completion.completion.inc())
+                        checkHabitCompletion(event.habitJoin, habtiCompletion)
+                    }
                 }
             }
 
-            is HabitEvent.decComletion -> {
-                viewModelScope.launch {
-                    dao.updateCompletion(event.completion.copy(completion = event.completion.completion.dec()))
+            is HabitEvent.DecCompletion -> {
+                if(event.habitJoin.completion.completion > 0){
+                    viewModelScope.launch {
+                        val habtiCompletion = event.habitJoin.completion.copy(completion = event.habitJoin.completion.completion.dec())
+                        checkHabitCompletion(event.habitJoin, habtiCompletion)
+                    }
                 }
             }
 
+            // Deprecated
             HabitEvent.resetCompletion -> {
                 viewModelScope.launch {
                     resetCompletion()
@@ -204,31 +236,53 @@ class HabitViewModel (
     }
 
     // logic for habit completion, components are explained individually below
-    private fun checkHabitCompletion(displayHabit: DisplayHabit) {
+    private fun checkHabitCompletion(join: HabitJoin, completion: HabitCompletion) {
         val habitRecord = HabitRecord(
-            habitName = displayHabit.habit.value.name,
+            habitName = join.habit.name,
             date = LocalDate.now().toString()
         )
-
+        var comp: HabitCompletion = completion
+        if (join.habit.frequency == completion.completion && !completion.done){
+            comp = completion.copy(done = false)
+            insertRecord(habitRecord)
+        }else if(completion.done){
+            comp = completion.copy(done = true)
+            removeRecord(habitRecord)
+        }
+        updateCompletion(comp)
         // if all the the boxes are ticked AND the habit is not marked as completed,
         // the habit is marked as completed and a record is inserted into the database.
         // else if, the habit is marked as completed,
         // the habit is marked as uncompleted and the record of completion is remove from the database.
-        if (displayHabit.completion.stream()
-                .map { x -> x.value }
-                .allMatch { x -> x == true }
-            && !displayHabit.done.value
-        ) {
-            displayHabit.done.value = displayHabit.done.value.not()
-            insertRecord(habitRecord)
-
-        } else if (displayHabit.done.value) {
-            displayHabit.done.value = displayHabit.done.value.not()
-            removeRecord(habitRecord)
-        }
+//        if (displayHabit.completion.stream()
+//                .map { x -> x.value }
+//                .allMatch { x -> x == true }
+//            && !displayHabit.done.value
+//        ) {
+//            displayHabit.done.value = displayHabit.done.value.not()
+//            insertRecord(habitRecord)
+//
+//        } else if (displayHabit.done.value) {
+//            displayHabit.done.value = displayHabit.done.value.not()
+//            removeRecord(habitRecord)
+//        }
     }
 
     // removes record from the database using the dao (database access object)
+
+    private fun removeHabit(habitJoin: HabitJoin){
+        viewModelScope.launch {
+            dao.deleteHabit(habitJoin.habit)
+            dao.deleteCompletion(habitJoin.completion)
+        }
+    }
+
+    private fun updateCompletion(completion: HabitCompletion){
+        viewModelScope.launch {
+            dao.updateCompletion(completion)
+        }
+    }
+
     private fun removeRecord(record: HabitRecord) {
         viewModelScope.launch {
             dao.deleteRecord(record.habitName, record.date)

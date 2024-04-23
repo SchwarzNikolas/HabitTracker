@@ -7,15 +7,12 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
 import com.example.habittracker.database.HabitDatabase
 import com.example.habittracker.habit.HabitViewModel
-import com.example.habittracker.habit.MainScreen
 import com.example.habittracker.navigation.AppNavigation
 import com.example.habittracker.ui.theme.HabitTrackerTheme
 
@@ -27,7 +24,7 @@ class MainActivity : ComponentActivity() {
             applicationContext,
             HabitDatabase::class.java,
             "habit.db"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
 
     // Creating view model for Habits

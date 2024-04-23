@@ -14,5 +14,6 @@ import androidx.room.PrimaryKey
 data class HabitCompletion (
     @PrimaryKey(autoGenerate = true)
     val habitID: Int = 0,
-    val completion: Int = 0
+    val completion: Int = 0,
+    val done: Boolean = false
     )

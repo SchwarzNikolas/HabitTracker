@@ -5,7 +5,7 @@ import androidx.room.Embedded
 
 class HabitJoin(
         @Embedded
-        val habit: Habit,
+        var habit: Habit,
         @Embedded
-        val completion: HabitCompletion
+        var completion: HabitCompletion,
 )

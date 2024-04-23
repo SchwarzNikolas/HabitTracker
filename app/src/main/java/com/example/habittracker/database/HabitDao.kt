@@ -36,6 +36,9 @@ interface HabitDao{
     @Delete
     suspend fun deleteHabit(habit: Habit)
 
+    @Delete
+    suspend fun deleteCompletion(completion: HabitCompletion)
+
     @Query("SELECT * FROM Habit JOIN HabitCompletion ON Habit.habitId = HabitCompletion.habitID")
      fun getHabit(): Flow<List<HabitJoin>>
 

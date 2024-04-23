@@ -10,5 +10,6 @@ data class Habit (
     @PrimaryKey(autoGenerate = true)
     val habitId: Int = 0,
     val name: String = "test123",
-    val frequency: Int = 1
+    val frequency: Int = 1,
+    //val occurrence: String = "1111111"
 )

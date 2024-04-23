@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun CircularProgressBar(
-    size: Dp = 30.dp,
+    size: Dp = 100.dp,
     strokeWidth: Dp = 10.dp,
     backgroundArcColor: Color = Color.DarkGray,
     backgroundArcColor2: Color = Color.White,
