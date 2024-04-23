@@ -22,6 +22,9 @@ interface HabitDao{
     @Upsert
     suspend fun insertHabit(habit: Habit)
 
+    @Update
+    suspend fun updateHabit(habit: Habit)
+
     @Insert
     suspend fun insertRecord(record: HabitRecord)
 

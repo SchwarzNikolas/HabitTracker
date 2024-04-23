@@ -108,14 +108,14 @@ fun MainScreen (
                 Text(text = habitRecord.habitName)
                 Text(text = habitRecord.date)
             }
-        NumberPicker(value = state.editFreq.toInt(), onValueChange = { onEvent(HabitEvent.UpDateEditFreq(it)) }, range = 1..10)
+        NumberPicker(value = state.editFreq, onValueChange = { onEvent(HabitEvent.UpDateEditFreq(it)) }, range = 1..10)
         }
     }
 
 @Composable
 fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit, habitJoin: HabitJoin, state: HabitState) {
     val dropdownItems :List<Item> = listOf(
-        Item(name ="Edit", onClick =  {onEvent(HabitEvent.EditHabit(habitJoin.habit))}, Icons.Default.Edit),
+        Item(name ="Edit", onClick =  {onEvent(HabitEvent.EditHabit(habitJoin))}, Icons.Default.Edit),
         Item(name = "Undo", onClick = {onEvent(HabitEvent.DecCompletion(habitJoin))}, Icons.Default.ArrowBack),
         Item(name = "Delete", onClick = {onEvent(HabitEvent.DeleteHabit(habitJoin))}, Icons.Default.Delete)
        )
@@ -125,7 +125,7 @@ fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit, hab
         ),
         modifier = Modifier
             //.size(width = 380.dp, height = 130.dp)
-            .padding(vertical = 5.dp),
+            .padding(vertical = 5.dp, horizontal = 5.dp),
         colors = CardDefaults.cardColors(Color.Gray)
 
     ) {
@@ -162,15 +162,14 @@ fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit, hab
                         singleLine = true,
                         readOnly = true,
                         modifier = Modifier.size(height = 50.dp,width = 100.dp)
-
                         )
                 }
                 //Text(text = habitJoin.completion.completion.toString())
                 //Text(text = habitJoin.habit.frequency.toString())
                 Row() {
-                    Box(modifier = Modifier.padding(start = 30.dp), contentAlignment = Alignment.Center) {
+                    Box(modifier = Modifier.padding(start = 30.dp, bottom = 10.dp), contentAlignment = Alignment.Center) {
                         CircularProgressBar(angle = (habitJoin.completion.completion.toFloat() / habitJoin.habit.frequency) * 360)
-                    Button(onClick = { onEvent(HabitEvent.IncCompletion(habitJoin))}, modifier = Modifier.size(100.dp), shape = CircleShape, colors = ButtonDefaults.buttonColors(
+                        Button(onClick = { onEvent(HabitEvent.IncCompletion(habitJoin))}, modifier = Modifier.size(100.dp), shape = CircleShape, colors = ButtonDefaults.buttonColors(
                         Color.Green), contentPadding = PaddingValues(0.dp)) {
                         if (habitJoin.completion.done){
                             Icon(imageVector =  Icons.Rounded.Check, contentDescription = null, modifier = Modifier.size(150.dp))

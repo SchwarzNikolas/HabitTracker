@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 @Database(
     // defines which entities belong to the database
     entities = [Habit::class, HabitRecord::class, HabitCompletion::class],
-    version = 2
+    version = 1
 )
 abstract class HabitDatabase:RoomDatabase(){
     // defines which daos belongs to this database

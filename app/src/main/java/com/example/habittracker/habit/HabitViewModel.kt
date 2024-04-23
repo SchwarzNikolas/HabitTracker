@@ -1,5 +1,6 @@
 package com.example.habittracker.habit
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.habittracker.database.Habit
@@ -22,12 +23,12 @@ class HabitViewModel (
     val state = _state
 
     init {
-//        viewModelScope.launch {
-//            // sync data base and state
-//            // will clean up later
-//            dao.insertHabit(Habit(name = "test2", frequency = 3))
-//            dao.insertCompletion(HabitCompletion())
-//        }
+        viewModelScope.launch {
+            // sync data base and state
+            // will clean up later
+            dao.insertHabit(Habit(name = "test2", frequency = 3))
+            dao.insertCompletion(HabitCompletion())
+        }
 
 //        viewModelScope.launch {
 //            // get date from percistent storage
@@ -142,11 +143,10 @@ class HabitViewModel (
                         showEdit = false
                     )
                 }
-                if (state.value.editFreq.toInt() < state.value.edithabitJoin.completion.completion){
+                if (state.value.editFreq < state.value.edithabitJoin.completion.completion){
                     updateCompletion(state.value.edithabitJoin.completion.copy(completion = state.value.editFreq))
                 }
-                insertHabit(
-                    state.value.edithabitJoin.habit.copy(
+                updateHabit(state.value.edithabitJoin.habit.copy(
                         frequency = state.value.editFreq,
                         name = state.value.editString
                     )
@@ -157,9 +157,9 @@ class HabitViewModel (
                 state.update {
                     it.copy(
                         showEdit = true,
-                        editString = event.habit.name,
-                        editFreq = event.habit.frequency,
-                        editHabit = event.habit
+                        editString = event.habitJoin.habit.name,
+                        editFreq = event.habitJoin.habit.frequency,
+                        edithabitJoin = event.habitJoin
                     )
                 }
             }
@@ -243,10 +243,10 @@ class HabitViewModel (
         )
         var comp: HabitCompletion = completion
         if (join.habit.frequency == completion.completion && !completion.done){
-            comp = completion.copy(done = false)
+            comp = completion.copy(done = true)
             insertRecord(habitRecord)
         }else if(completion.done){
-            comp = completion.copy(done = true)
+            comp = completion.copy(done = false)
             removeRecord(habitRecord)
         }
         updateCompletion(comp)
@@ -272,8 +272,8 @@ class HabitViewModel (
 
     private fun removeHabit(habitJoin: HabitJoin){
         viewModelScope.launch {
-            dao.deleteHabit(habitJoin.habit)
             dao.deleteCompletion(habitJoin.completion)
+            dao.deleteHabit(habitJoin.habit)
         }
     }
 
@@ -298,6 +298,12 @@ class HabitViewModel (
     private fun insertRecord(record: HabitRecord) {
         viewModelScope.launch {
             dao.insertRecord(record)
+        }
+    }
+
+    private fun updateHabit(habit: Habit){
+        viewModelScope.launch {
+            dao.updateHabit(habit)
         }
     }
 
