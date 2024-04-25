@@ -53,16 +53,41 @@ class CustomViewModel(
             }
 
             is CustomHabitEvent.SaveEdit -> {
-                val test = "1111111" // this represent completion and with daily is every day
+                /*val test = "1111111" // this represent on which days the habit will show up
                 if(state.value.isDaily){
                     val sb = StringBuilder(test)
                     sb.clear()
                     for(day in state.value.completion){
                         sb.append(day)
                     }
+                }*/
+
+                val habitOccurrence: String = if (state.value.isDaily) {
+                    "1111111"
                 }
+                else {
+                    val sb = StringBuilder("0000000")
+                    for (i in 0 until 7) {
+                        if (state.value.completion[i].value) {
+                            sb.setCharAt(i, '1')
+                        }
+                    }
+                    sb.toString()
+                }
+
                 val habitName = state.value.habitName
-                val habitFrequency = state.value.habitFrequency
+
+                val habitFrequency: String = if (state.value.isDaily) {
+                    state.value.habitFrequency
+                }
+                else {
+                    if (habitOccurrence.contains("0")) {
+                        "0"
+                    }
+                    else {
+                        "1"
+                    }
+                }
 
                 if (habitName.isBlank() || habitFrequency.isBlank()) {
                     return
@@ -75,7 +100,7 @@ class CustomViewModel(
                 )
                 viewModelScope.launch {
                     dao.insertHabit(newCusHabit)
-                    dao.insertCompletion(HabitCompletion(occurrence = test))
+                    dao.insertCompletion(HabitCompletion(occurrence = habitOccurrence))
                 }
             }
         }
