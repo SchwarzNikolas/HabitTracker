@@ -10,7 +10,6 @@ import com.example.habittracker.database.HabitDatabase
 import com.example.habittracker.database.Habit
 import com.example.habittracker.habit.HabitViewModel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -45,7 +44,7 @@ class HabitDaoTest {
     }
 
     @Test
-    fun daoInsert() = runTest {
+    fun daoInsert() {
         // create habit and check if habitList is empty
         val habit = Habit()
         assertTrue(habitList.isEmpty())
