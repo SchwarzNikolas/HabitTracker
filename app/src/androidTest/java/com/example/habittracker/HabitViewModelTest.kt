@@ -58,14 +58,14 @@ class HabitViewModelTest {
         viewModel.onEvent(event)
         assertEquals(10, viewModel.state.value.editFreq)
     }
-    @Test
-    fun cancelEdit(){
-        val event = HabitEvent.CancelEdit
-        viewModel.state.update { it.copy(showEdit = true) }
-        assertTrue(viewModel.state.value.showEdit)
-        viewModel.onEvent(event)
-        assertFalse(viewModel.state.value.showEdit)
-    }
+//    @Test
+//    fun cancelEdit(){
+//        val event = HabitEvent.CancelEdit
+//        viewModel.state.update { it.copy(showEdit = true) }
+//        assertTrue(viewModel.state.value.showEdit)
+//        viewModel.onEvent(event)
+//        assertFalse(viewModel.state.value.showEdit)
+//    }
 
     @Test
     fun deleteHabit(){

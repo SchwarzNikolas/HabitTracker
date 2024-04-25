@@ -87,7 +87,7 @@ fun <T> ListItemPicker(
     textStyle: TextStyle = LocalTextStyle.current,
 ) {
     val minimumAlpha = 0.3f
-    val verticalMargin = 8.dp
+    val verticalMargin = 0.dp
     val numbersColumnHeight = 50.dp
     val halfNumbersColumnHeight = numbersColumnHeight / 2
     val halfNumbersColumnHeightPx = with(LocalDensity.current) { halfNumbersColumnHeight.toPx() }
@@ -108,7 +108,7 @@ fun <T> ListItemPicker(
 
     val indexOfElement = getItemIndexForOffset(list, value, animatedOffset.value, halfNumbersColumnHeightPx)
 
-    var dividersWidth by remember { mutableStateOf(0.dp) }
+    var dividersWidth by remember { mutableStateOf(1.dp) }
 
     Layout(
         modifier = modifier
@@ -152,7 +152,7 @@ fun <T> ListItemPicker(
             )
             Box(
                 modifier = Modifier
-                    .padding(vertical = verticalMargin, horizontal = 20.dp)
+                    .padding(vertical = verticalMargin, horizontal = 0.dp)
                     .offset { IntOffset(x = 0, y = coercedAnimatedOffset.roundToInt()) }
             ) {
                 val baseLabelModifier = Modifier.align(Alignment.Center)
@@ -251,7 +251,7 @@ private fun Label(text: String, modifier: Modifier) {
         },
         text = text,
         textAlign = TextAlign.Center,
-        fontSize =  13.sp,
+        fontSize =  20.sp,
         color = Color.Black
     )
 }
