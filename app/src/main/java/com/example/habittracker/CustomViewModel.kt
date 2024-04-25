@@ -76,18 +76,21 @@ class CustomViewModel(
                 }
 
                 val habitName = state.value.habitName
+                // if weekly habits have also frequency
+                val habitFrequency: String = state.value.habitFrequency
 
-                val habitFrequency: String = if (state.value.isDaily) {
+                // if weekly habits don't have frequency
+                /*val habitFrequency: String = if (state.value.isDaily) {
                     state.value.habitFrequency
                 }
                 else {
-                    if (habitOccurrence.contains("0")) {
-                        "0"
-                    }
-                    else {
-                        "1"
-                    }
-                }
+                    //if (habitOccurrence.contains("0")) {
+                    //    "0"
+                    //}
+                    //else {
+                        "1" // delete then frequency form weekly creation
+                    //}
+                }*/
 
                 if (habitName.isBlank() || habitFrequency.isBlank()) {
                     return

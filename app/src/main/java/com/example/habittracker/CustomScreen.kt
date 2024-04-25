@@ -1,5 +1,6 @@
 package com.example.habittracker
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,7 +9,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -82,9 +85,14 @@ fun EditWindow(onEvent: (CustomHabitEvent) -> Unit, state: CustomState) {
             manager = focusManager
         )
 
-        if (state.isDaily)
-            DailyFields(state, onEvent, focusManager)
-        else
+        CustomTextField(
+            value = state.habitFrequency,
+            label = "Frequency",
+            onchange = {onEvent(CustomHabitEvent.EditFreq(it))},
+            manager = focusManager
+        )
+
+        if (!state.isDaily)
             WeeklyFields(state, onEvent, focusManager)
 
         Row (modifier = Modifier.size(width = 380.dp, height = 30.dp)) {
@@ -111,16 +119,6 @@ fun SwitchHabit(state: CustomState, onEvent: (CustomHabitEvent) -> Unit) {
 }
 
 @Composable
-fun DailyFields(state: CustomState, onEvent: (CustomHabitEvent) -> Unit, focusManager: FocusManager) {
-    CustomTextField(
-        value = state.habitFrequency,
-        label = "Frequency",
-        onchange = {onEvent(CustomHabitEvent.EditFreq(it))},
-        manager = focusManager
-    )
-}
-
-@Composable
 fun WeeklyFields(state: CustomState, onEvent: (CustomHabitEvent) -> Unit, focusManager: FocusManager) {
     Column {
         // Every day switch
@@ -139,6 +137,8 @@ fun WeeklyFields(state: CustomState, onEvent: (CustomHabitEvent) -> Unit, focusM
             )
         }*/
 
+        Text("Days")
+
         // Days buttons
         Row (
             modifier = Modifier
@@ -148,8 +148,8 @@ fun WeeklyFields(state: CustomState, onEvent: (CustomHabitEvent) -> Unit, focusM
         ) {
             for (index in 0 until 7) {
                 val day = listOf("M", "T", "W", "T", "F", "S", "S")[index]
-//                val isEnabled = state.completion[index].value
-                DayButton(day, true, onEvent, index)
+                val clicked = state.completion[index].value
+                DayButton(day, clicked, onEvent, index)
             }
         }
     }
@@ -158,17 +158,23 @@ fun WeeklyFields(state: CustomState, onEvent: (CustomHabitEvent) -> Unit, focusM
 @Composable
 fun DayButton(
     day: String,
-    isEnabled: Boolean,
+    clicked: Boolean,
     onEvent: (CustomHabitEvent) -> Unit,
     dayIndex: Int
 ) {
-    Button(
-        onClick = { onEvent(CustomHabitEvent.ToggleDay(dayIndex))},
-        enabled = isEnabled,
-        modifier = Modifier
-            .size(width = 40.dp, height = 40.dp)
-            .padding(4.dp)
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(4.dp)
     ) {
         Text(text = day)
+        OutlinedButton(
+            onClick = { onEvent(CustomHabitEvent.ToggleDay(dayIndex)) },
+            modifier = Modifier
+                .size(width = 40.dp, height = 40.dp),
+            border = BorderStroke(1.dp, Color.Black),
+            colors = ButtonDefaults.outlinedButtonColors(
+                containerColor = if (clicked) Color.Black else Color.White,
+            )
+        ) {}
     }
 }
