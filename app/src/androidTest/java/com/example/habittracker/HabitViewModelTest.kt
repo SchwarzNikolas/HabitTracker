@@ -46,11 +46,6 @@ class HabitViewModelTest {
     }
 
     @Test
-    fun onEventtest() {
-        assertEquals("test", viewModel.state.value.name)
-    }
-
-    @Test
     fun updateEditString(){
         val event = HabitEvent.UpDateEditString("test123")
         viewModel.onEvent(event)
@@ -59,9 +54,9 @@ class HabitViewModelTest {
 
     @Test
     fun updateEditFreq(){
-        val event = HabitEvent.UpDateEditFreq("10")
+        val event = HabitEvent.UpDateEditFreq(10)
         viewModel.onEvent(event)
-        assertEquals("10", viewModel.state.value.editFreq)
+        assertEquals(10, viewModel.state.value.editFreq)
     }
     @Test
     fun cancelEdit(){
