@@ -13,14 +13,14 @@ sealed interface HabitEvent {
     data class EditHabit(val displayHabit: DisplayHabit): HabitEvent
     data class UpDateEditString(val newString : String): HabitEvent
     data class UpDateEditFreq(val newFreq : Int): HabitEvent
-    data object ModifyHabit: HabitEvent
-    data object CancelEdit: HabitEvent
+    data class ModifyHabit(val joinHabit: HabitJoin) : HabitEvent
+    data class CancelEdit(val displayHabit: DisplayHabit) : HabitEvent
     data class DeleteHabit(val habitJoin: HabitJoin): HabitEvent
     data class ContextMenuVisibility(val displayHabit: DisplayHabit): HabitEvent
 
     // Deprecated
     data class BoxChecked(val displayHabit: DisplayHabit, val index:Int): HabitEvent
     // Deprecated
-    data object resetCompletion: HabitEvent
-    data object nextDay: HabitEvent
+    data object ResetCompletion: HabitEvent
+    data object NextDay: HabitEvent
 }

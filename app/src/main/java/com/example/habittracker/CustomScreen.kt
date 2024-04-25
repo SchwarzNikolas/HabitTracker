@@ -3,11 +3,9 @@ package com.example.habittracker
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -150,8 +148,8 @@ fun WeeklyFields(state: CustomState, onEvent: (CustomHabitEvent) -> Unit, focusM
         ) {
             for (index in 0 until 7) {
                 val day = listOf("M", "T", "W", "T", "F", "S", "S")[index]
-                val isEnabled = state.completion[index].value
-                DayButton(day, isEnabled, onEvent, index)
+//                val isEnabled = state.completion[index].value
+                DayButton(day, true, onEvent, index)
             }
         }
     }

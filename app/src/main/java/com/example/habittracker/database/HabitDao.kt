@@ -6,7 +6,6 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import androidx.room.Upsert
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 
 
@@ -58,7 +57,6 @@ interface HabitDao{
     @Query("UPDATE HabitCompletion SET completion = 0, done = 'false'")
     suspend fun resetCompletion()
 
-     @OptIn(ExperimentalCoroutinesApi::class)
      @Query("SELECT * FROM Habit JOIN HabitCompletion ON Habit.habitId = HabitCompletion.habitID WHERE HabitCompletion.occurrence LIKE :day")
      fun fetchHabitByDay(day: String): Flow<List<HabitJoin>>
 }
