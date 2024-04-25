@@ -9,6 +9,7 @@ import com.example.habittracker.database.HabitDao
 import com.example.habittracker.database.HabitDatabase
 import com.example.habittracker.database.Habit
 import com.example.habittracker.habit.HabitViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.junit.After
 import org.junit.Assert.assertTrue
@@ -24,6 +25,7 @@ class HabitDaoTest {
     private lateinit var db: HabitDatabase
     private lateinit var viewModel: HabitViewModel
     private var habitList: List<Habit> = listOf()
+    private lateinit var job: Job
 
     @Before
     fun createDB(){
@@ -32,7 +34,7 @@ class HabitDaoTest {
             context, HabitDatabase::class.java).build()
         dao = db.dao
         viewModel = HabitViewModel(dao)
-        viewModel.viewModelScope.launch {
+        job =        viewModel.viewModelScope.launch {
             upDateList()
         }
     }
@@ -56,11 +58,11 @@ class HabitDaoTest {
             Wait for habit to be fetched from the database,
             will time out after 100ms
          */
-        var cnt = 0
-        while (habitList.size < 1 && cnt < 10){
-            Thread.sleep(10)
-            cnt++
-        }
+//        var cnt = 0
+//        while (habitList.size < 1 && cnt < 10){
+//            Thread.sleep(10)
+//            cnt++
+//        }
         // check if habit is in database
         assertTrue(habitList[0].name == habit.name)
     }

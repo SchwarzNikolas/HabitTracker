@@ -49,8 +49,8 @@ class HabitViewModel (
 
 
         viewModelScope.launch {
-//             sync data base and state
-//             will clean up later
+////             sync data base and state
+////             will clean up later
 //            dao.insertHabit(Habit(name = "test1", frequency = 1))
 //            dao.insertCompletion(HabitCompletion())
 ////            dao.insertHabit(Habit(name = "test2", frequency = 2,))
@@ -96,7 +96,7 @@ class HabitViewModel (
             // handles ModifyHabit event
             is HabitEvent.ModifyHabit -> {
                 val habitCompletion: HabitCompletion
-                if (state.value.editFreq < event.joinHabit.completion.completion){
+                if (state.value.editFreq <= event.joinHabit.completion.completion){
                     habitCompletion = event.joinHabit.completion.copy(completion = state.value.editFreq)
                     updateCompletion(habitCompletion)
 
@@ -207,7 +207,7 @@ class HabitViewModel (
         if (join.frequency == completion.completion && !completion.done){
             comp = completion.copy(done = true)
             insertRecord(habitRecord)
-        }else if(completion.done){
+        }else if(completion.done && join.frequency != completion.completion){
             comp = completion.copy(done = false)
             removeRecord(habitRecord)
         }
