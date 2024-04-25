@@ -9,6 +9,7 @@ sealed interface CustomHabitEvent {
     data class EditName(val name: String): CustomHabitEvent
     // Edit frequency
     data class EditFreq(val frequency: String): CustomHabitEvent
+    data class ToggleDay(val dayIndex: Int): CustomHabitEvent
     // SaveEdit
     data object SaveEdit: CustomHabitEvent
 

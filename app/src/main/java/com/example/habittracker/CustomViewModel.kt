@@ -6,6 +6,7 @@ import com.example.habittracker.database.Habit
 import com.example.habittracker.database.HabitCompletion
 import com.example.habittracker.database.HabitDao
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -42,8 +43,17 @@ class CustomViewModel(
                 }
             }
 
+            is CustomHabitEvent.ToggleDay -> {
+                _state.update {
+                    state ->
+                    val newCompletion = state.completion.toMutableList()
+                    newCompletion[event.dayIndex].value = !newCompletion[event.dayIndex].value
+                    state.copy(completion = newCompletion)
+                }
+            }
+
             is CustomHabitEvent.SaveEdit -> {
-                val test = "1111111"
+                val test = "1111111" // this represent completion and with daily is every day
                 if(state.value.isDaily){
                     val sb = StringBuilder(test)
                     sb.clear()

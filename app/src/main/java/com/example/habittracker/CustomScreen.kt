@@ -3,9 +3,11 @@ package com.example.habittracker
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -17,6 +19,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
@@ -37,7 +40,9 @@ fun CustomScreen(
                 .padding(10.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = "Daily Habit")
+            // Text shown is based on switch state
+            Text(text = if (state.isDaily) "Daily Habit" else "Weekly Habit")
+            // Switch for daily/weekly habits
             SwitchHabit(state, onEvent)
         }
         TextField(
@@ -79,12 +84,11 @@ fun EditWindow(onEvent: (CustomHabitEvent) -> Unit, state: CustomState) {
             manager = focusManager
         )
 
-        CustomTextField(
-            value = state.habitFrequency,
-            label = "Frequency",
-            onchange = {onEvent(CustomHabitEvent.EditFreq(it))},
-            manager = focusManager
-        )
+        if (state.isDaily)
+            DailyFields(state, onEvent, focusManager)
+        else
+            WeeklyFields(state, onEvent, focusManager)
+
         Row (modifier = Modifier.size(width = 380.dp, height = 30.dp)) {
             Button(onClick = { onEvent(CustomHabitEvent.SaveEdit)}) {
                 Text(text = "Save")
@@ -106,4 +110,67 @@ fun SwitchHabit(state: CustomState, onEvent: (CustomHabitEvent) -> Unit) {
             uncheckedTrackColor = MaterialTheme.colorScheme.secondaryContainer,
         )
     )
+}
+
+@Composable
+fun DailyFields(state: CustomState, onEvent: (CustomHabitEvent) -> Unit, focusManager: FocusManager) {
+    CustomTextField(
+        value = state.habitFrequency,
+        label = "Frequency",
+        onchange = {onEvent(CustomHabitEvent.EditFreq(it))},
+        manager = focusManager
+    )
+}
+
+@Composable
+fun WeeklyFields(state: CustomState, onEvent: (CustomHabitEvent) -> Unit, focusManager: FocusManager) {
+    Column {
+        // Every day switch
+        /*Row (verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween) {
+            Text("Every day", modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.width(16.dp))
+            // have to implement
+            Switch(
+                checked = state.isEveryday,
+                onCheckedChange = null,
+                modifier = Modifier.align(Alignment.CenterVertically)
+            )
+        }*/
+
+        // Days buttons
+        Row (
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            for (index in 0 until 7) {
+                val day = listOf("M", "T", "W", "T", "F", "S", "S")[index]
+                val isEnabled = state.completion[index].value
+                DayButton(day, isEnabled, onEvent, index)
+            }
+        }
+    }
+}
+
+@Composable
+fun DayButton(
+    day: String,
+    isEnabled: Boolean,
+    onEvent: (CustomHabitEvent) -> Unit,
+    dayIndex: Int
+) {
+    Button(
+        onClick = { onEvent(CustomHabitEvent.ToggleDay(dayIndex))},
+        enabled = isEnabled,
+        modifier = Modifier
+            .size(width = 40.dp, height = 40.dp)
+            .padding(4.dp)
+    ) {
+        Text(text = day)
+    }
 }
