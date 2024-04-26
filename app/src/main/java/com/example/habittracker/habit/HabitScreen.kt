@@ -104,13 +104,13 @@ fun MainScreen (
                 )
             }
         }
-            Text(text = state.habitRecord.size.toString())
-            for (habitRecord in state.habitRecord) {
-                Text(text = habitRecord.habitName)
-                Text(text = habitRecord.date)
-            }
+        Text(text = state.habitRecord.size.toString())
+        for (habitRecord in state.habitRecord) {
+            Text(text = habitRecord.habitName)
+            Text(text = habitRecord.date)
         }
     }
+}
 
 @Composable
 fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit, state: HabitState) {
@@ -158,15 +158,17 @@ fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit, sta
             }
         }
     }
-        DropdownMenu(expanded = displayHabit.isMenuVisible.value, onDismissRequest = { onEvent(HabitEvent.ContextMenuVisibility(displayHabit))}) {
-            dropdownItems.forEach { item ->
-                DropdownMenuItem(text = { Text(text = item.name)}, onClick = {
+    DropdownMenu(expanded = displayHabit.isMenuVisible.value, onDismissRequest = { onEvent(HabitEvent.ContextMenuVisibility(displayHabit))}) {
+        dropdownItems.forEach { item ->
+            DropdownMenuItem(
+                text = { Text(text = item.name)},
+                onClick = {
                     item.onClick()
-                    onEvent(HabitEvent.ContextMenuVisibility(displayHabit)) }
-                , leadingIcon = { Icon(imageVector = item.icon, contentDescription = null)})
-            }
+                    onEvent(HabitEvent.ContextMenuVisibility(displayHabit))},
+                leadingIcon = { Icon(imageVector = item.icon, contentDescription = null)}
+            )
         }
-
+    }
 }
 
 
@@ -206,13 +208,11 @@ fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit){
                 }
             }
         }
-            IconButton(onClick = { onEvent(HabitEvent.ContextMenuVisibility(displayHabit))}){
-                Icon(imageVector = Icons.Default.MoreVert, contentDescription = "ContextMenu")
-
+        IconButton(onClick = { onEvent(HabitEvent.ContextMenuVisibility(displayHabit))}){
+            Icon(imageVector = Icons.Default.MoreVert, contentDescription = "ContextMenu")
         }
     }
 }
-
 
 
 @Composable
