@@ -12,8 +12,10 @@ import com.example.habittracker.habit.HabitViewModel
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import java.io.IOException
 
 class HabitDaoTest {
     private lateinit var dao: HabitDao
@@ -27,6 +29,12 @@ class HabitDaoTest {
             context, HabitDatabase::class.java).build()
         dao = db.dao
         viewModel = HabitViewModel(dao)
+    }
+
+    @After
+    @Throws(IOException::class)
+    fun closeDB() {
+        db.close()
     }
 
 
@@ -44,6 +52,26 @@ class HabitDaoTest {
         }
         // check that the returned habit name is the same as the inserted one
         assertThat(habitList[0].name).isEqualTo(habit.name)
+    }
+
+    @Test
+    fun daoDeleteTest() = runBlocking {
+        var habitList: List<Habit> = listOf()
+        // create habit and check if habitList is empty
+        val habit = Habit()
+        // insert the 2 habits into the database via the dao
+        dao.insertHabit(habit)
+        dao.insertHabit(habit)
+        dao.fetchHabits().test {
+            habitList = awaitItem()
+            cancel()
+        }
+        dao.deleteHabit(habitList[0])
+        dao.fetchHabits().test {
+            habitList = awaitItem()
+            cancel()
+        }
+        assertThat(habitList.size).isEqualTo(1)
     }
 
 }
