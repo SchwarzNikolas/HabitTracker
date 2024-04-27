@@ -46,20 +46,6 @@ fun CustomScreen(
             // Switch for daily/weekly habits
             SwitchHabit(state, onEvent)
         }
-        TextField(
-            value = "value",
-            onValueChange = { onEvent(CustomHabitEvent.EditName(it)) },
-            label = { Text("label") },
-            colors = TextFieldDefaults.colors(
-                focusedIndicatorColor = Color.Transparent,
-                //cursorColor = Color.Transparent
-            ),
-            keyboardOptions = KeyboardOptions.Default.copy(
-                autoCorrectEnabled = true,
-                imeAction = ImeAction.Done,
-                showKeyboardOnFocus = null ?: true
-            ),
-        )
 
         Row (
             verticalAlignment = Alignment.CenterVertically,
