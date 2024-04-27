@@ -43,20 +43,20 @@ interface HabitDao{
     suspend fun deleteCompletion(completion: HabitCompletion)
 
     @Query("SELECT * FROM Habit JOIN HabitCompletion ON Habit.habitId = HabitCompletion.habitID")
-     fun getHabit(): Flow<List<HabitJoin>>
+    fun getHabit(): Flow<List<HabitJoin>>
 
-     @Insert
-     suspend fun insertCompletion(habitCompletion: HabitCompletion)
+    @Insert
+    suspend fun insertCompletion(habitCompletion: HabitCompletion)
 
-     @Update
-     suspend fun updateCompletion(completion: HabitCompletion)
+    @Update
+    suspend fun updateCompletion(completion: HabitCompletion)
 
-     @Query("UPDATE HabitCompletion SET completion = 0, done = 'false' WHERE occurrence = '1111111'")
-     suspend fun resetDailyCompletion()
+    @Query("UPDATE HabitCompletion SET completion = 0, done = 'false' WHERE occurrence = '1111111'")
+    suspend fun resetDailyCompletion()
 
     @Query("UPDATE HabitCompletion SET completion = 0, done = 'false'")
     suspend fun resetCompletion()
 
-     @Query("SELECT * FROM Habit JOIN HabitCompletion ON Habit.habitId = HabitCompletion.habitID WHERE HabitCompletion.occurrence LIKE :day")
-     fun fetchHabitByDay(day: String): Flow<List<HabitJoin>>
+    @Query("SELECT * FROM Habit JOIN HabitCompletion ON Habit.habitId = HabitCompletion.habitID WHERE HabitCompletion.occurrence LIKE :day")
+    fun fetchHabitByDay(day: String): Flow<List<HabitJoin>>
 }
