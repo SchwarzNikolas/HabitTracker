@@ -1,10 +1,12 @@
 package com.example.habittracker.habit
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -48,6 +50,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 // details about compose available at https://developer.android.com/develop/ui/compose/layouts/basics
 
@@ -61,9 +65,11 @@ fun MainScreen (
     state: HabitState,
     onEvent: (HabitEvent) -> Unit
 ){
+    // val scrollState = rememberScrollState()
 
     Column(
         modifier = Modifier
+            //.verticalScroll(state = scrollState)
             //.verticalScroll(rememberScrollState())
             //.fillMaxWidth(),
         ,horizontalAlignment = Alignment.CenterHorizontally,
@@ -71,14 +77,18 @@ fun MainScreen (
     {
         Text(text = state.date.toString())
 
-        LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 158.dp)) {
+        // Daily part of the screen
+        Text(text = "Daily", textAlign = TextAlign.Center, modifier = Modifier
+            .background(Color.Gray)
+            .fillMaxWidth(), fontSize = 30.sp)
 
+        LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 158.dp)) {
             items(state.displayHabits.size){
-                    ElevatedHabit(
-                        displayHabit = state.displayHabits[it],
-                        onEvent = onEvent,
-                        state
-                    )
+                ElevatedHabit(
+                    displayHabit = state.displayHabits[it],
+                    onEvent = onEvent,
+                    state
+                )
             }
         }
 
@@ -90,7 +100,7 @@ fun MainScreen (
         }
         Text(text = state.date.dayOfWeek.toString())
 
-
+        // Weekly part of the screen
         Text(text = "Weekly", textAlign = TextAlign.Center, modifier = Modifier
             .background(Color.Gray)
             .fillMaxWidth(), fontSize = 30.sp)
@@ -119,6 +129,7 @@ fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit, sta
         Item(name = "Undo", onClick = {onEvent(HabitEvent.DecCompletion(displayHabit.habitJoin))}, Icons.Default.ArrowBack),
         Item(name = "Delete", onClick = {onEvent(HabitEvent.DeleteHabit(displayHabit.habitJoin))}, Icons.Default.Delete)
        )
+
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
@@ -141,8 +152,6 @@ fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit, sta
             contentAlignment = Alignment.Center
         ) {
             Column {
-
-
                 if (displayHabit.beingEdited.value) {
                     EditMode(
                         onEvent = onEvent,
@@ -158,7 +167,10 @@ fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit, sta
             }
         }
     }
-    DropdownMenu(expanded = displayHabit.isMenuVisible.value, onDismissRequest = { onEvent(HabitEvent.ContextMenuVisibility(displayHabit))}) {
+    DropdownMenu(
+        expanded = displayHabit.isMenuVisible.value,
+        onDismissRequest = { onEvent(HabitEvent.ContextMenuVisibility(displayHabit))}
+    ) {
         dropdownItems.forEach { item ->
             DropdownMenuItem(
                 text = { Text(text = item.name)},
