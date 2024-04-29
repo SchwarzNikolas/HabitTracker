@@ -1,7 +1,5 @@
 package com.example.habittracker
 
-import com.example.habittracker.habit.DisplayHabit
-
 sealed interface CustomHabitEvent {
     //User actions
 
@@ -11,8 +9,7 @@ sealed interface CustomHabitEvent {
     data class EditName(val name: String): CustomHabitEvent
     // Edit frequency
     data class EditFreq(val frequency: String): CustomHabitEvent
-    // CancelEdit
-    data object CancelEdit: CustomHabitEvent
+    data class ToggleDay(val dayIndex: Int): CustomHabitEvent
     // SaveEdit
     data object SaveEdit: CustomHabitEvent
 

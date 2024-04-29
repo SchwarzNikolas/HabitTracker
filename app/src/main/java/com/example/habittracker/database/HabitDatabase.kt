@@ -6,7 +6,7 @@ import androidx.room.RoomDatabase
 // This is the database
 @Database(
     // defines which entities belong to the database
-    entities = [Habit::class, HabitRecord::class],
+    entities = [Habit::class, HabitRecord::class, HabitCompletion::class],
     version = 1
 )
 abstract class HabitDatabase:RoomDatabase(){

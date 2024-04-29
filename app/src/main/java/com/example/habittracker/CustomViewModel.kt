@@ -2,9 +2,11 @@ package com.example.habittracker
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.habittracker.database.HabitDao
 import com.example.habittracker.database.Habit
+import com.example.habittracker.database.HabitCompletion
+import com.example.habittracker.database.HabitDao
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -40,17 +42,55 @@ class CustomViewModel(
                     )
                 }
             }
-            is CustomHabitEvent.CancelEdit -> {
+
+            is CustomHabitEvent.ToggleDay -> {
                 _state.update {
-                    it.copy(
-                        customMode = false
-                    )
+                    state ->
+                    val newCompletion = state.completion.toMutableList()
+                    newCompletion[event.dayIndex].value = !newCompletion[event.dayIndex].value
+                    state.copy(completion = newCompletion)
                 }
             }
+
             is CustomHabitEvent.SaveEdit -> {
-                val isDaily = state.value.isDaily
+                /*val test = "1111111" // this represent on which days the habit will show up
+                if(state.value.isDaily){
+                    val sb = StringBuilder(test)
+                    sb.clear()
+                    for(day in state.value.completion){
+                        sb.append(day)
+                    }
+                }*/
+
+                val habitOccurrence: String = if (state.value.isDaily) {
+                    "1111111"
+                }
+                else {
+                    val sb = StringBuilder("0000000")
+                    for (i in 0 until 7) {
+                        if (state.value.completion[i].value) {
+                            sb.setCharAt(i, '1')
+                        }
+                    }
+                    sb.toString()
+                }
+
                 val habitName = state.value.habitName
-                val habitFrequency = state.value.habitFrequency
+                // if weekly habits have also frequency
+                val habitFrequency: String = state.value.habitFrequency
+
+                // if weekly habits don't have frequency
+                /*val habitFrequency: String = if (state.value.isDaily) {
+                    state.value.habitFrequency
+                }
+                else {
+                    //if (habitOccurrence.contains("0")) {
+                    //    "0"
+                    //}
+                    //else {
+                        "1" // delete then frequency form weekly creation
+                    //}
+                }*/
 
                 if (habitName.isBlank() || habitFrequency.isBlank()) {
                     return
@@ -63,12 +103,7 @@ class CustomViewModel(
                 )
                 viewModelScope.launch {
                     dao.insertHabit(newCusHabit)
-                }
-
-                _state.update {
-                    it.copy(
-                        customMode = false
-                    )
+                    dao.insertCompletion(HabitCompletion(occurrence = habitOccurrence))
                 }
             }
         }

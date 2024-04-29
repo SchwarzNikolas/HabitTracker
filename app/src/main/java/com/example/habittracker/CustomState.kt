@@ -1,6 +1,7 @@
 package com.example.habittracker
 
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 
 data class CustomState(
 
@@ -12,4 +13,6 @@ data class CustomState(
     val habitName: String = "badminton",
     // Frequency that will be displayed by the edit box
     val habitFrequency: String = "2",
+    // Represent days for weekly habits
+    val completion: MutableList<MutableState<Boolean>> = MutableList(size = 7){ mutableStateOf(false) },
 )

@@ -9,17 +9,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.habittracker.CustomScreen
-import com.example.habittracker.habit.MainScreen
 import com.example.habittracker.CustomViewModel
 import com.example.habittracker.habit.HabitViewModel
+import com.example.habittracker.habit.MainScreen
 
 // Navigation Bar to switch to different screens
 @Composable
@@ -32,8 +30,6 @@ fun AppNavigation(
     val habitState by habitViewModel.state.collectAsState()
 
     Scaffold(
-        modifier = Modifier.blur( if(habitState.showEdit) {2.dp}
-            else{0.dp}),
         bottomBar = {
             NavigationBar{
                 // get the state of the navcontroller
