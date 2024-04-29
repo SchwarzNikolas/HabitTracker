@@ -1,9 +1,7 @@
 package com.example.habittracker.habit
 
 
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import com.example.habittracker.database.HabitRecord
 import kotlinx.coroutines.Job
 import java.time.LocalDateTime
@@ -26,11 +24,9 @@ data class HabitState(
     val weeklyDisplayHabits: MutableList<DisplayHabit> = mutableStateListOf(),
 
 
-    val date2: MutableState<LocalDateTime> = mutableStateOf(LocalDateTime.now()),
+    val date2: LocalDateTime = LocalDateTime.now().plusDays(1),
     // temp
     val date: LocalDateTime = LocalDateTime.now(),
-
-    val day: String = date.dayOfWeek.toString(),
 
     var job: Job
 

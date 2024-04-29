@@ -89,6 +89,7 @@ fun MainScreen (
             Text(text = "next day")
         }
         Text(text = state.date.dayOfWeek.toString())
+        Text(text = state.date2.dayOfWeek.toString())
 
 
         Text(text = "Weekly", textAlign = TextAlign.Center, modifier = Modifier
@@ -141,8 +142,6 @@ fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit, sta
             contentAlignment = Alignment.Center
         ) {
             Column {
-
-
                 if (displayHabit.beingEdited.value) {
                     EditMode(
                         onEvent = onEvent,

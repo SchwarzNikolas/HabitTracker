@@ -8,10 +8,12 @@ import com.example.habittracker.database.HabitDao
 import com.example.habittracker.database.HabitJoin
 import com.example.habittracker.database.HabitRecord
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 // modifies the state of the HabitState
 
@@ -23,29 +25,24 @@ class HabitViewModel (
     val state = _state
 
     init {
-//
-//        viewModelScope.launch {
-//
-//            val date: Flow<LocalDateTime> = flowOf(LocalDateTime.now())
-//
-//            date.collect{newDate -> run{
-//                Log.d("AAAAAAAAAAAAAAa", "here")
-////                if (newDate != state.value.date){
-////                    state.value.job.cancel()
-////                    state.update { it.copy(date = newDate) }
-////                    if(newDate.dayOfWeek.value == 1){
-////                        resetCompletion()
-////                    }else{
-////                        resetDailyCompletion()
-////                    }
-////                    state.update { it.copy(
-////                        job = viewModelScope.launch { dataSupRoutine() }
-////                    )
-////                    }
-////                }
-//            }
-//            }
-//        }
+
+        viewModelScope.launch {
+
+            while (true) {
+                if (getDate() != state.value.date) {
+                    state.update {
+                        it.copy(
+                            date = getDate()
+                        )
+                    }
+                    resetDailyCompletion()
+                    state.value.job.cancel()
+
+                    state.value.job = viewModelScope.launch { dataSupRoutine() }
+                }
+                delay(500)
+            }
+        }
 
 
         viewModelScope.launch {
@@ -53,8 +50,6 @@ class HabitViewModel (
 ////             will clean up later
 //            dao.insertHabit(Habit(name = "test1", frequency = 1))
 //            dao.insertCompletion(HabitCompletion())
-////            dao.insertHabit(Habit(name = "test2", frequency = 2,))
-////            dao.insertCompletion(HabitCompletion(occurrence = "1011111"))
 //            dao.insertHabit(Habit(name = "test1", frequency = 3,))
 //            dao.insertCompletion(HabitCompletion(occurrence = "1000000"))
 //            dao.insertHabit(Habit(name = "test2", frequency = 4,))
@@ -84,10 +79,10 @@ class HabitViewModel (
             }
             }
         }
-
-        _state.value.job = viewModelScope.launch {
-            dataSupRoutine()
-        }
+//
+//        state.value.job = viewModelScope.launch {
+//            dataSupRoutine()
+//        }
     }
 
     // Handles the events triggered by the UI
@@ -187,12 +182,7 @@ class HabitViewModel (
             }
             // Deprecated
             HabitEvent.NextDay -> {
-                resetDailyCompletion()
-                state.value.job.cancel()
-                state.update { it.copy(date = state.value.date.plusDays(1)) }
-                state.update { it.copy(
-                    job = viewModelScope.launch { dataSupRoutine() }
-                ) }
+                state.update { it.copy(date2 = state.value.date2.plusDays(1)) }
             }
         }
     }
@@ -286,5 +276,12 @@ class HabitViewModel (
             dao.resetCompletion()
         }
     }
+
+    // tem
+
+    private fun getDate(): LocalDateTime {
+        return state.value.date2
+    }
+
 }
 
