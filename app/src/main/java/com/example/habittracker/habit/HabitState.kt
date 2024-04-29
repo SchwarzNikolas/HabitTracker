@@ -19,6 +19,8 @@ data class HabitState(
 
     val editDisplayHabit: DisplayHabit = DisplayHabit(),
 
+    val editDays: String = "",
+
     // list of all the habits that will be displayed
     val displayHabits: MutableList<DisplayHabit> = mutableStateListOf(),
     val weeklyDisplayHabits: MutableList<DisplayHabit> = mutableStateListOf(),

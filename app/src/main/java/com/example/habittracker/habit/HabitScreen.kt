@@ -7,11 +7,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
@@ -34,6 +34,7 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -51,11 +52,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.OutlinedButton
-import com.example.habittracker.CustomHabitEvent
-import com.example.habittracker.DayButton
+
 
 // details about compose available at https://developer.android.com/develop/ui/compose/layouts/basics
 
@@ -69,14 +66,14 @@ fun MainScreen (
     state: HabitState,
     onEvent: (HabitEvent) -> Unit
 ){
-    // val scrollState = rememberScrollState()
+    //val scrollState = rememberScrollState()
 
     Column(
-        modifier = Modifier
-            //.verticalScroll(state = scrollState)
-            //.verticalScroll(rememberScrollState())
-            //.fillMaxWidth(),
-        ,horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier,
+        //.verticalScroll(state = scrollState)
+        //.verticalScroll(rememberScrollState())
+        //.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
     )
     {
         Text(text = state.date.toString())
@@ -94,6 +91,18 @@ fun MainScreen (
                     state
                 )
             }
+            item(span = {GridItemSpan(2)}) {
+                Text(text = "Weekly", textAlign = TextAlign.Center, modifier = Modifier
+                    .background(Color.Gray)
+                    .fillMaxWidth(), fontSize = 30.sp)
+            }
+            items(state.weeklyDisplayHabits.size){
+                ElevatedHabit(
+                    displayHabit = state.weeklyDisplayHabits[it],
+                    onEvent = onEvent,
+                    state
+                )
+            }
         }
 
         Button(onClick = { onEvent(HabitEvent.ResetCompletion)}) {
@@ -106,19 +115,19 @@ fun MainScreen (
         Text(text = state.date2.dayOfWeek.toString())
 
         // Weekly part of the screen
-        Text(text = "Weekly", textAlign = TextAlign.Center, modifier = Modifier
-            .background(Color.Gray)
-            .fillMaxWidth(), fontSize = 30.sp)
+//        Text(text = "Weekly", textAlign = TextAlign.Center, modifier = Modifier
+//            .background(Color.Gray)
+//            .fillMaxWidth(), fontSize = 30.sp)
 
-        LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 158.dp)) {
-            items(state.weeklyDisplayHabits.size){
-                ElevatedHabit(
-                    displayHabit = state.weeklyDisplayHabits[it],
-                    onEvent = onEvent,
-                    state
-                )
-            }
-        }
+//        LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 158.dp)) {
+//            items(state.weeklyDisplayHabits.size){
+//                ElevatedHabit(
+//                    displayHabit = state.weeklyDisplayHabits[it],
+//                    onEvent = onEvent,
+//                    state
+//                )
+//            }
+//        }
         Text(text = state.habitRecord.size.toString())
         for (habitRecord in state.habitRecord) {
             Text(text = habitRecord.habitName)
@@ -194,13 +203,16 @@ fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit){
 
     val habitJoin = displayHabit.habitJoin
 
-    BasicTextField(value = displayHabit.habitJoin.habit.name,
+    BasicTextField(
+        value = displayHabit.habitJoin.habit.name,
         onValueChange = { },
-        keyboardOptions = KeyboardOptions.Default.copy(autoCorrectEnabled = true,
+        keyboardOptions = KeyboardOptions.Default.copy(
+            autoCorrectEnabled = true,
             imeAction = ImeAction.Done,
             showKeyboardOnFocus = true,
             capitalization = KeyboardCapitalization.Sentences,
-            keyboardType = KeyboardType.Text),
+            keyboardType = KeyboardType.Text
+        ),
         singleLine = true,
         textStyle = LocalTextStyle.current.copy(fontSize = 30.sp),
         modifier = Modifier.padding(bottom = 5.dp),
@@ -350,7 +362,7 @@ fun DaysSelection(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, sta
     ) {
         for (index in 0 until 7) {
             val day = listOf("M", "T", "W", "T", "F", "S", "S")[index]
-            val clicked = displayHabit.habitJoin.completion.occurrence[index] == '1'
+            val clicked =  state.editDays[index] == '1'
             DayButton(day, clicked, onEvent, index)
         }
     }
@@ -369,7 +381,7 @@ fun DayButton(
     ) {
         Text(text = day)
         OutlinedButton(
-            onClick = { onEvent(HabitEvent.UpDateEditDays(dayIndex)) },
+            onClick = { onEvent(HabitEvent.UpDateEditDays(dayIndex, clicked)) },
             modifier = Modifier
                 .size(width = 16.dp, height = 16.dp),
             border = BorderStroke(1.dp, Color.Black),

@@ -17,6 +17,10 @@ import java.time.LocalDateTime
 
 // modifies the state of the HabitState
 
+private fun Boolean.toChar(): Char {
+    return if(this) '1' else '0'
+}
+
 //TODO update completion on edit
 class HabitViewModel (
     private val dao: HabitDao
@@ -27,7 +31,7 @@ class HabitViewModel (
     init {
 
         viewModelScope.launch {
-
+            state.value.job = viewModelScope.launch { dataSupRoutine() }
             while (true) {
                 if (getDate() != state.value.date) {
                     state.update {
@@ -35,9 +39,8 @@ class HabitViewModel (
                             date = getDate()
                         )
                     }
-                    resetDailyCompletion()
+                    resetCompletion()
                     state.value.job.cancel()
-
                     state.value.job = viewModelScope.launch { dataSupRoutine() }
                 }
                 delay(500)
@@ -92,17 +95,16 @@ class HabitViewModel (
             is HabitEvent.ModifyHabit -> {
                 val habitCompletion: HabitCompletion
                 if (state.value.editFreq <= event.joinHabit.completion.completion){
-                    habitCompletion = event.joinHabit.completion.copy(completion = state.value.editFreq)
-                    updateCompletion(habitCompletion)
-
+                    habitCompletion = event.joinHabit.completion.copy(completion = state.value.editFreq,occurrence = state.value.editDays)
                 }else{
-                    habitCompletion = event.joinHabit.completion
+                    habitCompletion = event.joinHabit.completion.copy(occurrence = state.value.editDays)
                 }
                 val habit = event.joinHabit.habit.copy(
                     frequency = state.value.editFreq,
                     name = state.value.editString
                 )
 
+                updateCompletion(habitCompletion)
                 checkHabitCompletion(habit, habitCompletion)
                 updateHabit(habit)
             }
@@ -113,6 +115,7 @@ class HabitViewModel (
                     it.copy(
                         editString = event.displayHabit.habitJoin.habit.name,
                         editFreq = event.displayHabit.habitJoin.habit.frequency,
+                        editDays = event.displayHabit.habitJoin.completion.occurrence,
                         editDisplayHabit = event.displayHabit
                     )
                 }
@@ -147,7 +150,11 @@ class HabitViewModel (
 
             // changes days of a weekly habit
             is HabitEvent.UpDateEditDays -> {
-                // TODO
+                val sb  = StringBuilder(state.value.editDays)
+                sb.setCharAt(event.newDayIndex, event.clicked.not().toChar())
+                state.update { it.copy(
+                    editDays = sb.toString()
+                ) }
             }
 
             // closes the edit window
@@ -184,7 +191,7 @@ class HabitViewModel (
 
             // Deprecated
             HabitEvent.ResetCompletion -> {
-                resetDailyCompletion()
+                resetCompletion()
             }
             // Deprecated
             HabitEvent.NextDay -> {
@@ -271,11 +278,6 @@ class HabitViewModel (
         return sb.toString()
     }
 
-    private fun resetDailyCompletion(){
-        viewModelScope.launch {
-            dao.resetDailyCompletion()
-        }
-    }
 
     private fun resetCompletion(){
         viewModelScope.launch {
@@ -284,6 +286,8 @@ class HabitViewModel (
     }
 
     // tem
+
+
 
     private fun getDate(): LocalDateTime {
         return state.value.date2

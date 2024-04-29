@@ -13,7 +13,7 @@ sealed interface HabitEvent {
     data class EditHabit(val displayHabit: DisplayHabit): HabitEvent
     data class UpDateEditString(val newString : String): HabitEvent
     data class UpDateEditFreq(val newFreq : Int): HabitEvent
-    data class UpDateEditDays(val newDayIndex : Int): HabitEvent
+    data class UpDateEditDays(val newDayIndex : Int, val clicked: Boolean): HabitEvent
     data class ModifyHabit(val joinHabit: HabitJoin) : HabitEvent
     data class CancelEdit(val displayHabit: DisplayHabit) : HabitEvent
     data class DeleteHabit(val habitJoin: HabitJoin): HabitEvent
@@ -24,4 +24,5 @@ sealed interface HabitEvent {
     // Deprecated
     data object ResetCompletion: HabitEvent
     data object NextDay: HabitEvent
+
 }

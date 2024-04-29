@@ -51,9 +51,6 @@ interface HabitDao{
     @Update
     suspend fun updateCompletion(completion: HabitCompletion)
 
-    @Query("UPDATE HabitCompletion SET completion = 0, done = 'false' WHERE occurrence = '1111111'")
-    suspend fun resetDailyCompletion()
-
     @Query("UPDATE HabitCompletion SET completion = 0, done = 'false'")
     suspend fun resetCompletion()
 
