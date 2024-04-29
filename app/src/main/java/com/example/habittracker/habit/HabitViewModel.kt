@@ -149,6 +149,12 @@ class HabitViewModel (
                     )
                 }
             }
+
+            // changes days of a weekly habit
+            is HabitEvent.UpDateEditDays -> {
+                // TODO
+            }
+
             // closes the edit window
             is HabitEvent.CancelEdit -> {
                 event.displayHabit.beingEdited.value = false
