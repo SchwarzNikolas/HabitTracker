@@ -1,10 +1,13 @@
 package com.example.habittracker.habit
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -48,6 +51,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.OutlinedButton
+import com.example.habittracker.CustomHabitEvent
+import com.example.habittracker.DayButton
 
 // details about compose available at https://developer.android.com/develop/ui/compose/layouts/basics
 
@@ -61,9 +69,11 @@ fun MainScreen (
     state: HabitState,
     onEvent: (HabitEvent) -> Unit
 ){
+    // val scrollState = rememberScrollState()
 
     Column(
         modifier = Modifier
+            //.verticalScroll(state = scrollState)
             //.verticalScroll(rememberScrollState())
             //.fillMaxWidth(),
         ,horizontalAlignment = Alignment.CenterHorizontally,
@@ -71,14 +81,18 @@ fun MainScreen (
     {
         Text(text = state.date.toString())
 
-        LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 158.dp)) {
+        // Daily part of the screen
+        Text(text = "Daily", textAlign = TextAlign.Center, modifier = Modifier
+            .background(Color.Gray)
+            .fillMaxWidth(), fontSize = 30.sp)
 
+        LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 158.dp)) {
             items(state.displayHabits.size){
-                    ElevatedHabit(
-                        displayHabit = state.displayHabits[it],
-                        onEvent = onEvent,
-                        state
-                    )
+                ElevatedHabit(
+                    displayHabit = state.displayHabits[it],
+                    onEvent = onEvent,
+                    state
+                )
             }
         }
 
@@ -91,7 +105,7 @@ fun MainScreen (
         Text(text = state.date.dayOfWeek.toString())
         Text(text = state.date2.dayOfWeek.toString())
 
-
+        // Weekly part of the screen
         Text(text = "Weekly", textAlign = TextAlign.Center, modifier = Modifier
             .background(Color.Gray)
             .fillMaxWidth(), fontSize = 30.sp)
@@ -120,6 +134,7 @@ fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit, sta
         Item(name = "Undo", onClick = {onEvent(HabitEvent.DecCompletion(displayHabit.habitJoin))}, Icons.Default.ArrowBack),
         Item(name = "Delete", onClick = {onEvent(HabitEvent.DeleteHabit(displayHabit.habitJoin))}, Icons.Default.Delete)
        )
+
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
@@ -157,7 +172,10 @@ fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit, sta
             }
         }
     }
-    DropdownMenu(expanded = displayHabit.isMenuVisible.value, onDismissRequest = { onEvent(HabitEvent.ContextMenuVisibility(displayHabit))}) {
+    DropdownMenu(
+        expanded = displayHabit.isMenuVisible.value,
+        onDismissRequest = { onEvent(HabitEvent.ContextMenuVisibility(displayHabit))}
+    ) {
         dropdownItems.forEach { item ->
             DropdownMenuItem(
                 text = { Text(text = item.name)},
@@ -228,10 +246,12 @@ fun EditMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, state: H
             textDecoration = TextDecoration.Underline),
         modifier = Modifier.padding(bottom = 5.dp)
     )
+
     val habitJoin = displayHabit.habitJoin
     Row {
         Box(
-            modifier = Modifier.padding(start = 30.dp, bottom = 10.dp),
+            modifier = Modifier
+                .padding(start = 30.dp, bottom = 10.dp),
             contentAlignment = Alignment.Center
         ) {
             CircularProgressBar(angle = (habitJoin.completion.completion.toFloat() / habitJoin.habit.frequency) * 360)
@@ -247,9 +267,22 @@ fun EditMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, state: H
                 contentPadding = PaddingValues(0.dp),
                 enabled = false
             ) {
-                Text(text = habitJoin.completion.completion.toString(), modifier = Modifier.padding(end = 20.dp),fontSize = 20.sp )
-                Text(text = "/" ,modifier = Modifier.padding(start = 0.dp),fontSize = 20.sp)
-                Box(modifier = Modifier.padding(start = 20.dp)) {
+                Text(
+                    text = habitJoin.completion.completion.toString(),
+                    modifier = Modifier
+                        .padding(end = 20.dp),
+                    fontSize = 20.sp
+                )
+                Text(
+                    text = "/" ,
+                    modifier = Modifier
+                        .padding(start = 0.dp),
+                    fontSize = 20.sp
+                )
+                Box(
+                    modifier = Modifier.
+                    padding(start = 20.dp)
+                ) {
                     NumberPicker(
                         value = state.editFreq,
                         onValueChange = { onEvent(HabitEvent.UpDateEditFreq(it)) },
@@ -258,16 +291,23 @@ fun EditMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, state: H
                 }
             }
         }
+
         Column {
-            IconButton(onClick = { onEvent(HabitEvent.ModifyHabit(habitJoin))}){
+            IconButton(
+                onClick = { onEvent(HabitEvent.ModifyHabit(habitJoin))}
+            ) {
                 Icon(imageVector = Icons.Default.Check, contentDescription = "ContextMenu")
-
             }
-            IconButton(onClick = { onEvent(HabitEvent.CancelEdit(displayHabit))}){
+            IconButton(onClick = { onEvent(HabitEvent.CancelEdit(displayHabit))}
+            ) {
                 Icon(imageVector = Icons.Default.Close, contentDescription = "cancel edit")
-
             }
         }
+    }
+
+    // chose days
+    if (habitJoin.completion.occurrence.contains("0")) {
+        DaysSelection(onEvent, displayHabit, state)
     }
 }
 //@Composable
@@ -300,3 +340,42 @@ fun CustomTextField(value: String, label: String, onchange: (String) -> Unit, ma
     )
 }
 
+@Composable
+fun DaysSelection(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, state: HabitState) {
+    Row (
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        for (index in 0 until 7) {
+            val day = listOf("M", "T", "W", "T", "F", "S", "S")[index]
+            val clicked = displayHabit.habitJoin.completion.occurrence[index] == '1'
+            DayButton(day, clicked, onEvent, index)
+        }
+    }
+}
+
+@Composable
+fun DayButton(
+    day: String,
+    clicked: Boolean,
+    onEvent: (HabitEvent) -> Unit,
+    dayIndex: Int
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(4.dp)
+    ) {
+        Text(text = day)
+        OutlinedButton(
+            onClick = { onEvent(HabitEvent.UpDateEditDays(dayIndex)) },
+            modifier = Modifier
+                .size(width = 16.dp, height = 16.dp),
+            border = BorderStroke(1.dp, Color.Black),
+            colors = ButtonDefaults.outlinedButtonColors(
+                containerColor = if (clicked) Color.Black else Color.White,
+            )
+        ) {}
+    }
+}
