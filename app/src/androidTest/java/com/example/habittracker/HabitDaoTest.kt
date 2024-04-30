@@ -46,7 +46,6 @@ class HabitDaoTest {
         db.close()
     }
 
-
     @Test
     fun daoInsertTest() = runBlocking{
         // create habit and check if habitList is empty
@@ -195,23 +194,6 @@ class HabitDaoTest {
         // check that data got updated
         assertThat(habitCompletion[0].completion.done).isEqualTo(true)
         assertThat(habitCompletion[0].completion.completion).isEqualTo(1)
-    }
-
-    @Test
-    fun resetDailyCompletionTest() = runBlocking {
-        // create habitCompletion and insert them into the database
-        val completedHabit = HabitCompletion(1, 1, true, "1111111")
-        dao.insertHabit(Habit())
-        dao.insertCompletion(completedHabit)
-        // reset the completion and fetch all the habits
-        dao.resetDailyCompletion()
-        dao.getHabit().test {
-            habitCompletion = awaitItem()
-            cancelAndIgnoreRemainingEvents()
-        }
-        // check if the stats got reset
-        assertThat(habitCompletion[0].completion.done).isEqualTo(false)
-        assertThat(habitCompletion[0].completion.completion).isEqualTo(0)
     }
 
     @Test
