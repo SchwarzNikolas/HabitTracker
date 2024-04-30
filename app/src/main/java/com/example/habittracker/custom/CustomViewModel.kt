@@ -1,4 +1,4 @@
-package com.example.habittracker
+package com.example.habittracker.custom
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -6,7 +6,6 @@ import com.example.habittracker.database.Habit
 import com.example.habittracker.database.HabitCompletion
 import com.example.habittracker.database.HabitDao
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 

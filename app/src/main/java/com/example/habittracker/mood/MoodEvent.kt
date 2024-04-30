@@ -1,4 +1,6 @@
 package com.example.habittracker.mood
 
-interface MoodEvent {
+// Events that happen in the MoodScreen
+sealed interface MoodEvent {
+
 }
