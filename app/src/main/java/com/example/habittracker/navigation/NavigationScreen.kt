@@ -18,11 +18,14 @@ import com.example.habittracker.CustomScreen
 import com.example.habittracker.CustomViewModel
 import com.example.habittracker.habit.HabitViewModel
 import com.example.habittracker.habit.MainScreen
+import com.example.habittracker.mood.MoodScreen
+import com.example.habittracker.mood.MoodViewModel
 
 // Navigation Bar to switch to different screens
 @Composable
 fun AppNavigation(
     // get the viewmodels from the MainActivity
+    moodViewModel: MoodViewModel,
     customViewModel: CustomViewModel,
     habitViewModel: HabitViewModel
 ){
@@ -73,6 +76,11 @@ fun AppNavigation(
                 // link the CustomScreen to the second button
                 val customState by customViewModel.state.collectAsState()
                 CustomScreen(state = customState, onEvent = customViewModel::onEvent)
+            }
+            composable(route = "Mood"){
+                // link the CustomScreen to the second button
+                val moodState by moodViewModel.state.collectAsState()
+                MoodScreen(state = moodState, onEvent = moodViewModel::onEvent)
             }
             composable(route = "History"){
                 // link the HistoryScreen to the third button

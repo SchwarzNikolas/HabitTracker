@@ -67,7 +67,6 @@ fun MainScreen (
     onEvent: (HabitEvent) -> Unit
 ){
     //val scrollState = rememberScrollState()
-
     Column(
         modifier = Modifier,
         //.verticalScroll(state = scrollState)

@@ -3,6 +3,7 @@ package com.example.habittracker.navigation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -22,6 +23,11 @@ val destinationList = listOf(
         // Page for the CustomScreen
         label = "Add",
         icon = Icons.Default.Add
+    ),
+    NavigationDestination(
+        // Page for the MoodScreen
+        label = "Mood",
+        icon = Icons.Default.Face
     ),
     NavigationDestination(
         // Page for the HistoryScreen
