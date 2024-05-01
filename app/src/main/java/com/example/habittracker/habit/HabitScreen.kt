@@ -52,6 +52,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.habittracker.custom.CustomHabitEvent
 import com.example.habittracker.mood.MoodEvent
 import com.example.habittracker.mood.MoodState
 
@@ -399,7 +400,7 @@ fun DayButton(
 }
 
 @Composable
-fun MoodSection(state: MoodState, onEvent: (MoodEvent) -> Unit, modifier: Modifier) {
+fun MoodSection(moodState: MoodState, onMoodEvent: (MoodEvent) -> Unit, modifier: Modifier) {
     Column (
         modifier = modifier
             .fillMaxWidth()
@@ -414,8 +415,9 @@ fun MoodSection(state: MoodState, onEvent: (MoodEvent) -> Unit, modifier: Modifi
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Text("Bad")
+            // No logic for now
             repeat(5) { index ->
-                // MoodCircle(index, onMoodSelected)
+                MoodButton(index, onMoodEvent) // can add other things
             }
             Text("Good")
         }
@@ -423,6 +425,15 @@ fun MoodSection(state: MoodState, onEvent: (MoodEvent) -> Unit, modifier: Modifi
 }
 
 @Composable
-fun MoodCircle(index: Int) {
-
+fun MoodButton(index: Int, onMoodEvent: (MoodEvent) -> Unit) {
+    // No logic for now
+    OutlinedButton(
+        onClick = { /*TODO*/ },
+        modifier = Modifier
+            .size(width = 40.dp, height = 40.dp),
+        border = BorderStroke(1.dp, Color.Black),
+        colors = ButtonDefaults.outlinedButtonColors(
+            containerColor = Color.White
+        )
+    ) {}
 }
