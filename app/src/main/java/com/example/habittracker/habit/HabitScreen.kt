@@ -52,6 +52,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.habittracker.mood.MoodEvent
+import com.example.habittracker.mood.MoodState
 
 
 // details about compose available at https://developer.android.com/develop/ui/compose/layouts/basics
@@ -64,7 +66,9 @@ data class Item(
 @Composable
 fun MainScreen (
     state: HabitState,
-    onEvent: (HabitEvent) -> Unit
+    moodState: MoodState,
+    onEvent: (HabitEvent) -> Unit,
+    onMoodEvent: (MoodEvent) -> Unit
 ){
     //val scrollState = rememberScrollState()
     Column(
@@ -76,6 +80,9 @@ fun MainScreen (
     )
     {
         Text(text = state.date.toString())
+
+        // Mood part of the screen
+        MoodSection(moodState, onMoodEvent, Modifier)
 
         // Daily part of the screen
         Text(text = "Daily", textAlign = TextAlign.Center, modifier = Modifier
@@ -389,4 +396,33 @@ fun DayButton(
             )
         ) {}
     }
+}
+
+@Composable
+fun MoodSection(state: MoodState, onEvent: (MoodEvent) -> Unit, modifier: Modifier) {
+    Column (
+        modifier = modifier
+            .fillMaxWidth()
+    ) {
+        Text(
+            text = "How do you feel?",
+            textAlign = TextAlign.Center,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Text("Bad")
+            repeat(5) { index ->
+                // MoodCircle(index, onMoodSelected)
+            }
+            Text("Good")
+        }
+    }
+}
+
+@Composable
+fun MoodCircle(index: Int) {
+
 }

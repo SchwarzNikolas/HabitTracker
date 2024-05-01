@@ -25,11 +25,6 @@ val destinationList = listOf(
         icon = Icons.Default.Add
     ),
     NavigationDestination(
-        // Page for the MoodScreen
-        label = "Mood",
-        icon = Icons.Default.Face
-    ),
-    NavigationDestination(
         // Page for the HistoryScreen
         label = "History",
         icon = Icons.Default.DateRange
