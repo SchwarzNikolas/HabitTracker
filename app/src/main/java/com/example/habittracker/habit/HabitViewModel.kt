@@ -51,7 +51,7 @@ class HabitViewModel (
         viewModelScope.launch {
 ////             sync data base and state
 ////             will clean up later
-//            dao.insertHabit(Habit(name = "test1", frequency = 1))
+//            dao.insertHabit(Habit(name = "test1", frequency = 5))
 //            dao.insertCompletion(HabitCompletion())
 //            dao.insertHabit(Habit(name = "test1", frequency = 3,))
 //            dao.insertCompletion(HabitCompletion(occurrence = "1000000"))

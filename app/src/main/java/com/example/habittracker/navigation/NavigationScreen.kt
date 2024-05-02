@@ -18,7 +18,7 @@ import com.example.habittracker.custom.CustomScreen
 import com.example.habittracker.custom.CustomViewModel
 import com.example.habittracker.habit.HabitViewModel
 import com.example.habittracker.habit.MainScreen
-import com.example.habittracker.mood.MoodScreen
+import com.example.habittracker.mood.MoodState
 import com.example.habittracker.mood.MoodViewModel
 
 // Navigation Bar to switch to different screens
@@ -31,6 +31,7 @@ fun AppNavigation(
 ){
     val navController = rememberNavController() // The navcontroller is responsible to handle the page navigation
     val habitState by habitViewModel.state.collectAsState()
+    val moodState by moodViewModel.state.collectAsState()
 
     Scaffold(
         bottomBar = {
@@ -70,17 +71,12 @@ fun AppNavigation(
         ){
             composable(route = "Home"){
                 // link the MainScreen to the first button
-                MainScreen(state = habitState, onEvent = habitViewModel::onEvent)
+                MainScreen(state = habitState, moodState = moodState, onEvent = habitViewModel::onEvent, onMoodEvent = moodViewModel::onEvent)
             }
             composable(route = "Add"){
                 // link the CustomScreen to the second button
                 val customState by customViewModel.state.collectAsState()
                 CustomScreen(state = customState, onEvent = customViewModel::onEvent)
-            }
-            composable(route = "Mood"){
-                // link the CustomScreen to the second button
-                val moodState by moodViewModel.state.collectAsState()
-                MoodScreen(state = moodState, onEvent = moodViewModel::onEvent)
             }
             composable(route = "History"){
                 // link the HistoryScreen to the third button

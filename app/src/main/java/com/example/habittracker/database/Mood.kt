@@ -7,8 +7,8 @@ import androidx.room.PrimaryKey
 @Entity
 data class Mood(
     @PrimaryKey(autoGenerate = true)
-    val moodId: Int = 0,
-    val name: String = "Pumped",
-    val moodColor: String = "Purple"
+    val moodId: Int,
+    val moodName: String,
+    val moodColor: String
 )
 
