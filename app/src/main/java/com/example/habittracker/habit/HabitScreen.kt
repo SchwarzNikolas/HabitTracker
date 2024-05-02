@@ -1,6 +1,7 @@
 package com.example.habittracker.habit
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,6 +24,8 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material3.Button
@@ -36,15 +39,23 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -69,13 +80,31 @@ fun MainScreen (
     //val scrollState = rememberScrollState()
     Column(
         modifier = Modifier,
-        //.verticalScroll(state = scrollState)
-        //.verticalScroll(rememberScrollState())
-        //.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     )
     {
-        Text(text = state.date.toString())
+
+        for (habit in state.displayHabits){
+            Row {
+//            if (habit.beingEdited.value) {
+//                IconButton(
+//                    onClick = { onEvent(HabitEvent.ModifyHabit(habit.habitJoin)) }
+//                ) {
+//                    Icon(imageVector = Icons.Default.Check, contentDescription = "ContextMenu")
+//                    }
+//                }
+                BarExample(displayHabit = habit, onEvent = onEvent, state = state)
+//                if (habit.beingEdited.value) {
+//                    IconButton(onClick = { onEvent(HabitEvent.CancelEdit(habit)) }
+//                    ) {
+//                        Icon(imageVector = Icons.Default.Close, contentDescription = "cancel edit")
+//                    }
+//                }
+            }
+        }
+        for (habit in state.displayHabits){
+            CircleUpdate(displayHabit = habit, onEvent = onEvent, state = state)
+        }
 
         // Daily part of the screen
         Text(text = "Daily", textAlign = TextAlign.Center, modifier = Modifier
@@ -90,7 +119,7 @@ fun MainScreen (
                     state
                 )
             }
-            item(span = {GridItemSpan(2)}) {
+            item(span = { GridItemSpan(2) }) {
                 Text(text = "Weekly", textAlign = TextAlign.Center, modifier = Modifier
                     .background(Color.Gray)
                     .fillMaxWidth(), fontSize = 30.sp)
@@ -104,6 +133,9 @@ fun MainScreen (
             }
         }
 
+        //debug
+        Text(text = state.date.toString())
+
         Button(onClick = { onEvent(HabitEvent.ResetCompletion)}) {
                 Text(text = "test")
         }
@@ -113,24 +145,327 @@ fun MainScreen (
         Text(text = state.date.dayOfWeek.toString())
         Text(text = state.date2.dayOfWeek.toString())
 
-        // Weekly part of the screen
-//        Text(text = "Weekly", textAlign = TextAlign.Center, modifier = Modifier
-//            .background(Color.Gray)
-//            .fillMaxWidth(), fontSize = 30.sp)
-
-//        LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 158.dp)) {
-//            items(state.weeklyDisplayHabits.size){
-//                ElevatedHabit(
-//                    displayHabit = state.weeklyDisplayHabits[it],
-//                    onEvent = onEvent,
-//                    state
-//                )
-//            }
-//        }
         Text(text = state.habitRecord.size.toString())
         for (habitRecord in state.habitRecord) {
             Text(text = habitRecord.habitName)
             Text(text = habitRecord.date)
+        }
+    }
+}
+
+@Composable
+fun BarExample(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit, state: HabitState){
+    val dropdownItems :List<Item> = listOf(
+        Item(name ="Edit", onClick =  {onEvent(HabitEvent.EditHabit(displayHabit))}, Icons.Default.Edit),
+        Item(name = "Undo", onClick = {onEvent(HabitEvent.DecCompletion(displayHabit.habitJoin))}, Icons.Default.ArrowBack),
+        Item(name = "Delete", onClick = {onEvent(HabitEvent.DeleteHabit(displayHabit.habitJoin))}, Icons.Default.Delete)
+    )
+    ElevatedCard(
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 6.dp
+        ),
+        modifier = Modifier
+            //.size(width = 380.dp, height = 130.dp)
+            .padding(vertical = 5.dp, horizontal = 5.dp),
+        colors = CardDefaults.cardColors(Color.Gray)
+
+    ) {
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.TopCenter
+            ) {
+
+
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Row {
+                        Text(text = displayHabit.habitJoin.habit.name)
+                        IconButton(onClick = { onEvent(HabitEvent.ContextMenuVisibility(displayHabit)) }) {
+                            Icon(
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = "ContextMenu"
+                            )
+                        }
+                    }
+                    val w = 300.dp
+                    val h = 50.dp
+                    if (displayHabit.beingEdited.value) {
+
+                        Row (modifier = Modifier.padding(bottom = 5.dp)){
+                            TextButton(onClick = { /*TODO*/ },
+                                modifier = Modifier
+                                    .background(Color.DarkGray)
+                                    .size(w / 2, h)) {
+                                Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = "")
+                            }
+                            TextButton(onClick = { /*TODO*/ },
+                                modifier = Modifier
+                                    .background(Color.DarkGray)
+                                    .size(w / 2, h)) {
+                                Icon(imageVector = Icons.Default.KeyboardArrowUp, contentDescription = "")
+                            }
+
+                            Button(
+                                onClick = { /*TODO*/ },
+                                enabled = false,
+                                modifier = Modifier.padding(start = 5.dp)
+                            ) {
+                                Text(text = displayHabit.habitJoin.habit.frequency.toString())
+                            }
+//
+//                            IconButton(onClick = { onEvent(HabitEvent.CancelEdit(displayHabit),
+//                                ) }
+//                            ) {
+//                                Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = "cancel edit")
+//                            }
+//                            IconButton(onClick = { onEvent(HabitEvent.CancelEdit(displayHabit)) }
+//                            ) {
+//                                Icon(imageVector = Icons.Default.KeyboardArrowUp, contentDescription = "cancel edit")
+//                            }
+                        }
+                    }
+
+                    else {
+                        Row(modifier = Modifier.padding(bottom = 5.dp)) {
+                            Box() {
+                                Canvas(modifier = Modifier.size(w, h)) {
+                                    drawRect(
+                                        color = Color.DarkGray,
+                                        size = Size(w.toPx(), h.toPx())
+                                    )
+                                }
+                                Canvas(modifier = Modifier.size(w, h)) {
+                                    drawRect(
+                                        color = Color.White,
+                                        size = Size(
+                                            (w.toPx() * (displayHabit.habitJoin.completion.completion.toFloat() / displayHabit.habitJoin.habit.frequency)),
+                                            h.toPx()
+                                        )
+                                    )
+                                }
+                            }
+//                        LinearProgressIndicator(
+//                            progress = (displayHabit.habitJoin.completion.completion.toFloat() / displayHabit.habitJoin.habit.frequency).toFloat(),
+//                        )
+                            Button(
+                                onClick = { /*TODO*/ },
+                                enabled = false,
+                                modifier = Modifier.padding(start = 5.dp)
+                            ) {
+                                Text(text = displayHabit.habitJoin.completion.completion.toString())
+                            }
+                        }
+                    }
+                }
+            }
+    }
+}
+
+
+@Composable
+fun CircleUpdate(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit, state: HabitState){
+    val dropdownItems :List<Item> = listOf(
+        Item(name ="Edit", onClick =  {onEvent(HabitEvent.EditHabit(displayHabit))}, Icons.Default.Edit),
+        Item(name = "Undo", onClick = {onEvent(HabitEvent.DecCompletion(displayHabit.habitJoin))}, Icons.Default.ArrowBack),
+        Item(name = "Delete", onClick = {onEvent(HabitEvent.DeleteHabit(displayHabit.habitJoin))}, Icons.Default.Delete)
+    )
+    var itemHeight by remember{
+        mutableStateOf(0.dp)
+    }
+    val density = LocalDensity.current
+    ElevatedCard(
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 6.dp
+        ),
+        modifier = Modifier
+            //.size(width = 380.dp, height = 130.dp)
+            .padding(vertical = 5.dp, horizontal = 5.dp).onSizeChanged { itemHeight = with(density){it.height.toDp()} },
+        colors = CardDefaults.cardColors(Color.Gray)
+
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(),
+//                .pointerInput(true) {
+//                    detectTapGestures(onLongPress = {
+//                        onEvent(HabitEvent.ContextMenuVisibility(displayHabit))
+//                        pressOffset = DpOffset(it.x.toDp(), it.y.toDp())
+//            })
+//            },
+            contentAlignment = Alignment.Center
+        ) {
+            Column {
+                if (displayHabit.beingEdited.value) {
+                    val habitJoin = displayHabit.habitJoin
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .padding(start = 20.dp, bottom = 20.dp, top = 20.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressBar(angle = (habitJoin.completion.completion.toFloat() / habitJoin.habit.frequency) * 360)
+                            Button(
+                                onClick = { onEvent(HabitEvent.IncCompletion(habitJoin)) },
+                                modifier = Modifier.size(100.dp),
+                                shape = CircleShape,
+                                colors = ButtonDefaults.buttonColors(
+                                    Color.Green,
+                                    disabledContainerColor = Color.Green,
+                                    disabledContentColor = Color.White
+                                ),
+                                contentPadding = PaddingValues(0.dp),
+                                enabled = false
+                            ) {
+                                Text(
+                                    text = habitJoin.completion.completion.toString(),
+                                    modifier = Modifier
+                                        .padding(end = 20.dp),
+                                    fontSize = 20.sp
+                                )
+                                Text(
+                                    text = "/",
+                                    modifier = Modifier
+                                        .padding(start = 0.dp),
+                                    fontSize = 20.sp
+                                )
+                                Box(
+                                    modifier = Modifier.padding(start = 20.dp)
+                                ) {
+                                    NumberPicker(
+                                        value = state.editFreq,
+                                        onValueChange = { onEvent(HabitEvent.UpDateEditFreq(it)) },
+                                        range = 1..10
+                                    )
+                                }
+                            }
+                        }
+                        BasicTextField(
+                            value = state.editString,
+                            onValueChange = { onEvent(HabitEvent.UpDateEditString(it)) },
+                            keyboardOptions = KeyboardOptions.Default.copy(
+                                autoCorrectEnabled = true,
+                                imeAction = ImeAction.Done,
+                                showKeyboardOnFocus = true,
+                                capitalization = KeyboardCapitalization.Sentences,
+                                keyboardType = KeyboardType.Text
+                            ),
+                            singleLine = true,
+                            textStyle = LocalTextStyle.current.copy(
+                                fontSize = 30.sp,
+                                textDecoration = TextDecoration.Underline
+                            ),
+                            modifier = Modifier.padding(start = 10.dp),
+                        )
+                        Column {
+                            IconButton(
+                                onClick = { onEvent(HabitEvent.ModifyHabit(habitJoin)) }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = "ContextMenu"
+                                )
+                            }
+                            IconButton(onClick = { onEvent(HabitEvent.CancelEdit(displayHabit)) }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "cancel edit"
+                                )
+                            }
+                        }
+                    }
+
+                    // chose days
+                    if (habitJoin.completion.occurrence.contains("0")) {
+                        DaysSelection(onEvent, displayHabit, state)
+                    }
+                } else {
+                    val habitJoin = displayHabit.habitJoin
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier.padding(start = 20.dp, bottom = 20.dp, top = 20.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressBar(angle = (habitJoin.completion.completion.toFloat() / habitJoin.habit.frequency) * 360)
+                            Button(
+                                onClick = { onEvent(HabitEvent.IncCompletion(habitJoin)) },
+                                modifier = Modifier.size(100.dp),
+                                shape = CircleShape,
+                                colors = ButtonDefaults.buttonColors(
+                                    Color.Green
+                                ),
+                                contentPadding = PaddingValues(0.dp)
+                            ) {
+                                if (habitJoin.completion.done) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Check,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(150.dp)
+                                    )
+
+                                } else {
+                                    Text(
+                                        text = habitJoin.completion.completion.toString(),
+                                        modifier = Modifier.padding(end = 20.dp),
+                                        fontSize = 20.sp
+                                    )
+                                    Text(
+                                        text = "/",
+                                        modifier = Modifier.padding(start = 0.dp),
+                                        fontSize = 20.sp
+                                    )
+                                    Text(
+                                        text = habitJoin.habit.frequency.toString(),
+                                        modifier = Modifier.padding(start = 20.dp),
+                                        fontSize = 20.sp
+                                    )
+                                }
+                            }
+                        }
+                        BasicTextField(
+                            value = displayHabit.habitJoin.habit.name,
+                            onValueChange = { },
+                            keyboardOptions = KeyboardOptions.Default.copy(
+                                autoCorrectEnabled = true,
+                                imeAction = ImeAction.Done,
+                                showKeyboardOnFocus = true,
+                                capitalization = KeyboardCapitalization.Sentences,
+                                keyboardType = KeyboardType.Text
+                            ),
+                            singleLine = true,
+                            textStyle = LocalTextStyle.current.copy(fontSize = 30.sp),
+                            modifier = Modifier.padding(start = 10.dp),
+                            readOnly = true,
+                        )
+                        IconButton(
+                            onClick = { onEvent(HabitEvent.ContextMenuVisibility(displayHabit)) },
+                            modifier = Modifier.align(Alignment.Top)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = "ContextMenu"
+                            )
+                            DropdownMenu(
+                                expanded = displayHabit.isMenuVisible.value,
+                                onDismissRequest = { onEvent(HabitEvent.ContextMenuVisibility(displayHabit)) }
+                            ) {
+                                dropdownItems.forEach { item ->
+                                    DropdownMenuItem(
+                                        text = { Text(text = item.name) },
+                                        onClick = {
+                                            item.onClick()
+                                            onEvent(HabitEvent.ContextMenuVisibility(displayHabit))
+                                        },
+                                        leadingIcon = { Icon(imageVector = item.icon, contentDescription = null) }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -180,20 +515,20 @@ fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit, sta
             }
         }
     }
-    DropdownMenu(
-        expanded = displayHabit.isMenuVisible.value,
-        onDismissRequest = { onEvent(HabitEvent.ContextMenuVisibility(displayHabit))}
-    ) {
-        dropdownItems.forEach { item ->
-            DropdownMenuItem(
-                text = { Text(text = item.name)},
-                onClick = {
-                    item.onClick()
-                    onEvent(HabitEvent.ContextMenuVisibility(displayHabit))},
-                leadingIcon = { Icon(imageVector = item.icon, contentDescription = null)}
-            )
-        }
-    }
+//    DropdownMenu(
+//        expanded = displayHabit.isMenuVisible.value,
+//        onDismissRequest = { onEvent(HabitEvent.ContextMenuVisibility(displayHabit))}
+//    ) {
+//        dropdownItems.forEach { item ->
+//            DropdownMenuItem(
+//                text = { Text(text = item.name)},
+//                onClick = {
+//                    item.onClick()
+//                    onEvent(HabitEvent.ContextMenuVisibility(displayHabit))},
+//                leadingIcon = { Icon(imageVector = item.icon, contentDescription = null)}
+//            )
+//        }
+//    }
 }
 
 
@@ -321,15 +656,6 @@ fun EditMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, state: H
         DaysSelection(onEvent, displayHabit, state)
     }
 }
-//@Composable
-//fun HabitCheckBox(displayHabit: DisplayHabit, index:Int, onEvent: (HabitEvent) -> Unit){
-//    Checkbox(
-//        checked = displayHabit.completion[index].value,
-//        onCheckedChange = {onEvent(HabitEvent.BoxChecked(displayHabit, index))},
-//        modifier = Modifier.padding(5.dp),
-//        colors = CheckboxDefaults.colors(Color.Green),
-//    )
-//}
 
 @Composable
 fun CustomTextField(value: String, label: String, onchange: (String) -> Unit, manager: FocusManager){

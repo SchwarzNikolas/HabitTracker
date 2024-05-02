@@ -14,8 +14,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.habittracker.CustomScreen
-import com.example.habittracker.CustomViewModel
+import com.example.habittracker.custom.CustomScreen
+import com.example.habittracker.custom.CustomViewModel
 import com.example.habittracker.habit.HabitViewModel
 import com.example.habittracker.habit.MainScreen
 import com.example.habittracker.mood.MoodScreen

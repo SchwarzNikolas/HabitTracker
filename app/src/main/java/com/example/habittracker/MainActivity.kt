@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
+import com.example.habittracker.custom.CustomViewModel
 import com.example.habittracker.database.HabitDatabase
 import com.example.habittracker.habit.HabitViewModel
 import com.example.habittracker.mood.MoodViewModel
