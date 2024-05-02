@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.sp
 import com.example.habittracker.custom.CustomHabitEvent
 import com.example.habittracker.mood.MoodEvent
 import com.example.habittracker.mood.MoodState
+import com.example.habittracker.mood.MoodType
 
 
 // details about compose available at https://developer.android.com/develop/ui/compose/layouts/basics
@@ -415,16 +416,76 @@ fun MoodSection(moodState: MoodState, onMoodEvent: (MoodEvent) -> Unit, modifier
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Text("Bad")
+
+            // Bad button
+            OutlinedButton(
+                onClick = { onMoodEvent(MoodEvent.BadSelected(MoodType.BAD)) },
+                modifier = Modifier
+                    .size(width = 40.dp, height = 40.dp),
+                border = BorderStroke(1.dp, Color.Black),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = Color.White
+                )
+            ) {}
+
+            // So_so button
+            OutlinedButton(
+                onClick = { onMoodEvent(MoodEvent.SoSoSelected(MoodType.SO_SO)) },
+                modifier = Modifier
+                    .size(width = 40.dp, height = 40.dp),
+                border = BorderStroke(1.dp, Color.Black),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = Color.White
+                )
+            ) {}
+
+            // Ok button
+            OutlinedButton(
+                onClick = { onMoodEvent(MoodEvent.OkSelected(MoodType.OK)) },
+                modifier = Modifier
+                    .size(width = 40.dp, height = 40.dp),
+                border = BorderStroke(1.dp, Color.Black),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = Color.White
+                )
+            ) {}
+
+            // Alright button
+            OutlinedButton(
+                onClick = { onMoodEvent(MoodEvent.AlrightSelected(MoodType.ALRIGHT)) },
+                modifier = Modifier
+                    .size(width = 40.dp, height = 40.dp),
+                border = BorderStroke(1.dp, Color.Black),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = Color.White
+                )
+            ) {}
+
+            // Good button
+            OutlinedButton(
+                onClick = { onMoodEvent(MoodEvent.GoodSelected(MoodType.GOOD)) },
+                modifier = Modifier
+                    .size(width = 40.dp, height = 40.dp),
+                border = BorderStroke(1.dp, Color.Black),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = Color.White
+                )
+            ) {}
+
+
             // No logic for now
-            repeat(5) { index ->
+            /*repeat(5) { index ->
                 MoodButton(index, onMoodEvent) // can add other things
-            }
+            }*/
             Text("Good")
         }
+
+        // Test
+        // Text()
     }
 }
 
-@Composable
+/*@Composable
 fun MoodButton(index: Int, onMoodEvent: (MoodEvent) -> Unit) {
     // No logic for now
     OutlinedButton(
@@ -436,4 +497,4 @@ fun MoodButton(index: Int, onMoodEvent: (MoodEvent) -> Unit) {
             containerColor = Color.White
         )
     ) {}
-}
+}*/
