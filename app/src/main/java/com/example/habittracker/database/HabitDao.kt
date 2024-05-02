@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import androidx.room.Upsert
+import com.example.habittracker.mood.MoodType
 import kotlinx.coroutines.flow.Flow
 
 
@@ -63,10 +64,10 @@ interface HabitDao{
     @Query("SELECT * FROM MoodRecord")
     fun fetchMoodRecords(): Flow<List<MoodRecord>>
 
-    @Query("SELECT * FROM MoodRecord WHERE moodDate = :date ")  // LIMIT 1?
+    @Query("SELECT * FROM MoodRecord WHERE moodDate = :date LIMIT 1")
     suspend fun getMoodRecByDate(date: String): MoodRecord?
 
-    @Transaction
+    /*@Transaction
     suspend fun upsertMoodRec(moodRec: MoodRecord) {
         val existingRecord = getMoodRecByDate(moodRec.moodDate)
         if (existingRecord == null) {
@@ -75,8 +76,14 @@ interface HabitDao{
             val updatedRecord = existingRecord.copy(moodRecId = moodRec.moodRecId)
             insertMoodRec(updatedRecord)
         }
-    }
+    }*/
 
     @Upsert
     suspend fun insertMoodRec(moodRec: MoodRecord)
+
+    @Query("UPDATE MoodRecord SET mood = :mood WHERE moodDate = :date")
+    suspend fun updateMoodRec(date: String, mood: MoodType)
+
+    @Query("DELETE FROM MoodRecord WHERE moodDate = :date")
+    suspend fun deleteMoodRecord(date:String)
 }
