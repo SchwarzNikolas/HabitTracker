@@ -27,9 +27,14 @@ class MoodViewModel(
                     )
                 }
                 viewModelScope.launch {
-                    dao.upsertMoodRec(
-                        moodRec = MoodRecord(moodDate = currentDate.toString(),
+                    val existingRec = dao.getMoodRecByDate(currentDate.toString())
+                    if (existingRec == null) {
+                        dao.insertMoodRec(moodRec = MoodRecord(
+                            moodDate = currentDate.toString(),
                             mood = moodEvent.moodType))
+                    } else {
+                            dao.updateMoodRec(currentDate.toString(), moodEvent.moodType)
+                    }
                 }
             }
             is MoodEvent.SoSoSelected -> {
@@ -39,9 +44,14 @@ class MoodViewModel(
                     )
                 }
                 viewModelScope.launch {
-                    dao.upsertMoodRec(
-                        moodRec = MoodRecord(moodDate = currentDate.toString(),
+                    val existingRec = dao.getMoodRecByDate(currentDate.toString())
+                    if (existingRec == null) {
+                        dao.insertMoodRec(moodRec = MoodRecord(
+                            moodDate = currentDate.toString(),
                             mood = moodEvent.moodType))
+                    } else {
+                        dao.updateMoodRec(currentDate.toString(), moodEvent.moodType)
+                    }
                 }
             }
             is MoodEvent.OkSelected -> {
@@ -51,9 +61,8 @@ class MoodViewModel(
                     )
                 }
                 viewModelScope.launch {
-                    dao.upsertMoodRec(
-                        moodRec = MoodRecord(moodDate = currentDate.toString(),
-                            mood = moodEvent.moodType))
+                    dao.deleteMoodRecord(
+                        currentDate.toString())
                 }
             }
             is MoodEvent.AlrightSelected -> {
@@ -63,9 +72,14 @@ class MoodViewModel(
                     )
                 }
                 viewModelScope.launch {
-                    dao.upsertMoodRec(
-                        moodRec = MoodRecord(moodDate = currentDate.toString(),
+                    val existingRec = dao.getMoodRecByDate(currentDate.toString())
+                    if (existingRec == null) {
+                        dao.insertMoodRec(moodRec = MoodRecord(
+                            moodDate = currentDate.toString(),
                             mood = moodEvent.moodType))
+                    } else {
+                        dao.updateMoodRec(currentDate.toString(), moodEvent.moodType)
+                    }
                 }
             }
             is MoodEvent.GoodSelected -> {
@@ -75,9 +89,14 @@ class MoodViewModel(
                     )
                 }
                 viewModelScope.launch {
-                    dao.upsertMoodRec(
-                        moodRec = MoodRecord(moodDate = currentDate.toString(),
+                    val existingRec = dao.getMoodRecByDate(currentDate.toString())
+                    if (existingRec == null) {
+                        dao.insertMoodRec(moodRec = MoodRecord(
+                            moodDate = currentDate.toString(),
                             mood = moodEvent.moodType))
+                    } else {
+                        dao.updateMoodRec(currentDate.toString(), moodEvent.moodType)
+                    }
                 }
             }
         }
