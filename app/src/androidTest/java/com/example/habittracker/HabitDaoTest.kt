@@ -258,9 +258,7 @@ class HabitDaoTest {
             fetchMood = awaitItem()
             cancelAndIgnoreRemainingEvents()
         }
-        // why is mood name string in Mood but enum in MoodType
-        // fix later
-        assertThat(fetchMood[0].mood.moodColor).isEqualTo("GREEN")
+        assertThat(fetchMood[0].mood.moodColor).isEqualTo(0xFF008000)
     }
 
     @Test
