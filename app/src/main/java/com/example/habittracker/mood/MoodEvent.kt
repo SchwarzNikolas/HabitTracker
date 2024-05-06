@@ -1,7 +1,5 @@
 package com.example.habittracker.mood
 
-import com.example.habittracker.database.Mood
-
 // Events that happen in the MoodBar
 sealed interface MoodEvent {
     data class BadSelected(val moodType: MoodType = MoodType.BAD): MoodEvent
