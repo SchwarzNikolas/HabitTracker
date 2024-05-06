@@ -424,7 +424,7 @@ fun MoodSection(moodState: MoodState, onMoodEvent: (MoodEvent) -> Unit, modifier
                     .size(width = 40.dp, height = 40.dp),
                 border = BorderStroke(1.dp, Color.Black),
                 colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = Color.White
+                    containerColor = if (moodState.selectedMood == MoodType.BAD) Color(moodState.moodColors.getValue(moodState.selectedMood)) else Color.Transparent
                 )
             ) {}
 
@@ -435,7 +435,7 @@ fun MoodSection(moodState: MoodState, onMoodEvent: (MoodEvent) -> Unit, modifier
                     .size(width = 40.dp, height = 40.dp),
                 border = BorderStroke(1.dp, Color.Black),
                 colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = Color.White
+                    containerColor = if (moodState.selectedMood == MoodType.SO_SO) Color(moodState.moodColors.getValue(moodState.selectedMood)) else Color.Transparent
                 )
             ) {}
 
@@ -446,7 +446,7 @@ fun MoodSection(moodState: MoodState, onMoodEvent: (MoodEvent) -> Unit, modifier
                     .size(width = 40.dp, height = 40.dp),
                 border = BorderStroke(1.dp, Color.Black),
                 colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = Color.White
+                    containerColor = if (moodState.selectedMood == MoodType.OK) Color(moodState.moodColors.getValue(moodState.selectedMood)) else Color.Transparent
                 )
             ) {}
 
@@ -457,7 +457,7 @@ fun MoodSection(moodState: MoodState, onMoodEvent: (MoodEvent) -> Unit, modifier
                     .size(width = 40.dp, height = 40.dp),
                 border = BorderStroke(1.dp, Color.Black),
                 colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = Color.White
+                    containerColor = if (moodState.selectedMood == MoodType.ALRIGHT) Color(moodState.moodColors.getValue(moodState.selectedMood)) else Color.Transparent
                 )
             ) {}
 
@@ -468,7 +468,7 @@ fun MoodSection(moodState: MoodState, onMoodEvent: (MoodEvent) -> Unit, modifier
                     .size(width = 40.dp, height = 40.dp),
                 border = BorderStroke(1.dp, Color.Black),
                 colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = Color.White
+                    containerColor = if (moodState.selectedMood == MoodType.GOOD) Color(moodState.moodColors.getValue(moodState.selectedMood)) else Color.Transparent
                 )
             ) {}
 
