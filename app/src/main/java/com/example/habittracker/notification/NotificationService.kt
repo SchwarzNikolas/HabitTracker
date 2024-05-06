@@ -21,7 +21,7 @@ class NotificationService(
             activityIntent,
             PendingIntent.FLAG_IMMUTABLE        // This?
         )
-        val notification = NotificationCompat
+        // val notification = NotificationCompat
     }
 
     companion object {
