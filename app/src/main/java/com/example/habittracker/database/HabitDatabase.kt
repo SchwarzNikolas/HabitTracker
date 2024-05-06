@@ -10,12 +10,10 @@ import androidx.room.RoomDatabase
         Habit::class,
         HabitRecord::class,
         HabitCompletion::class,
-        Mood::class,
         MoodRecord::class],
     version = 1
 )
 abstract class HabitDatabase:RoomDatabase(){
     // defines which daos belongs to this database
     abstract val dao: HabitDao
-    abstract val moodDao: MoodDao
 }
