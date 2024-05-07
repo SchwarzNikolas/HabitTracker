@@ -9,7 +9,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.habittracker"
+        applicationId = "com.habittracker.rootreflect"
         minSdk = 34
         targetSdk = 34
         versionCode = 1
