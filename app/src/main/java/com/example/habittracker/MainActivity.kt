@@ -1,5 +1,8 @@
 package com.example.habittracker
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,6 +19,7 @@ import com.example.habittracker.database.HabitDatabase
 import com.example.habittracker.habit.HabitViewModel
 import com.example.habittracker.mood.MoodViewModel
 import com.example.habittracker.navigation.AppNavigation
+import com.example.habittracker.notification.NotificationService
 import com.example.habittracker.ui.theme.HabitTrackerTheme
 
 class MainActivity : ComponentActivity() {
@@ -81,5 +85,21 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
+        createNotificationChannel()
     }
+
+    private fun createNotificationChannel() {
+        val channel = NotificationChannel(
+            NotificationService.COUNTER_CHANNEL_ID,
+            "Notification",
+            NotificationManager.IMPORTANCE_DEFAULT
+        )
+        channel.description = "Used for mood reminder"
+
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
+    }
+
+
 }

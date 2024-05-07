@@ -3,7 +3,6 @@ package com.example.habittracker.mood
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.habittracker.database.HabitDao
-import com.example.habittracker.database.MoodDao
 import com.example.habittracker.database.MoodRecord
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update

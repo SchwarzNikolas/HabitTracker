@@ -38,6 +38,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -734,92 +736,48 @@ fun MoodSection(moodState: MoodState, onMoodEvent: (MoodEvent) -> Unit, modifier
         Text(
             text = "How do you feel?",
             textAlign = TextAlign.Center,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            fontSize = 24.sp
         )
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Bad")
+            Text(
+                text = "Bad",
+                fontSize = 16.sp
+            )
 
-            // Bad button
-            OutlinedButton(
-                onClick = { onMoodEvent(MoodEvent.BadSelected(MoodType.BAD)) },
-                modifier = Modifier
-                    .size(width = 40.dp, height = 40.dp),
-                border = BorderStroke(1.dp, Color.Black),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = Color.White
-                )
-            ) {}
+            // Mood radio buttons
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                for (moodType in moodState.moods) {
+                    RadioButton(
+                        selected = moodState.selectedMood == moodType,
+                        onClick = {
+                            onMoodEvent(
+                                when (moodType) {
+                                    MoodType.BAD -> MoodEvent.BadSelected(moodType)
+                                    MoodType.SO_SO -> MoodEvent.SoSoSelected(moodType)
+                                    MoodType.OK -> MoodEvent.OkSelected(moodType)
+                                    MoodType.ALRIGHT -> MoodEvent.AlrightSelected(moodType)
+                                    MoodType.GOOD -> MoodEvent.GoodSelected(moodType)
+                                }
+                            )
+                        },
+                        colors = RadioButtonDefaults.colors(
+                            selectedColor = Color(moodType.moodColor),
+                            unselectedColor = Color.Gray,
+                        ),
+                        modifier = Modifier.padding(horizontal = 4.dp)
+                    )
+                }
+            }
 
-            // So_so button
-            OutlinedButton(
-                onClick = { onMoodEvent(MoodEvent.SoSoSelected(MoodType.SO_SO)) },
-                modifier = Modifier
-                    .size(width = 40.dp, height = 40.dp),
-                border = BorderStroke(1.dp, Color.Black),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = Color.White
-                )
-            ) {}
-
-            // Ok button
-            OutlinedButton(
-                onClick = { onMoodEvent(MoodEvent.OkSelected(MoodType.OK)) },
-                modifier = Modifier
-                    .size(width = 40.dp, height = 40.dp),
-                border = BorderStroke(1.dp, Color.Black),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = Color.White
-                )
-            ) {}
-
-            // Alright button
-            OutlinedButton(
-                onClick = { onMoodEvent(MoodEvent.AlrightSelected(MoodType.ALRIGHT)) },
-                modifier = Modifier
-                    .size(width = 40.dp, height = 40.dp),
-                border = BorderStroke(1.dp, Color.Black),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = Color.White
-                )
-            ) {}
-
-            // Good button
-            OutlinedButton(
-                onClick = { onMoodEvent(MoodEvent.GoodSelected(MoodType.GOOD)) },
-                modifier = Modifier
-                    .size(width = 40.dp, height = 40.dp),
-                border = BorderStroke(1.dp, Color.Black),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = Color.White
-                )
-            ) {}
-
-
-            // No logic for now
-            /*repeat(5) { index ->
-                MoodButton(index, onMoodEvent) // can add other things
-            }*/
-            Text("Good")
+            Text(
+                text = "Good",
+                fontSize = 16.sp
+            )
         }
-
-        // Test
-        // Text()
     }
 }
-
-/*@Composable
-fun MoodButton(index: Int, onMoodEvent: (MoodEvent) -> Unit) {
-    // No logic for now
-    OutlinedButton(
-        onClick = { /*TODO*/ },
-        modifier = Modifier
-            .size(width = 40.dp, height = 40.dp),
-        border = BorderStroke(1.dp, Color.Black),
-        colors = ButtonDefaults.outlinedButtonColors(
-            containerColor = Color.White
-        )
-    ) {}
-}*/
