@@ -17,6 +17,7 @@ import androidx.room.Room
 import com.habittracker.rootreflect.custom.CustomViewModel
 import com.habittracker.rootreflect.database.HabitDatabase
 import com.habittracker.rootreflect.habit.HabitViewModel
+import com.habittracker.rootreflect.history.HistoryViewModel
 import com.habittracker.rootreflect.mood.MoodViewModel
 import com.habittracker.rootreflect.navigation.AppNavigation
 import com.habittracker.rootreflect.notification.NotificationService
@@ -66,6 +67,17 @@ class MainActivity : ComponentActivity() {
         }
     )
 
+    // Creating view model for History
+    private val historyViewModel by viewModels<HistoryViewModel>(
+        factoryProducer = {
+            object : ViewModelProvider.Factory{
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return HistoryViewModel(db.dao) as T
+                }
+            }
+        }
+    )
+
     // when app launches runs continuously and handles UI theme and connects Viewmodel to the UI
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,7 +92,8 @@ class MainActivity : ComponentActivity() {
                     AppNavigation(
                         moodViewModel = moodViewModel,
                         customViewModel = customViewModel,
-                        habitViewModel = habitViewModel
+                        habitViewModel = habitViewModel,
+                        historyViewModel = historyViewModel
                     )
                 }
             }
