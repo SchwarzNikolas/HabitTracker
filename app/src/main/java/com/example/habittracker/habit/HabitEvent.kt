@@ -18,9 +18,6 @@ sealed interface HabitEvent {
     data class CancelEdit(val displayHabit: DisplayHabit) : HabitEvent
     data class DeleteHabit(val habitJoin: HabitJoin): HabitEvent
     data class ContextMenuVisibility(val displayHabit: DisplayHabit): HabitEvent
-
-    // Deprecated
-    data class BoxChecked(val displayHabit: DisplayHabit, val index:Int): HabitEvent
     // Deprecated
     data object ResetCompletion: HabitEvent
     data object NextDay: HabitEvent

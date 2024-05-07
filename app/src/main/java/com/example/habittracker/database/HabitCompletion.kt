@@ -7,7 +7,8 @@ import androidx.room.PrimaryKey
 
 @Entity(foreignKeys = [ForeignKey(entity = Habit::class,
     parentColumns = arrayOf("habitId"),
-    childColumns = arrayOf("habitID")
+    childColumns = arrayOf("habitID"),
+    onDelete = 5
         )
     ]
 )
