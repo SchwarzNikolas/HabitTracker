@@ -1,4 +1,4 @@
-package com.example.habittracker
+package com.example.habittracker.custom
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf

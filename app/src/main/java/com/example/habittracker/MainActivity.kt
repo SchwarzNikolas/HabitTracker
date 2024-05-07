@@ -1,5 +1,8 @@
 package com.example.habittracker
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,9 +14,12 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
+import com.example.habittracker.custom.CustomViewModel
 import com.example.habittracker.database.HabitDatabase
 import com.example.habittracker.habit.HabitViewModel
+import com.example.habittracker.mood.MoodViewModel
 import com.example.habittracker.navigation.AppNavigation
+import com.example.habittracker.notification.NotificationService
 import com.example.habittracker.ui.theme.HabitTrackerTheme
 
 class MainActivity : ComponentActivity() {
@@ -38,12 +44,23 @@ class MainActivity : ComponentActivity() {
         }
     )
 
-//     Creating view model for Habit-Creation
+    // Creating view model for Habit-Creation
     private val customViewModel by viewModels<CustomViewModel>(
         factoryProducer = {
             object : ViewModelProvider.Factory{
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return CustomViewModel(db.dao) as T
+                }
+            }
+        }
+    )
+
+    // Creating view model for Moods
+    private val moodViewModel by viewModels<MoodViewModel>(
+        factoryProducer = {
+            object : ViewModelProvider.Factory{
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return MoodViewModel(db.dao) as T
                 }
             }
         }
@@ -61,11 +78,28 @@ class MainActivity : ComponentActivity() {
 //                    val habitState by habitViewModel.state.collectAsState()
 //                    MainScreen(state = habitState, onEvent = habitViewModel::onEvent)
                     AppNavigation(
+                        moodViewModel = moodViewModel,
                         customViewModel = customViewModel,
                         habitViewModel = habitViewModel
                     )
                 }
             }
         }
+
+        createNotificationChannel()
     }
+
+    private fun createNotificationChannel() {
+        val channel = NotificationChannel(
+            NotificationService.COUNTER_CHANNEL_ID,
+            "Notification",
+            NotificationManager.IMPORTANCE_DEFAULT
+        )
+        channel.description = "Used for mood reminder"
+
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
+    }
+
+
 }

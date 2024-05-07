@@ -1,4 +1,4 @@
-package com.example.habittracker
+package com.example.habittracker.custom
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -6,7 +6,6 @@ import com.example.habittracker.database.Habit
 import com.example.habittracker.database.HabitCompletion
 import com.example.habittracker.database.HabitDao
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -14,7 +13,6 @@ class CustomViewModel(
     private val dao: HabitDao
 ): ViewModel() {
     private val _state = MutableStateFlow(CustomState())
-    // Why do we need this?
     val state = _state
 
     fun onEvent(event: CustomHabitEvent) {
@@ -97,7 +95,6 @@ class CustomViewModel(
                 }
 
                 val newCusHabit = Habit(
-                    //isDaily = isDaily,      // We need to insert a field in Habit entity for this
                     name = habitName,
                     frequency = habitFrequency.toInt(),
                 )

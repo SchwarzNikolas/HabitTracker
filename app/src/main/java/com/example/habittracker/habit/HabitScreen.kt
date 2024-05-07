@@ -35,6 +35,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -52,6 +54,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.habittracker.custom.CustomHabitEvent
+import com.example.habittracker.mood.MoodEvent
+import com.example.habittracker.mood.MoodState
+import com.example.habittracker.mood.MoodType
 
 
 // details about compose available at https://developer.android.com/develop/ui/compose/layouts/basics
@@ -64,10 +70,11 @@ data class Item(
 @Composable
 fun MainScreen (
     state: HabitState,
-    onEvent: (HabitEvent) -> Unit
+    moodState: MoodState,
+    onEvent: (HabitEvent) -> Unit,
+    onMoodEvent: (MoodEvent) -> Unit
 ){
     //val scrollState = rememberScrollState()
-
     Column(
         modifier = Modifier,
         //.verticalScroll(state = scrollState)
@@ -77,6 +84,9 @@ fun MainScreen (
     )
     {
         Text(text = state.date.toString())
+
+        // Mood part of the screen
+        MoodSection(moodState, onMoodEvent, Modifier)
 
         // Daily part of the screen
         Text(text = "Daily", textAlign = TextAlign.Center, modifier = Modifier
@@ -389,5 +399,60 @@ fun DayButton(
                 containerColor = if (clicked) Color.Black else Color.White,
             )
         ) {}
+    }
+}
+
+@Composable
+fun MoodSection(moodState: MoodState, onMoodEvent: (MoodEvent) -> Unit, modifier: Modifier) {
+    Column (
+        modifier = modifier
+            .fillMaxWidth()
+    ) {
+        Text(
+            text = "How do you feel?",
+            textAlign = TextAlign.Center,
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            fontSize = 24.sp
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Bad",
+                fontSize = 16.sp
+            )
+
+            // Mood radio buttons
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                for (moodType in moodState.moods) {
+                    RadioButton(
+                        selected = moodState.selectedMood == moodType,
+                        onClick = {
+                            onMoodEvent(
+                                when (moodType) {
+                                    MoodType.BAD -> MoodEvent.BadSelected(moodType)
+                                    MoodType.SO_SO -> MoodEvent.SoSoSelected(moodType)
+                                    MoodType.OK -> MoodEvent.OkSelected(moodType)
+                                    MoodType.ALRIGHT -> MoodEvent.AlrightSelected(moodType)
+                                    MoodType.GOOD -> MoodEvent.GoodSelected(moodType)
+                                }
+                            )
+                        },
+                        colors = RadioButtonDefaults.colors(
+                            selectedColor = Color(moodType.moodColor),
+                            unselectedColor = Color.Gray,
+                        ),
+                        modifier = Modifier.padding(horizontal = 4.dp)
+                    )
+                }
+            }
+
+            Text(
+                text = "Good",
+                fontSize = 16.sp
+            )
+        }
     }
 }

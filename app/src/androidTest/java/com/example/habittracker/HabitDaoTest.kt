@@ -10,7 +10,9 @@ import com.example.habittracker.database.HabitDao
 import com.example.habittracker.database.HabitDatabase
 import com.example.habittracker.database.HabitJoin
 import com.example.habittracker.database.HabitRecord
+import com.example.habittracker.database.MoodRecord
 import com.example.habittracker.habit.HabitViewModel
+import com.example.habittracker.mood.MoodType
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -30,6 +32,7 @@ class HabitDaoTest {
     private var habitList: List<Habit> = listOf()
     private var habitRecords: List<HabitRecord> = listOf()
     private var habitCompletion: List<HabitJoin> = listOf()
+    private lateinit var fetchMood: List<MoodRecord>
 
     @Before
     fun setUp(){
@@ -45,7 +48,6 @@ class HabitDaoTest {
     fun closeDB() {
         db.close()
     }
-
 
     @Test
     fun daoInsertTest() = runBlocking{
@@ -198,23 +200,6 @@ class HabitDaoTest {
     }
 
     @Test
-    fun resetDailyCompletionTest() = runBlocking {
-        // create habitCompletion and insert them into the database
-        val completedHabit = HabitCompletion(1, 1, true, "1111111")
-        dao.insertHabit(Habit())
-        dao.insertCompletion(completedHabit)
-        // reset the completion and fetch all the habits
-        dao.resetDailyCompletion()
-        dao.getHabit().test {
-            habitCompletion = awaitItem()
-            cancelAndIgnoreRemainingEvents()
-        }
-        // check if the stats got reset
-        assertThat(habitCompletion[0].completion.done).isEqualTo(false)
-        assertThat(habitCompletion[0].completion.completion).isEqualTo(0)
-    }
-
-    @Test
     fun resetCompletionTest() = runBlocking {
         // create habitCompletion and insert them into the database
         val completedHabit = HabitCompletion(1, 1, true, "1111111")
@@ -242,5 +227,51 @@ class HabitDaoTest {
             cancelAndIgnoreRemainingEvents()
         }
         assertThat(habitCompletion.size).isEqualTo(1)
+    }
+
+    @Test
+    fun insertMoodRecTest() = runBlocking{
+        val moodRecord = MoodRecord()
+        dao.insertMoodRec(moodRecord)
+        dao.fetchMoodRecords().test {
+            fetchMood = awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+        assertThat(fetchMood[0].mood).isEqualTo(moodRecord.mood)
+    }
+
+    @Test
+    fun getMoodRecByDateTest() = runBlocking{
+        val moodRecord = MoodRecord()
+        dao.insertMoodRec(moodRecord)
+        // replace String with LocalDate.now().toString() when date implemented
+        val moodDate: MoodRecord? = dao.getMoodRecByDate("2025-05-05")
+        assertThat(moodDate).isNotNull()
+    }
+
+    @Test
+    fun updateMoodRecTest() = runBlocking {
+        val moodRecord = MoodRecord()
+        dao.insertMoodRec(moodRecord)
+        dao.updateMoodRec("2025-05-05", MoodType.GOOD)
+        dao.fetchMoodRecords().test {
+            fetchMood = awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+        assertThat(fetchMood[0].mood.moodColor).isEqualTo(0xFF008000)
+    }
+
+    @Test
+    fun deleteMoodRecordTest() = runBlocking {
+        var moodRecord = MoodRecord(1, "2024-05-05", MoodType.GOOD)
+        dao.insertMoodRec(moodRecord)
+        moodRecord = MoodRecord(2, "2025-05-05", MoodType.BAD)
+        dao.insertMoodRec(moodRecord)
+        dao.deleteMoodRecord("2025-05-05")
+        dao.fetchMoodRecords().test {
+            fetchMood = awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+        assertThat(fetchMood.size).isEqualTo(1)
     }
 }

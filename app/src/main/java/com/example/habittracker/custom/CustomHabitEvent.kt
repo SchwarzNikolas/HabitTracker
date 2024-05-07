@@ -1,4 +1,4 @@
-package com.example.habittracker
+package com.example.habittracker.custom
 
 sealed interface CustomHabitEvent {
     //User actions
