@@ -20,9 +20,8 @@ class NotificationService(
             context,
             1,
             activityIntent,
-            PendingIntent.FLAG_IMMUTABLE        // This?
+            PendingIntent.FLAG_IMMUTABLE
         )
-<<<<<<< HEAD
         val notification = NotificationCompat.Builder(context, COUNTER_CHANNEL_ID)
             .setSmallIcon(R.drawable.baseline_cruelty_free_24)
             .setContentTitle("RootReflect")
@@ -31,9 +30,6 @@ class NotificationService(
             .build()
 
         notificationManager.notify(1, notification)
-=======
-        val notification = NotificationCompat
->>>>>>> 7428f21ae9cb3f3b47ae6be252ee580538f0700e
     }
 
     companion object {
