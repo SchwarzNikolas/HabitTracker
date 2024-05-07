@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import com.example.habittracker.MainActivity
+import com.example.habittracker.R
 
 class NotificationService(
     private val context: Context
@@ -21,7 +22,14 @@ class NotificationService(
             activityIntent,
             PendingIntent.FLAG_IMMUTABLE        // This?
         )
-        val notification = NotificationCompat
+        val notification = NotificationCompat.Builder(context, COUNTER_CHANNEL_ID)
+            .setSmallIcon(R.drawable.baseline_cruelty_free_24)
+            .setContentTitle("RootReflect")
+            .setContentText("Don't forget to log your mood!")
+            .setContentIntent(activityPendingIntent)
+            .build()
+
+        notificationManager.notify(1, notification)
     }
 
     companion object {
