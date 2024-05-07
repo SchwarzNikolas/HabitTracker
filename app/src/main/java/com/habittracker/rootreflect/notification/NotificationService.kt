@@ -6,7 +6,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import com.habittracker.rootreflect.MainActivity
-import com.example.habittracker.R
+import com.habittracker.rootreflect.R
 
 class NotificationService(
     private val context: Context
