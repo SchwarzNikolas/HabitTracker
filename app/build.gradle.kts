@@ -5,12 +5,12 @@ plugins {
 }
 
 android {
-    namespace = "com.example.habittracker"
+    namespace = "com.habittracker.rootreflect"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.habittracker"
-        minSdk = 34
+        applicationId = "com.habittracker.rootreflect"
+        minSdk = 31
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
