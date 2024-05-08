@@ -3,11 +3,13 @@ package com.example.habittracker.habit
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -15,6 +17,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -53,8 +56,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
@@ -93,19 +101,16 @@ fun MainScreen (
 
         for (habit in state.displayHabits){
             Row {
-//            if (habit.beingEdited.value) {
+//
 //                IconButton(
 //                    onClick = { onEvent(HabitEvent.ModifyHabit(habit.habitJoin)) }
 //                ) {
 //                    Icon(imageVector = Icons.Default.Check, contentDescription = "ContextMenu")
 //                    }
-//                }
                 BarExample(displayHabit = habit, onEvent = onEvent, state = state)
-//                if (habit.beingEdited.value) {
 //                    IconButton(onClick = { onEvent(HabitEvent.CancelEdit(habit)) }
 //                    ) {
 //                        Icon(imageVector = Icons.Default.Close, contentDescription = "cancel edit")
-//                    }
 //                }
             }
         }
@@ -174,45 +179,63 @@ fun BarExample(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit, state:
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
         ),
-        modifier = Modifier
+        modifier = Modifier.clickable {onEvent(HabitEvent.IncCompletion(displayHabit.habitJoin))  }
             //.size(width = 380.dp, height = 130.dp)
-            .padding(vertical = 5.dp, horizontal = 5.dp),
-        colors = CardDefaults.cardColors(Color.Gray)
+            .padding(vertical = 5.dp, horizontal = 5.dp)
+        ,colors = CardDefaults.cardColors(Color.Gray)
 
     ) {
 
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.TopCenter
+                    //.fillMaxWidth(),
+                //contentAlignment = Alignment.TopCenter,
+
             ) {
-
-
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Row {
-                        Text(text = displayHabit.habitJoin.habit.name)
-                        IconButton(onClick = { onEvent(HabitEvent.ContextMenuVisibility(displayHabit)) }) {
-                            Icon(
-                                imageVector = Icons.Default.MoreVert,
-                                contentDescription = "ContextMenu"
-                            )
-                        }
-                    }
                     val w = 300.dp
                     val h = 50.dp
+                    val cornerRadius = CornerRadius(25f,25f)
                     if (displayHabit.beingEdited.value) {
 
+                        Row (verticalAlignment = Alignment.CenterVertically){
+                            BasicTextField(
+                                value = state.editString,
+                                onValueChange = {onEvent(HabitEvent.UpDateEditString(it))},
+                                keyboardOptions = KeyboardOptions.Default.copy(
+                                    autoCorrectEnabled = true,
+                                    imeAction = ImeAction.Done,
+                                    showKeyboardOnFocus = true,
+                                    capitalization = KeyboardCapitalization.Sentences,
+                                    keyboardType = KeyboardType.Text
+                                ),
+                                singleLine = true,
+                                textStyle = LocalTextStyle.current.copy(fontSize = 30.sp,
+                                    textDecoration = TextDecoration.Underline),
+                                modifier = Modifier.padding(start = 10.dp),
+                            )
+                            Spacer(Modifier.weight(1f))
+                            IconButton(onClick = { onEvent(HabitEvent.ContextMenuVisibility(displayHabit))},
+                                modifier = Modifier) {
+                                Icon(
+                                    imageVector = Icons.Default.MoreVert,
+                                    contentDescription = "ContextMenu"
+                                )
+                            }
+                        }
                         Row (modifier = Modifier.padding(bottom = 5.dp)){
                             TextButton(onClick = { /*TODO*/ },
                                 modifier = Modifier
                                     .background(Color.DarkGray)
-                                    .size(w / 2, h)) {
+                                    .size(w / 2, h)
+                                    .background(Color.Red)) {
                                 Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = "")
                             }
                             TextButton(onClick = { /*TODO*/ },
                                 modifier = Modifier
                                     .background(Color.DarkGray)
-                                    .size(w / 2, h)) {
+                                    .size(w / 2, h)
+                                    .background(Color.Green)) {
                                 Icon(imageVector = Icons.Default.KeyboardArrowUp, contentDescription = "")
                             }
 
@@ -237,23 +260,72 @@ fun BarExample(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit, state:
                     }
 
                     else {
+                        Row (verticalAlignment = Alignment.CenterVertically){
+                            BasicText(text = displayHabit.habitJoin.habit.name,
+                                maxLines = 1,
+                                modifier = Modifier.padding(start = 10.dp),
+                                style = LocalTextStyle.current.copy(fontSize = 30.sp))
+                            Spacer(Modifier.weight(1f))
+                            IconButton(onClick = { onEvent(HabitEvent.ContextMenuVisibility(displayHabit))},
+                                modifier = Modifier) {
+                                Icon(
+                                    imageVector = Icons.Default.MoreVert,
+                                    contentDescription = "ContextMenu"
+                                )
+                            }
+                        }
                         Row(modifier = Modifier.padding(bottom = 5.dp)) {
                             Box() {
                                 Canvas(modifier = Modifier.size(w, h)) {
-                                    drawRect(
-                                        color = Color.DarkGray,
-                                        size = Size(w.toPx(), h.toPx())
-                                    )
-                                }
-                                Canvas(modifier = Modifier.size(w, h)) {
-                                    drawRect(
-                                        color = Color.White,
-                                        size = Size(
-                                            (w.toPx() * (displayHabit.habitJoin.completion.completion.toFloat() / displayHabit.habitJoin.habit.frequency)),
-                                            h.toPx()
+                                    val path = Path().apply {
+                                        addRoundRect(
+                                        RoundRect(
+                                            rect = Rect(
+                                                offset = Offset(0f, 0f),
+                                                size = Size(w.toPx(),h.toPx())
+                                            ),
+                                            topLeft = cornerRadius,
+                                            topRight = cornerRadius,
+                                            bottomLeft = cornerRadius,
+                                            bottomRight = cornerRadius
+                                            )
                                         )
-                                    )
+                                    }
+                                    drawPath(path, color = Color.DarkGray)
+                                    val path2 = Path().apply {
+                                        addRoundRect(
+                                            RoundRect(
+                                                rect = Rect(
+                                                    offset = Offset(0f, 0f),
+                                                    size = Size(
+                                                        (w.toPx() * (displayHabit.habitJoin.completion.completion.toFloat() / displayHabit.habitJoin.habit.frequency)),
+                                                        h.toPx()
+                                                    )
+                                                ),
+                                                topLeft = cornerRadius,
+                                                topRight = cornerRadius,
+                                                bottomLeft = cornerRadius,
+                                                bottomRight = cornerRadius
+                                            )
+                                        )
+                                    }
+                                    drawPath(path2, color = Color.Green)
                                 }
+//                                Canvas(modifier = Modifier.size(w, h)) {
+//                                    drawRect(
+//                                        color = Color.DarkGray,
+//                                        size = Size(w.toPx(), h.toPx())
+//                                    )
+//                                }
+//                                Canvas(modifier = Modifier.size(w, h)) {
+//                                    drawRect(
+//                                        color = Color.White,
+//                                        size = Size(
+//                                            (w.toPx() * (displayHabit.habitJoin.completion.completion.toFloat() / displayHabit.habitJoin.habit.frequency)),
+//                                            h.toPx()
+//                                        )
+//                                    )
+//                                }
                             }
 //                        LinearProgressIndicator(
 //                            progress = (displayHabit.habitJoin.completion.completion.toFloat() / displayHabit.habitJoin.habit.frequency).toFloat(),
@@ -290,7 +362,8 @@ fun CircleUpdate(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit, stat
         ),
         modifier = Modifier
             //.size(width = 380.dp, height = 130.dp)
-            .padding(vertical = 5.dp, horizontal = 5.dp).onSizeChanged { itemHeight = with(density){it.height.toDp()} },
+            .padding(vertical = 5.dp, horizontal = 5.dp)
+            .onSizeChanged { itemHeight = with(density) { it.height.toDp() } },
         colors = CardDefaults.cardColors(Color.Gray)
 
     ) {
