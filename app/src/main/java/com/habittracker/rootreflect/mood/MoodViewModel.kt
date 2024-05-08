@@ -60,8 +60,14 @@ class MoodViewModel(
                     )
                 }
                 viewModelScope.launch {
-                    dao.deleteMoodRecord(
-                        currentDate.toString())
+                    val existingRec = dao.getMoodRecByDate(currentDate.toString())
+                    if (existingRec == null) {
+                        dao.insertMoodRec(moodRec = MoodRecord(
+                            moodDate = currentDate.toString(),
+                            mood = moodEvent.moodType))
+                    } else {
+                        dao.updateMoodRec(currentDate.toString(), moodEvent.moodType)
+                    }
                 }
             }
             is MoodEvent.AlrightSelected -> {

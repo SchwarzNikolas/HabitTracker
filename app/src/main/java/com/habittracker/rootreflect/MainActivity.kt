@@ -81,6 +81,7 @@ class MainActivity : ComponentActivity() {
     // when app launches runs continuously and handles UI theme and connects Viewmodel to the UI
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        createNotificationChannel()
         setContent {
             HabitTrackerTheme {
                 Surface(
@@ -99,7 +100,8 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        createNotificationChannel()
+        val notification = NotificationService(applicationContext)
+        notification.showNotification()
     }
 
     private fun createNotificationChannel() {
