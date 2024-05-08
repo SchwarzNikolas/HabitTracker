@@ -1,7 +1,6 @@
 package com.habittracker.rootreflect.habit
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,8 +9,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
@@ -28,6 +27,7 @@ import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
@@ -87,12 +87,12 @@ fun MainScreen (
         // Mood part of the screen
         MoodSection(moodState, onMoodEvent, Modifier)
 
-        // Daily part of the screen
-        Text(text = "Daily", textAlign = TextAlign.Center, modifier = Modifier
-            .background(Color.Gray)
-            .fillMaxWidth(), fontSize = 30.sp)
+        Divider(modifier = Modifier
+            .fillMaxWidth()
+            .width(4.dp))
 
         LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 158.dp)) {
+            // Daily Habits
             items(state.displayHabits.size){
                 ElevatedHabit(
                     displayHabit = state.displayHabits[it],
@@ -100,11 +100,7 @@ fun MainScreen (
                     state
                 )
             }
-            item(span = {GridItemSpan(2)}) {
-                Text(text = "Weekly", textAlign = TextAlign.Center, modifier = Modifier
-                    .background(Color.Gray)
-                    .fillMaxWidth(), fontSize = 30.sp)
-            }
+            // Weekly Habits
             items(state.weeklyDisplayHabits.size){
                 ElevatedHabit(
                     displayHabit = state.weeklyDisplayHabits[it],
