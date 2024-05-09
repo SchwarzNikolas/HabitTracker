@@ -105,17 +105,13 @@ fun MonthSelector(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
 
 @Composable
 fun DailyBox(onEvent: (HistoryEvent) -> Unit, state: HistoryState, dayNum: Int){
-    // change parsing after date is used in mood
-    val buttonDate = "20"+LocalDate.now().year.toString()+"-"+(state.selectedMonth.ordinal + 1).toString()+"-"+(dayNum+1).toString()
-    Text(text = buttonDate)
     Button(
         modifier = Modifier
             .size(width = 25.dp, height = 25.dp),
         shape = RoundedCornerShape(5.dp),
-        colors = ButtonDefaults.buttonColors(Color(state.selectedMood.moodColor)),
+        colors = ButtonDefaults.buttonColors(Color(state.dayList[dayNum].colour)),
         onClick = {
-            onEvent(HistoryEvent.EnableBottomSheet)
-            onEvent(HistoryEvent.ChangeSelectedMood(MoodType.BAD))}
+            onEvent(HistoryEvent.EnableBottomSheet)}
     ) {
     }
 }

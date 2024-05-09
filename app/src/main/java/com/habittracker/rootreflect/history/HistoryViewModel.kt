@@ -3,14 +3,12 @@ package com.habittracker.rootreflect.history
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.habittracker.rootreflect.database.HabitDao
-import com.habittracker.rootreflect.database.HabitRecord
 import com.habittracker.rootreflect.database.MoodRecord
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.sql.Date
 import java.time.LocalDate
-import java.time.Month
 import java.time.YearMonth
 
 class HistoryViewModel(
@@ -68,21 +66,20 @@ class HistoryViewModel(
                 val amountDays: Int = year.lengthOfMonth()
                 val days: MutableList<DayOfMonth> = mutableListOf()
                 for (i in 1..amountDays) {
-                    // Change to DATE!!!!
-                    val date: String = LocalDate.now().year.toString()+"-"+(state.value.selectedMonth.ordinal+1).toString()+"-"+1.toString()
-                    var colour: Long = 0xffffff
+                    // Change Mood entity to date instead of string and delete all .toStrings()
                     viewModelScope.launch {
-                        colour = dao.getMoodRecByDate(date)?.mood?.moodColor ?: 0xffffff
+                        val date = LocalDate.of(state.value.selectedYear, state.value.selectedMonth.ordinal+1, i)
+                        val colour = dao.getMoodRecByDate(date.toString())?.mood?.moodColor ?: state.value.dayPassiveColour
+                        days.add(DayOfMonth(
+                            colour = colour,
+                            date = Date.valueOf(date.toString())
+                        ))
+                        _state.update {
+                            it.copy(
+                                dayList = days
+                            )
+                        }
                     }
-                    days.add(DayOfMonth(
-                        colour = colour,
-                        date = Date.valueOf(date)
-                    ))
-                }
-                _state.update {
-                    it.copy(
-                        dayList = days
-                    )
                 }
             }
             is HistoryEvent.ChangeSelectedMood -> {

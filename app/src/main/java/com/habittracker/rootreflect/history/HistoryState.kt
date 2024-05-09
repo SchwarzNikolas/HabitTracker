@@ -12,6 +12,8 @@ data class HistoryState(
     val dayList: MutableList<DayOfMonth> = mutableStateListOf(),
     val selectedDate: Date? = null,
     val selectedMonth: Month = LocalDate.now().month,
+    val selectedYear: Int = LocalDate.now().year,
     val bottomSheetActive: Boolean = false,
-    val selectedMood: MoodType = MoodType.GOOD
+    val selectedMood: MoodType = MoodType.GOOD,
+    val dayPassiveColour: Long = 0xFF000000
 )
