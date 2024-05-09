@@ -113,7 +113,7 @@ class MoodViewModel(
                     val existingRec = dao.getMoodRecByDate(currentDate.toString())
                     if (existingRec == null) {
                         dao.upsertMoodRec(moodRec = MoodRecord(
-                            moodDate = currentDate.toString(),
+                            moodDate = currentDate,
                             mood = moodEvent.moodType))
                     } else {
                         dao.updateMoodRec(currentDate.toString(), moodEvent.moodType)
