@@ -36,7 +36,7 @@ class NotificationService(
         val calendar: Calendar = Calendar.getInstance().apply{
             timeInMillis = System.currentTimeMillis()
             set(Calendar.HOUR_OF_DAY, 11)
-            set(Calendar.MINUTE, 39)
+            set(Calendar.MINUTE, 41)
             set(Calendar.SECOND, 0)
             if (before(Calendar.getInstance())) {
                 add(Calendar.DAY_OF_MONTH, 1)

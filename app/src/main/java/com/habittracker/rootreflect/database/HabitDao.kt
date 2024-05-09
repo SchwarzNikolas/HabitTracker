@@ -66,23 +66,13 @@ interface HabitDao{
     @Query("SELECT * FROM MoodRecord WHERE moodDate = :date LIMIT 1")
     suspend fun getMoodRecByDate(date: String): MoodRecord?
 
-    /*@Transaction
-    suspend fun upsertMoodRec(moodRec: MoodRecord) {
-        val existingRecord = getMoodRecByDate(moodRec.moodDate)
-        if (existingRecord == null) {
-            insertMoodRec(moodRec)
-        } else {
-            val updatedRecord = existingRecord.copy(moodRecId = moodRec.moodRecId)
-            insertMoodRec(updatedRecord)
-        }
-    }*/
-
     @Upsert
     suspend fun insertMoodRec(moodRec: MoodRecord)
 
     @Query("UPDATE MoodRecord SET mood = :mood WHERE moodDate = :date")
     suspend fun updateMoodRec(date: String, mood: MoodType)
 
-    @Query("DELETE FROM MoodRecord WHERE moodDate = :date")
-    suspend fun deleteMoodRecord(date:String)
+    // temp
+    @Query("DELETE FROM MoodRecord")
+    suspend fun deleteMoodRecord()
 }
