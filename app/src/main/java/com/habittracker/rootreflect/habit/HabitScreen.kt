@@ -1,11 +1,15 @@
 package com.habittracker.rootreflect.habit
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -13,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -22,6 +27,8 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material3.Button
@@ -38,6 +45,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -45,7 +53,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.RoundRect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -73,17 +87,11 @@ fun MainScreen (
     onEvent: (HabitEvent) -> Unit,
     onMoodEvent: (MoodEvent) -> Unit
 ){
-    //val scrollState = rememberScrollState()
     Column(
         modifier = Modifier,
-        //.verticalScroll(state = scrollState)
-        //.verticalScroll(rememberScrollState())
-        //.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     )
     {
-        Text(text = state.date.toString())
-
         // Mood part of the screen
         MoodSection(moodState, onMoodEvent, Modifier)
 
@@ -91,10 +99,10 @@ fun MainScreen (
             .fillMaxWidth()
             .width(4.dp))
 
-        LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 158.dp)) {
+        LazyVerticalGrid(columns = GridCells.Fixed(1) ) {
             // Daily Habits
             items(state.displayHabits.size){
-                ElevatedHabit(
+                BarHabit(
                     displayHabit = state.displayHabits[it],
                     onEvent = onEvent,
                     state
@@ -102,7 +110,7 @@ fun MainScreen (
             }
             // Weekly Habits
             items(state.weeklyDisplayHabits.size){
-                ElevatedHabit(
+                BarHabit(
                     displayHabit = state.weeklyDisplayHabits[it],
                     onEvent = onEvent,
                     state
@@ -142,62 +150,171 @@ fun MainScreen (
 }
 
 @Composable
-fun ElevatedHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit, state: HabitState) {
+fun BarHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit, state: HabitState){
     val dropdownItems :List<Item> = listOf(
         Item(name ="Edit", onClick =  {onEvent(HabitEvent.EditHabit(displayHabit))}, Icons.Default.Edit),
         Item(name = "Undo", onClick = {onEvent(HabitEvent.DecCompletion(displayHabit.habitJoin))}, Icons.Default.ArrowBack),
         Item(name = "Delete", onClick = {onEvent(HabitEvent.DeleteHabit(displayHabit.habitJoin))}, Icons.Default.Delete)
-       )
-
+    )
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
         ),
         modifier = Modifier
-            //.size(width = 380.dp, height = 130.dp)
+            .clickable { onEvent(HabitEvent.IncCompletion(displayHabit.habitJoin)) }
+            .fillMaxWidth()
             .padding(vertical = 5.dp, horizontal = 5.dp),
         colors = CardDefaults.cardColors(Color.Gray)
-
     ) {
         Box(
-            modifier = Modifier,
-//            .fillMaxWidth()
-//                .pointerInput(true) {
-//                    detectTapGestures(onLongPress = {
-//                        onEvent(HabitEvent.ContextMenuVisibility(displayHabit))
-//                        pressOffset = DpOffset(it.x.toDp(), it.y.toDp())
-//            })
-//            },
-            contentAlignment = Alignment.Center
+            modifier = Modifier
+            //.fillMaxWidth(),
+            //contentAlignment = Alignment.TopCenter,
         ) {
-            Column {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                val w = 300.dp
+                val h = 50.dp
+                val cornerRadius = CornerRadius(25f,25f)
                 if (displayHabit.beingEdited.value) {
-                    EditMode(
-                        onEvent = onEvent,
-                        displayHabit = displayHabit,
-                        state = state,
-                    )
-                } else {
-                    DisplayMode(
-                        displayHabit = displayHabit,
-                        onEvent = onEvent,
-                    )
+                    Row (verticalAlignment = Alignment.CenterVertically){
+                        BasicTextField(
+                            value = state.editString,
+                            onValueChange = {onEvent(HabitEvent.UpDateEditString(it))},
+                            keyboardOptions = KeyboardOptions.Default.copy(
+                                autoCorrectEnabled = true,
+                                imeAction = ImeAction.Done,
+                                showKeyboardOnFocus = true,
+                                capitalization = KeyboardCapitalization.Sentences,
+                                keyboardType = KeyboardType.Text
+                            ),
+                            singleLine = true,
+                            textStyle = LocalTextStyle.current.copy(fontSize = 30.sp,
+                                textDecoration = TextDecoration.Underline),
+                            modifier = Modifier.padding(start = 10.dp),
+                        )
+                        Spacer(Modifier.weight(1f))
+                        IconButton(onClick = { onEvent(HabitEvent.ContextMenuVisibility(displayHabit))},
+                            modifier = Modifier) {
+                            Icon(
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = "ContextMenu"
+                            )
+                        }
+                    }
+                    Row (modifier = Modifier.padding(bottom = 5.dp)){
+                        TextButton(onClick = { /*TODO*/ },
+                            modifier = Modifier
+                                .background(Color.DarkGray)
+                                .size(w / 2, h)
+                                .background(Color.Red)) {
+                            Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = "")
+                        }
+                        TextButton(onClick = { /*TODO*/ },
+                            modifier = Modifier
+                                .background(Color.DarkGray)
+                                .size(w / 2, h)
+                                .background(Color.Green)) {
+                            Icon(imageVector = Icons.Default.KeyboardArrowUp, contentDescription = "")
+                        }
+                        Button(
+                            onClick = { /*TODO*/ },
+                            enabled = false,
+                            modifier = Modifier.padding(start = 5.dp)
+                        ) {
+                            Text(text = displayHabit.habitJoin.habit.frequency.toString())
+                        }
+//                            IconButton(onClick = { onEvent(HabitEvent.CancelEdit(displayHabit),
+//                                ) }
+//                            ) {
+//                                Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = "cancel edit")
+//                            }
+//                            IconButton(onClick = { onEvent(HabitEvent.CancelEdit(displayHabit)) }
+//                            ) {
+//                                Icon(imageVector = Icons.Default.KeyboardArrowUp, contentDescription = "cancel edit")
+//                            }
+                    }
+                }
+                else {
+                    Row (verticalAlignment = Alignment.CenterVertically){
+                        BasicText(text = displayHabit.habitJoin.habit.name,
+                            maxLines = 1,
+                            modifier = Modifier.padding(start = 10.dp),
+                            style = LocalTextStyle.current.copy(fontSize = 30.sp))
+                        Spacer(Modifier.weight(1f))
+                        IconButton(onClick = { onEvent(HabitEvent.ContextMenuVisibility(displayHabit))},
+                            modifier = Modifier) {
+                            Icon(
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = "ContextMenu"
+                            )
+                        }
+                    }
+                    Row(modifier = Modifier.padding(bottom = 5.dp)) {
+                        Box() {
+                            Canvas(modifier = Modifier.size(w, h)) {
+                                val path = Path().apply {
+                                    addRoundRect(
+                                        RoundRect(
+                                            rect = Rect(
+                                                offset = Offset(0f, 0f),
+                                                size = Size(w.toPx(),h.toPx())
+                                            ),
+                                            topLeft = cornerRadius,
+                                            topRight = cornerRadius,
+                                            bottomLeft = cornerRadius,
+                                            bottomRight = cornerRadius
+                                        )
+                                    )
+                                }
+                                drawPath(path, color = Color.DarkGray)
+                                val path2 = Path().apply {
+                                    addRoundRect(
+                                        RoundRect(
+                                            rect = Rect(
+                                                offset = Offset(0f, 0f),
+                                                size = Size(
+                                                    (w.toPx() * (displayHabit.habitJoin.completion.completion.toFloat() / displayHabit.habitJoin.habit.frequency)),
+                                                    h.toPx()
+                                                )
+                                            ),
+                                            topLeft = cornerRadius,
+                                            topRight = cornerRadius,
+                                            bottomLeft = cornerRadius,
+                                            bottomRight = cornerRadius
+                                        )
+                                    )
+                                }
+                                drawPath(path2, color = Color.Green)
+                            }
+//                                Canvas(modifier = Modifier.size(w, h)) {
+//                                    drawRect(
+//                                        color = Color.DarkGray,
+//                                        size = Size(w.toPx(), h.toPx())
+//                                    )
+//                                }
+//                                Canvas(modifier = Modifier.size(w, h)) {
+//                                    drawRect(
+//                                        color = Color.White,
+//                                        size = Size(
+//                                            (w.toPx() * (displayHabit.habitJoin.completion.completion.toFloat() / displayHabit.habitJoin.habit.frequency)),
+//                                            h.toPx()
+//                                        )
+//                                    )
+//                                }
+                        }
+//                        LinearProgressIndicator(
+//                            progress = (displayHabit.habitJoin.completion.completion.toFloat() / displayHabit.habitJoin.habit.frequency).toFloat(),
+//                        )
+                        Button(
+                            onClick = { /*TODO*/ },
+                            enabled = false,
+                            modifier = Modifier.padding(start = 5.dp)
+                        ) {
+                            Text(text = displayHabit.habitJoin.completion.completion.toString())
+                        }
+                    }
                 }
             }
-        }
-    }
-    DropdownMenu(
-        expanded = displayHabit.isMenuVisible.value,
-        onDismissRequest = { onEvent(HabitEvent.ContextMenuVisibility(displayHabit))}
-    ) {
-        dropdownItems.forEach { item ->
-            DropdownMenuItem(
-                text = { Text(text = item.name)},
-                onClick = {
-                    item.onClick()
-                    onEvent(HabitEvent.ContextMenuVisibility(displayHabit))},
-                leadingIcon = { Icon(imageVector = item.icon, contentDescription = null)}
-            )
         }
     }
 }
