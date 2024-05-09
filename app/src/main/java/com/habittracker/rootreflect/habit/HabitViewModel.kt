@@ -29,7 +29,6 @@ class HabitViewModel (
     val state = _state
 
     init {
-
         viewModelScope.launch {
             state.value.job = viewModelScope.launch { dataSupRoutine() }
             while (true) {
@@ -51,7 +50,7 @@ class HabitViewModel (
         viewModelScope.launch {
 ////             sync data base and state
 ////             will clean up later
-//            dao.insertHabit(Habit(name = "test1", frequency = 1))
+//            dao.insertHabit(Habit(name = "test1", frequency = 5))
 //            dao.insertCompletion(HabitCompletion())
 //            dao.insertHabit(Habit(name = "test1", frequency = 3,))
 //            dao.insertCompletion(HabitCompletion(occurrence = "1000000"))
@@ -82,10 +81,6 @@ class HabitViewModel (
             }
             }
         }
-//
-//        state.value.job = viewModelScope.launch {
-//            dataSupRoutine()
-//        }
     }
 
     // Handles the events triggered by the UI
@@ -120,16 +115,6 @@ class HabitViewModel (
                     )
                 }
             }
-
-            // Deprecated
-            is HabitEvent.BoxChecked -> {
-                //if box is checked, it becomes unchecked and vice versa
-//                event.displayHabit.completion[event.index].value =
-//                    event.displayHabit.completion[event.index].value.not()
-//                // accesses if habit is completed
-//                //checkHabitCompletion(event.displayHabit)
-            }
-
             // when text is entered by the user into the text field is updated here and temporarily stored in the habit state.
             is HabitEvent.UpDateEditFreq -> {
                 state.update {
@@ -218,10 +203,9 @@ class HabitViewModel (
     }
 
     // removes record from the database using the dao (database access object)
-
     private fun removeHabit(habitJoin: HabitJoin){
         viewModelScope.launch {
-            dao.deleteCompletion(habitJoin.completion)
+            //dao.deleteCompletion(habitJoin.completion)
             dao.deleteHabit(habitJoin.habit)
         }
     }
@@ -286,9 +270,6 @@ class HabitViewModel (
     }
 
     // tem
-
-
-
     private fun getDate(): LocalDateTime {
         return state.value.date2
     }
