@@ -7,6 +7,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -14,14 +17,19 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.habittracker.rootreflect.habit.CustomTextField
 
 @Composable
 fun CustomScreen(
@@ -159,4 +167,25 @@ fun DayButton(
             )
         ) {}
     }
+}
+
+
+@Composable
+fun CustomTextField(value: String, label: String, onchange: (String) -> Unit, manager: FocusManager){
+    TextField(
+        value = value,
+        onValueChange = { onchange(it) },
+        label = { Text(label) },
+        colors = TextFieldDefaults.colors(focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent),
+        keyboardOptions = KeyboardOptions.Default.copy(autoCorrectEnabled = true,
+            imeAction = ImeAction.Done,
+            showKeyboardOnFocus = true,
+            capitalization = KeyboardCapitalization.Sentences,
+            keyboardType = KeyboardType.Text),
+        keyboardActions = KeyboardActions(onDone = {
+            manager.moveFocus(FocusDirection.Down) }),
+        singleLine = true,
+        modifier = Modifier.size(height = 50.dp,width = 100.dp),
+        shape = CircleShape
+    )
 }

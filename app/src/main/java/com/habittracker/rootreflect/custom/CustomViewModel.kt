@@ -99,8 +99,8 @@ class CustomViewModel(
                     frequency = habitFrequency.toInt(),
                 )
                 viewModelScope.launch {
-                    dao.insertHabit(newCusHabit)
-                    dao.insertCompletion(HabitCompletion(occurrence = habitOccurrence))
+                    dao.upsertHabit(newCusHabit)
+                    dao.upsertCompletion(HabitCompletion(occurrence = habitOccurrence))
                 }
             }
         }

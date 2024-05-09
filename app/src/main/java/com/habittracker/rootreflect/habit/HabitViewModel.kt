@@ -1,19 +1,21 @@
 package com.habittracker.rootreflect.habit
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.habittracker.rootreflect.database.DateRecord
 import com.habittracker.rootreflect.database.Habit
 import com.habittracker.rootreflect.database.HabitCompletion
 import com.habittracker.rootreflect.database.HabitDao
 import com.habittracker.rootreflect.database.HabitJoin
 import com.habittracker.rootreflect.database.HabitRecord
+import com.habittracker.rootreflect.database.MoodRecord
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 // modifies the state of the HabitState
 
@@ -29,7 +31,19 @@ class HabitViewModel (
     val state = _state
 
     init {
+
+
+
         viewModelScope.launch {
+
+            val date = dao.getDate()
+            if (date == null){
+                Log.d("AAAAAAAAAA","AAAAAAAAAAAAAAAAAAAA")
+                dao.upsertDate(DateRecord(key = 1, date = LocalDate.now()))
+            }else{
+                state.update { it.copy(date = date.date) }
+            }
+
             state.value.job = viewModelScope.launch { dataSupRoutine() }
             while (true) {
                 if (getDate() != state.value.date) {
@@ -38,6 +52,7 @@ class HabitViewModel (
                             date = getDate()
                         )
                     }
+                    dao.upsertDate(DateRecord(key = 1, date = LocalDate.now()))
                     resetCompletion()
                     state.value.job.cancel()
                     state.value.job = viewModelScope.launch { dataSupRoutine() }
@@ -180,7 +195,38 @@ class HabitViewModel (
             }
             // Deprecated
             HabitEvent.NextDay -> {
-                state.update { it.copy(date2 = state.value.date2.plusDays(1)) }
+                //state.update { it.copy(date2 = state.value.date2.plusDays(1)) }
+            }
+
+            is HabitEvent.DecFrequency -> {
+                if (event.frequency > 1){
+                    state.update {it.copy(editFreq =  state.value.editFreq.dec())}
+                }
+            }
+            is HabitEvent.IncFrequency -> {
+                if (event.frequency < 10){
+                    state.update {it.copy(editFreq =  state.value.editFreq.inc())}
+                }
+            }
+            is HabitEvent.MoodChange -> {
+                _state.update {
+                    it.copy(
+                        selectedMood = event.moodType
+                    )
+                }
+                viewModelScope.launch {
+
+                    dao.upsertMoodRec(MoodRecord(state.value.date, event.moodType))
+//                    val existingRec = dao.getMoodRecByDate(date = state.value.date.toString())
+//                    if (existingRec == null) {
+//                        dao.upsertMoodRec(moodRec = MoodRecord(
+//                            moodDate = state.value.date,
+//                            mood = event.moodType)
+//                        )
+//                    } else {
+//                        dao.updateMoodRec(state.value.date.toString(), event.moodType)
+//                    }
+                }
             }
         }
     }
@@ -189,7 +235,7 @@ class HabitViewModel (
     private fun checkHabitCompletion(join: Habit, completion: HabitCompletion) {
         val habitRecord = HabitRecord(
             habitName = join.name,
-            date = LocalDate.now().toString()
+            date = LocalDate.now()
         )
         var comp: HabitCompletion = completion
         if (join.frequency == completion.completion && !completion.done){
@@ -212,7 +258,7 @@ class HabitViewModel (
 
     private fun updateCompletion(completion: HabitCompletion){
         viewModelScope.launch {
-            dao.updateCompletion(completion)
+            dao.upsertCompletion(completion)
         }
     }
 
@@ -231,7 +277,7 @@ class HabitViewModel (
 
     private fun updateHabit(habit: Habit){
         viewModelScope.launch {
-            dao.updateHabit(habit)
+            dao.upsertHabit(habit)
         }
     }
 
@@ -270,8 +316,8 @@ class HabitViewModel (
     }
 
     // tem
-    private fun getDate(): LocalDateTime {
-        return state.value.date2
+    private fun getDate(): LocalDate {
+        return LocalDate.now()
     }
 
 }

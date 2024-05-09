@@ -3,13 +3,13 @@ package com.habittracker.rootreflect.database
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.habittracker.rootreflect.mood.MoodType
+import java.time.LocalDate
 
 // Database for (daily) mood record
 
 @Entity
 data class MoodRecord(
-    @PrimaryKey(autoGenerate = true)
-    val moodRecId: Int = 0,
-    val moodDate: String = "2025-05-05",
+    @PrimaryKey
+    val moodDate: LocalDate,
     val mood: MoodType = MoodType.OK
 )

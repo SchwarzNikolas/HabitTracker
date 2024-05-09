@@ -4,10 +4,10 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import androidx.room.Update
 import androidx.room.Upsert
 import com.habittracker.rootreflect.mood.MoodType
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDate
 
 
 // this is the Data Access Object
@@ -15,23 +15,23 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface HabitDao{
 
+    @Query("Select * from DateRecord limit 1")
+    suspend fun getDate(): DateRecord
+
+    @Upsert()
+    suspend fun upsertDate(dateRecord: DateRecord)
     // defines sql query to be executed on the database
     @Query("SELECT * FROM Habit JOIN HabitCompletion ON Habit.habitId = HabitCompletion.habitID WHERE HabitCompletion.occurrence LIKE :day")
     fun fetchHabitByDay(day: String): Flow<List<HabitJoin>>
     @Upsert
-    suspend fun insertHabit(habit: Habit)
-
-    @Update
-    suspend fun updateHabit(habit: Habit)
+    suspend fun upsertHabit(habit: Habit)
 
     @Delete
     suspend fun deleteHabit(habit: Habit)
 
-    @Insert
-    suspend fun insertCompletion(habitCompletion: HabitCompletion)
+    @Upsert
+    suspend fun upsertCompletion(habitCompletion: HabitCompletion)
 
-    @Update
-    suspend fun updateCompletion(completion: HabitCompletion)
     @Query("UPDATE HabitCompletion SET completion = 0, done = 'false'")
     suspend fun resetCompletion()
     @Delete
@@ -45,7 +45,7 @@ interface HabitDao{
 
     // defines sql query to be executed on the database
     @Query("DELETE FROM HabitRecord WHERE habitName = :name AND date = :date")
-    suspend fun deleteRecord(name: String, date:String)
+    suspend fun deleteRecord(name: String, date: LocalDate)
 
 
 
@@ -58,12 +58,9 @@ interface HabitDao{
     suspend fun getMoodRecByDate(date: String): MoodRecord?
 
     @Upsert
-    suspend fun insertMoodRec(moodRec: MoodRecord)
+    suspend fun upsertMoodRec(moodRec: MoodRecord)
 
     @Query("UPDATE MoodRecord SET mood = :mood WHERE moodDate = :date")
     suspend fun updateMoodRec(date: String, mood: MoodType)
 
-    // temp
-    @Query("DELETE FROM MoodRecord")
-    suspend fun deleteMoodRecord()
 }

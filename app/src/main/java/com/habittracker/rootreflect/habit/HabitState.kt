@@ -3,8 +3,9 @@ package com.habittracker.rootreflect.habit
 
 import androidx.compose.runtime.mutableStateListOf
 import com.habittracker.rootreflect.database.HabitRecord
+import com.habittracker.rootreflect.mood.MoodType
 import kotlinx.coroutines.Job
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 
 // This contains all the data that the UI displays
@@ -26,10 +27,11 @@ data class HabitState(
     val weeklyDisplayHabits: MutableList<DisplayHabit> = mutableStateListOf(),
 
 
-    val date2: LocalDateTime = LocalDateTime.now().plusDays(1),
+    //val date2: LocalDate = LocalDate.now().plusDays(1),
     // temp
-    val date: LocalDateTime = LocalDateTime.now(),
+    val date: LocalDate = LocalDate.now(),
 
-    var job: Job
+    var job: Job,
 
-)
+    val selectedMood: MoodType = MoodType.OK,
+    )

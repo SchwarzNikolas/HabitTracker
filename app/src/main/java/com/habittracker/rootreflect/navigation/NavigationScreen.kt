@@ -21,7 +21,6 @@ import com.habittracker.rootreflect.habit.MainScreen
 import com.habittracker.rootreflect.history.HistoryScreen
 import com.habittracker.rootreflect.history.HistoryViewModel
 import com.habittracker.rootreflect.mood.MoodViewModel
-import java.time.Month
 
 
 // Navigation Bar to switch to different screens
@@ -77,7 +76,7 @@ fun AppNavigation(
         ){
             composable(route = "Home"){
                 // link the MainScreen to the first button
-                MainScreen(state = habitState, moodState = moodState, onEvent = habitViewModel::onEvent, onMoodEvent = moodViewModel::onEvent)
+                MainScreen(state = habitState, onEvent = habitViewModel::onEvent)
             }
             composable(route = "Add"){
                 // link the CustomScreen to the second button

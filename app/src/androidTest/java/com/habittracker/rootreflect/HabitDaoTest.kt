@@ -54,7 +54,7 @@ class HabitDaoTest {
         // create habit and check if habitList is empty
         val habit = Habit()
         // insert the habit into the database via the dao
-        dao.insertHabit(habit)
+        dao.upsertHabit(habit)
         // the .test method waits for the flow to return an item and then cancels method call
         dao.fetchHabits().test {
             habitList = awaitItem()
@@ -68,8 +68,8 @@ class HabitDaoTest {
     fun daoDeleteTest() = runBlocking {
         val habit = Habit()
         // insert the 2 habits into the database via the dao
-        dao.insertHabit(habit)
-        dao.insertHabit(habit)
+        dao.upsertHabit(habit)
+        dao.upsertHabit(habit)
         // fetch the habits from the database and then delete the first one in the list
         dao.fetchHabits().test {
             habitList = awaitItem()
@@ -89,7 +89,7 @@ class HabitDaoTest {
     fun updateHabitTest() = runBlocking {
         // create habit and insert it into the database
         var habit = Habit()
-        dao.insertHabit(habit)
+        dao.upsertHabit(habit)
         // fetch habit from the database and check if it exists
         dao.fetchHabits().test {
             habitList = awaitItem()
@@ -149,8 +149,8 @@ class HabitDaoTest {
     fun insertCompletionTest() = runBlocking {
         // create habitCompletion and insert it into the database
         val completedHabit = HabitCompletion(1, 0, false, "1111111")
-        dao.insertHabit(Habit())
-        dao.insertCompletion(completedHabit)
+        dao.upsertHabit(Habit())
+        dao.upsertCompletion(completedHabit)
         // fetch completed habits from the database and compare it with created object
         dao.getHabit().test {
             habitCompletion = awaitItem()
@@ -163,8 +163,8 @@ class HabitDaoTest {
     fun deleteCompletionTest() = runBlocking {
         // create habitCompletion and insert them into the database
         val completedHabit = HabitCompletion(1, 0, false, "1111111")
-        dao.insertHabit(Habit())
-        dao.insertCompletion(completedHabit)
+        dao.upsertHabit(Habit())
+        dao.upsertCompletion(completedHabit)
         // fetch completed habits from the database and check size
         dao.getHabit().test {
             habitCompletion = awaitItem()
@@ -185,8 +185,8 @@ class HabitDaoTest {
     fun updateCompletionTest() = runBlocking {
         // create habitCompletion and insert them into the database
         var completedHabit = HabitCompletion(1, 0, false, "1111111")
-        dao.insertHabit(Habit())
-        dao.insertCompletion(completedHabit)
+        dao.upsertHabit(Habit())
+        dao.upsertCompletion(completedHabit)
         // update HabitCompletion and fetch the results
         completedHabit = HabitCompletion(1, 1, true, "1111111")
         dao.updateCompletion(completedHabit)
@@ -203,8 +203,8 @@ class HabitDaoTest {
     fun resetCompletionTest() = runBlocking {
         // create habitCompletion and insert them into the database
         val completedHabit = HabitCompletion(1, 1, true, "1111111")
-        dao.insertHabit(Habit())
-        dao.insertCompletion(completedHabit)
+        dao.upsertHabit(Habit())
+        dao.upsertCompletion(completedHabit)
         // reset the completion and fetch all the habits
         dao.resetCompletion()
         dao.getHabit().test {
@@ -220,8 +220,8 @@ class HabitDaoTest {
     fun fetchHabitByDayTest() = runBlocking {
         // create habitCompletion and insert them into the database
         val completedHabit = HabitCompletion(1, 1, true, "1111111")
-        dao.insertHabit(Habit())
-        dao.insertCompletion(completedHabit)
+        dao.upsertHabit(Habit())
+        dao.upsertCompletion(completedHabit)
         dao.fetchHabitByDay("1111111").test {
             habitCompletion = awaitItem()
             cancelAndIgnoreRemainingEvents()
@@ -232,7 +232,7 @@ class HabitDaoTest {
     @Test
     fun insertMoodRecTest() = runBlocking{
         val moodRecord = MoodRecord()
-        dao.insertMoodRec(moodRecord)
+        dao.upsertMoodRec(moodRecord)
         dao.fetchMoodRecords().test {
             fetchMood = awaitItem()
             cancelAndIgnoreRemainingEvents()
@@ -243,7 +243,7 @@ class HabitDaoTest {
     @Test
     fun getMoodRecByDateTest() = runBlocking{
         val moodRecord = MoodRecord()
-        dao.insertMoodRec(moodRecord)
+        dao.upsertMoodRec(moodRecord)
         // replace String with LocalDate.now().toString() when date implemented
         val moodDate: MoodRecord? = dao.getMoodRecByDate("2025-05-05")
         assertThat(moodDate).isNotNull()
@@ -252,7 +252,7 @@ class HabitDaoTest {
     @Test
     fun updateMoodRecTest() = runBlocking {
         val moodRecord = MoodRecord()
-        dao.insertMoodRec(moodRecord)
+        dao.upsertMoodRec(moodRecord)
         dao.updateMoodRec("2025-05-05", MoodType.GOOD)
         dao.fetchMoodRecords().test {
             fetchMood = awaitItem()
@@ -264,9 +264,9 @@ class HabitDaoTest {
     @Test
     fun deleteMoodRecordTest() = runBlocking {
         var moodRecord = MoodRecord(1, "2024-05-05", MoodType.GOOD)
-        dao.insertMoodRec(moodRecord)
+        dao.upsertMoodRec(moodRecord)
         moodRecord = MoodRecord(2, "2025-05-05", MoodType.BAD)
-        dao.insertMoodRec(moodRecord)
+        dao.upsertMoodRec(moodRecord)
         dao.deleteMoodRecord("2025-05-05")
         dao.fetchMoodRecords().test {
             fetchMood = awaitItem()
