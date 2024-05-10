@@ -18,17 +18,30 @@ class HistoryViewModel(
     val state = _state
 
     init {
+        val year: YearMonth = YearMonth.of(LocalDate.now().year, state.value.selectedMonth)
+        val amountDays: Int = year.lengthOfMonth()
+        val days: MutableList<DayOfMonth> = mutableListOf()
         viewModelScope.launch {
-            dao.fetchMoodRecords().collect{moodRecords -> run{
-                val displayMoodRecordList: MutableList<MoodRecord> = mutableListOf()
-                for (record in moodRecords){
-                    displayMoodRecordList.add(record)
-                }
-                _state.update { it.copy(
-                    habitRecord = displayMoodRecordList
+            for (i in 1..amountDays) {
+                // Change Mood entity to date instead of string and delete all .toStrings()
+                val date = LocalDate.of(
+                    state.value.selectedYear,
+                    state.value.selectedMonth.ordinal + 1,
+                    i
                 )
-                }
+                val colour = dao.getMoodRecByDate(date.toString())?.mood?.moodColor
+                    ?: state.value.dayPassiveColour
+                days.add(
+                    DayOfMonth(
+                        colour = colour,
+                        date = Date.valueOf(date.toString())
+                    )
+                )
             }
+            _state.update {
+                it.copy(
+                    dayList = days
+                )
             }
         }
     }
@@ -62,13 +75,13 @@ class HistoryViewModel(
                         selectedMonth = event.month
                     )
                 }
+                // change to selected year instead of current year
                 val year: YearMonth = YearMonth.of(LocalDate.now().year, state.value.selectedMonth)
                 val amountDays: Int = year.lengthOfMonth()
                 val days: MutableList<DayOfMonth> = mutableListOf()
                 viewModelScope.launch {
                     for (i in 1..amountDays) {
                         // Change Mood entity to date instead of string and delete all .toStrings()
-
                             val date = LocalDate.of(
                                 state.value.selectedYear,
                                 state.value.selectedMonth.ordinal + 1,
