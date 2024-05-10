@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.habittracker.rootreflect.database.HabitDao
 import com.habittracker.rootreflect.database.MoodRecord
 import com.habittracker.rootreflect.habit.HabitState
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -14,7 +13,7 @@ import java.time.LocalDate
 class MoodViewModel(
     private val dao: HabitDao
 ) : ViewModel() {
-    private val _state = MutableStateFlow(HabitState(job = Job()))
+    private val _state = MutableStateFlow(HabitState())
     val state = _state
 
     private val currentDate: LocalDate = LocalDate.now()

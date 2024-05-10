@@ -1,7 +1,9 @@
 package com.habittracker.rootreflect.habit
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -45,13 +48,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.RoundRect
-import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -71,7 +69,7 @@ data class Item(
     val onClick: () -> Unit,
     val icon: ImageVector
     )
-val moods: List<MoodType> = enumValues<MoodType>().toList()
+private val moods: List<MoodType> = enumValues<MoodType>().toList()
 @Composable
 fun MainScreen (
     state: HabitState,
@@ -118,7 +116,7 @@ fun MainScreen (
         }
         Text(text = state.date.dayOfWeek.toString())
         //Text(text = state.date2.dayOfWeek.toString())
-        
+
         Text(text = state.habitRecord.size.toString())
         for (habitRecord in state.habitRecord) {
             Text(text = habitRecord.habitName)
@@ -170,7 +168,6 @@ fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit){
                 )
                 val w = 300.dp
                 val h = 50.dp
-                val cornerRadius = CornerRadius(25f, 25f)
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     BasicText(
@@ -219,44 +216,30 @@ fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit){
                 }
                 Row(modifier = Modifier.padding(bottom = 5.dp)) {
                     Box() {
-                        Canvas(modifier = Modifier.size(w, h)) {
-                            val path = Path().apply {
-                                addRoundRect(
-                                    RoundRect(
-                                        rect = Rect(
-                                            offset = Offset(0f, 0f),
-                                            size = Size(w.toPx(), h.toPx())
-                                        ),
-                                        topLeft = cornerRadius,
-                                        topRight = cornerRadius,
-                                        bottomLeft = cornerRadius,
-                                        bottomRight = cornerRadius
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(10.dp))
+                                .size(w, h)
+                                .background(Color.DarkGray)
+                        )
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(Color.Green)
+                                .animateContentSize(
+                                    animationSpec = tween(
+                                        durationMillis = 500,
+                                        easing = FastOutSlowInEasing
                                     )
                                 )
-                            }
-                            drawPath(path, color = Color.DarkGray)
-                            val path2 = Path().apply {
-                                addRoundRect(
-                                    RoundRect(
-                                        rect = Rect(
-                                            offset = Offset(0f, 0f),
-                                            size = Size(
-                                                (w.toPx() * (displayHabit.habitJoin.completion.completion.toFloat() / displayHabit.habitJoin.habit.frequency)),
-                                                h.toPx()
-                                            )
-                                        ),
-                                        topLeft = cornerRadius,
-                                        topRight = cornerRadius,
-                                        bottomLeft = cornerRadius,
-                                        bottomRight = cornerRadius
-                                    )
+                                .size(
+                                    w * (displayHabit.habitJoin.completion.completion.toFloat() / displayHabit.habitJoin.habit.frequency),
+                                    h
                                 )
-                            }
-                            drawPath(path2, color = Color.Green)
-                        }
+                        )
                     }
                     Button(
-                        onClick = { /*TODO*/ },
+                        onClick = {},
                         enabled = false,
                         modifier = Modifier.padding(start = 5.dp)
                     ) {

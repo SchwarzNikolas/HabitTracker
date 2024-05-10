@@ -1,6 +1,5 @@
 package com.habittracker.rootreflect.habit
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.habittracker.rootreflect.database.DateRecord
@@ -27,35 +26,28 @@ private fun Boolean.toChar(): Char {
 class HabitViewModel (
     private val dao: HabitDao
 ): ViewModel() {
-    private val _state = MutableStateFlow(HabitState(job = Job()))
+    private val _state = MutableStateFlow(HabitState())
     val state = _state
-
+    private lateinit var date: LocalDate
+    private lateinit var job: Job
     init {
-
-
-
         viewModelScope.launch {
 
-            val date = dao.getDate()
-            if (date == null){
-                Log.d("AAAAAAAAAA","AAAAAAAAAAAAAAAAAAAA")
+            val dateRecord = dao.getDate()
+            if (dateRecord == null){
                 dao.upsertDate(DateRecord(key = 1, date = LocalDate.now()))
             }else{
-                state.update { it.copy(date = date.date) }
+               date = dateRecord.date
             }
 
-            state.value.job = viewModelScope.launch { dataSupRoutine() }
+            job = viewModelScope.launch { dataSupRoutine() }
             while (true) {
-                if (getDate() != state.value.date) {
-                    state.update {
-                        it.copy(
-                            date = getDate()
-                        )
-                    }
+                if (getDate() != date) {
+                    date = getDate()
                     dao.upsertDate(DateRecord(key = 1, date = LocalDate.now()))
                     resetCompletion()
-                    state.value.job.cancel()
-                    state.value.job = viewModelScope.launch { dataSupRoutine() }
+                    job.cancel()
+                    job = viewModelScope.launch { dataSupRoutine() }
                 }
                 delay(500)
             }
@@ -215,8 +207,7 @@ class HabitViewModel (
                     )
                 }
                 viewModelScope.launch {
-
-                    dao.upsertMoodRec(MoodRecord(state.value.date, event.moodType))
+                    dao.upsertMoodRec(MoodRecord(date, event.moodType))
 //                    val existingRec = dao.getMoodRecByDate(date = state.value.date.toString())
 //                    if (existingRec == null) {
 //                        dao.upsertMoodRec(moodRec = MoodRecord(
@@ -235,7 +226,7 @@ class HabitViewModel (
     private fun checkHabitCompletion(join: Habit, completion: HabitCompletion) {
         val habitRecord = HabitRecord(
             habitName = join.name,
-            date = LocalDate.now()
+            date = date
         )
         var comp: HabitCompletion = completion
         if (join.frequency == completion.completion && !completion.done){
@@ -282,7 +273,7 @@ class HabitViewModel (
     }
 
      private suspend fun dataSupRoutine(){
-         dao.fetchHabitByDay(dayToString(state.value.date.dayOfWeek.value-1)).collect{habitJoin -> run{
+         dao.fetchHabitByDay(dayToString(date.dayOfWeek.value-1)).collect{habitJoin -> run{
              val displayHabitRecordList: MutableList<DisplayHabit> = mutableListOf()
              val weeklyDisplayHabitRecordList: MutableList<DisplayHabit> = mutableListOf()
              for (habit in habitJoin){

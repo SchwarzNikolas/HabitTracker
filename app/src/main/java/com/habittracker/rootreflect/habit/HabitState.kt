@@ -4,7 +4,6 @@ package com.habittracker.rootreflect.habit
 import androidx.compose.runtime.mutableStateListOf
 import com.habittracker.rootreflect.database.HabitRecord
 import com.habittracker.rootreflect.mood.MoodType
-import kotlinx.coroutines.Job
 import java.time.LocalDate
 
 
@@ -30,8 +29,6 @@ data class HabitState(
     //val date2: LocalDate = LocalDate.now().plusDays(1),
     // temp
     val date: LocalDate = LocalDate.now(),
-
-    var job: Job,
 
     val selectedMood: MoodType = MoodType.OK,
     )
