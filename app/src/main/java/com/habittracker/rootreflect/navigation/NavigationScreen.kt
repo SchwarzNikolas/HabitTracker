@@ -76,7 +76,7 @@ fun AppNavigation(
         ){
             composable(route = "Home"){
                 // link the MainScreen to the first button
-                MainScreen(state = habitState, onEvent = habitViewModel::onEvent)
+                MainScreen(state = habitState, onEvent = habitViewModel::onEvent, moodEvent = moodViewModel::onEvent)
             }
             composable(route = "Add"){
                 // link the CustomScreen to the second button
