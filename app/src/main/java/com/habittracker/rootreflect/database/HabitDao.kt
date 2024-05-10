@@ -18,6 +18,8 @@ interface HabitDao{
     @Query("Select * from DateRecord limit 1")
     suspend fun getDate(): DateRecord
 
+    @Upsert
+    suspend fun upsertMoodRec(moodRec: MoodRecord)
     @Upsert()
     suspend fun upsertDate(dateRecord: DateRecord)
     // defines sql query to be executed on the database
@@ -57,8 +59,10 @@ interface HabitDao{
     @Query("SELECT * FROM MoodRecord WHERE moodDate = :date LIMIT 1")
     suspend fun getMoodRecByDate(date: String): MoodRecord?
 
+
+
     @Upsert
-    suspend fun upsertMoodRec(moodRec: MoodRecord)
+    suspend fun insertMoodRec(moodRec: MoodRecord)
 
     @Query("UPDATE MoodRecord SET mood = :mood WHERE moodDate = :date")
     suspend fun updateMoodRec(date: String, mood: MoodType)

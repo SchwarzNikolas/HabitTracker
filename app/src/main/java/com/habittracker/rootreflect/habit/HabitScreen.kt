@@ -59,6 +59,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.habittracker.rootreflect.mood.MoodEvent
 import com.habittracker.rootreflect.mood.MoodType
 
 
@@ -74,6 +75,7 @@ private val moods: List<MoodType> = enumValues<MoodType>().toList()
 fun MainScreen (
     state: HabitState,
     onEvent: (HabitEvent) -> Unit,
+    moodEvent: (MoodEvent) -> Unit
 ){
     Column(
         modifier = Modifier,
@@ -81,7 +83,7 @@ fun MainScreen (
     )
     {
         // Mood part of the screen
-        MoodSection(state, onEvent, Modifier)
+        MoodSection(state, moodEvent, Modifier)
 
         Divider(modifier = Modifier
             .fillMaxWidth()
@@ -389,7 +391,7 @@ fun DayButton(
 }
 
 @Composable
-fun MoodSection(state: HabitState, onEvent: (HabitEvent) -> Unit, modifier: Modifier) {
+fun MoodSection(state: HabitState, onEvent: (MoodEvent) -> Unit, modifier: Modifier) {
     Column (
         modifier = modifier
             .fillMaxWidth()
@@ -417,15 +419,13 @@ fun MoodSection(state: HabitState, onEvent: (HabitEvent) -> Unit, modifier: Modi
                         selected = state.selectedMood == moodType,
                         onClick = {
                             onEvent(
-                                HabitEvent.MoodChange(moodType)
-                                        //MoodEvent.MoodChange(moodType)
-//                                when (moodType) {
-//                                    MoodType.BAD -> MoodEvent.BadSelected(moodType)
-//                                    MoodType.SO_SO -> MoodEvent.SoSoSelected(moodType)
-//                                    MoodType.OK -> MoodEvent.OkSelected(moodType)
-//                                    MoodType.ALRIGHT -> MoodEvent.AlrightSelected(moodType)
-//                                    MoodType.GOOD -> MoodEvent.GoodSelected(moodType)
-//                                }
+                                when (moodType) {
+                                    MoodType.BAD -> MoodEvent.BadSelected(moodType)
+                                    MoodType.SO_SO -> MoodEvent.SoSoSelected(moodType)
+                                    MoodType.OK -> MoodEvent.OkSelected(moodType)
+                                    MoodType.ALRIGHT -> MoodEvent.AlrightSelected(moodType)
+                                    MoodType.GOOD -> MoodEvent.GoodSelected(moodType)
+                                }
                             )
                         },
                         colors = RadioButtonDefaults.colors(
