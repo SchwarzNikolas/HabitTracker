@@ -1,12 +1,15 @@
 package com.habittracker.rootreflect.history
 
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.habittracker.rootreflect.database.HabitDao
+import com.habittracker.rootreflect.mood.MoodType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.Month
 import java.time.YearMonth
 
 class HistoryViewModel(
@@ -18,16 +21,22 @@ class HistoryViewModel(
     init {
         // recordedDates has this format: yyyymm as an integer
         val recordedDates: MutableSet<Int> = mutableSetOf()
+        val filledDates: MutableList<Int> = mutableStateListOf()
         viewModelScope.launch {
             dao.fetchDates().collect { dates ->
                 run {
                     for (date in dates) {
                         recordedDates.add(date.year*100 + date.month.value)
                     }
-                    recordedDates.forEach(System.out::println)
+                    IntRange(recordedDates.min(), recordedDates.max()).forEach{date ->
+                        if (date%100 < 13 && date%100 != 0){
+                            filledDates.add(date)
+                        }
+                    }
+                    filledDates.forEach(System.out::println)
                     _state.update {
                         it.copy(
-                            monthsWithRecord = IntRange(recordedDates.min(), recordedDates.max()).toMutableList()
+                            monthsWithRecord = filledDates
                         )
                     }
                 }
@@ -35,7 +44,7 @@ class HistoryViewModel(
         }
         // debug
 //        viewModelScope.launch {
-//            dao.debugCalendar(LocalDate.of(2024, 2, 1), MoodType.GOOD)
+//              dao.debugCalendar(LocalDate.of(2023, 11, 1), MoodType.GOOD)
 //            dao.debugCalendar(LocalDate.of(2024, 2, 2), MoodType.GOOD)
 //            dao.debugCalendar(LocalDate.of(2024, 2, 3), MoodType.GOOD)
 //            dao.debugCalendar(LocalDate.of(2024, 3, 4), MoodType.GOOD)
@@ -71,10 +80,11 @@ class HistoryViewModel(
                 }
             }
             is HistoryEvent.ChangeCurrentMonth -> {
-                // change selected month and update the calendar accordingly
+                // change selected month and year and update the calendar accordingly
                 _state.update {
                     it.copy(
-                        selectedMonth = event.month
+                        selectedMonth = Month.of(event.date%100),
+                        selectedYear = (event.date - event.date%100) / 100
                     )
                 }
                 updateDays()
@@ -96,7 +106,7 @@ class HistoryViewModel(
         method which fetches all logged moods for a certain month and updates a list of days in the state
          */
         // change to selected year instead of current year
-        val year: YearMonth = YearMonth.of(LocalDate.now().year, state.value.selectedMonth)
+        val year: YearMonth = YearMonth.of(state.value.selectedYear, state.value.selectedMonth)
         val amountDays: Int = year.lengthOfMonth()
         val days: MutableList<DayOfMonth> = mutableListOf()
 

@@ -115,7 +115,7 @@ fun MonthSelector(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
             .padding(horizontal = 10.dp),
         label = {Month.of(it%100).toString()},
         value = state.selectedYear * 100 + state.selectedMonth.value,
-        onValueChange = { onEvent(HistoryEvent.ChangeCurrentMonth(Month.of(it%100))) },
+        onValueChange = { onEvent(HistoryEvent.ChangeCurrentMonth(it)) },
         list = months,
     )
 }
