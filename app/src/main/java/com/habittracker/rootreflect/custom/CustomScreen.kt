@@ -4,7 +4,9 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -14,6 +16,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -30,25 +33,38 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun CustomScreen(
     state: CustomState,
     onEvent: (CustomHabitEvent) -> Unit
 ){
-    Column {
-        Text(text = "Create Habit Here!")
+    Column (
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
+    ) {
+        Text(
+            text = "Create new Habit!",
+            fontSize = 24.sp
+        )
         Row (
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(10.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
-            // Text shown is based on switch state
-            Text(text = if (state.isDaily) "Daily Habit" else "Weekly Habit")
+            Text(
+                text = "Weekly",
+                modifier = Modifier.padding(end = 16.dp)
+            )
             // Switch for daily/weekly habits
             SwitchHabit(state, onEvent)
+            Text(
+                text = "Daily",
+                modifier = Modifier.padding(start = 16.dp)
+            )
         }
 
         Row (
@@ -66,7 +82,10 @@ fun CustomScreen(
 @Composable
 fun EditWindow(onEvent: (CustomHabitEvent) -> Unit, state: CustomState) {
     val focusManager = LocalFocusManager.current
-    Column {
+    Column (
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth()
+    ) {
 
         CustomTextField(
             value = state.habitName,
@@ -75,6 +94,19 @@ fun EditWindow(onEvent: (CustomHabitEvent) -> Unit, state: CustomState) {
             manager = focusManager
         )
 
+        Spacer(modifier = Modifier.height(16.dp))
+
+
+        /*Slider(
+            value = state.habitFrequency.toFloat(),
+            onValueChange = { onEvent(CustomHabitEvent.EditFreq(it.toInt().toString()))
+            },
+            valueRange = 1f..10f,
+            steps = 9,
+            modifier = Modifier.fillMaxWidth()
+        )*/
+
+
         CustomTextField(
             value = state.habitFrequency,
             label = "Frequency",
@@ -82,13 +114,20 @@ fun EditWindow(onEvent: (CustomHabitEvent) -> Unit, state: CustomState) {
             manager = focusManager
         )
 
+        Spacer(modifier = Modifier.height(16.dp))
+
         if (!state.isDaily)
             WeeklyFields(state, onEvent, focusManager)
 
-        Row (modifier = Modifier.size(width = 380.dp, height = 30.dp)) {
-            Button(onClick = { onEvent(CustomHabitEvent.SaveEdit)}) {
-                Text(text = "Save")
-            }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = { onEvent(CustomHabitEvent.SaveEdit)}
+        ) {
+            Text(
+                text = "Save",
+                fontSize = 24.sp
+            )
         }
     }
 }
@@ -110,23 +149,10 @@ fun SwitchHabit(state: CustomState, onEvent: (CustomHabitEvent) -> Unit) {
 
 @Composable
 fun WeeklyFields(state: CustomState, onEvent: (CustomHabitEvent) -> Unit, focusManager: FocusManager) {
-    Column {
-        // Every day switch
-        /*Row (verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween) {
-            Text("Every day", modifier = Modifier.weight(1f))
-            Spacer(modifier = Modifier.width(16.dp))
-            // have to implement
-            Switch(
-                checked = state.isEveryday,
-                onCheckedChange = null,
-                modifier = Modifier.align(Alignment.CenterVertically)
-            )
-        }*/
-
+    Column (
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
+    ) {
         Text("Days")
 
         // Days buttons
@@ -163,7 +189,7 @@ fun DayButton(
                 .size(width = 40.dp, height = 40.dp),
             border = BorderStroke(1.dp, Color.Black),
             colors = ButtonDefaults.outlinedButtonColors(
-                containerColor = if (clicked) Color.Black else Color.White,
+                containerColor = if (clicked) MaterialTheme.colorScheme.primary else Color.Transparent,
             )
         ) {}
     }
@@ -171,21 +197,30 @@ fun DayButton(
 
 
 @Composable
-fun CustomTextField(value: String, label: String, onchange: (String) -> Unit, manager: FocusManager){
+fun CustomTextField(
+    value: String,
+    label: String,
+    onchange: (String) -> Unit,
+    manager: FocusManager
+) {
     TextField(
         value = value,
         onValueChange = { onchange(it) },
         label = { Text(label) },
         colors = TextFieldDefaults.colors(focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent),
-        keyboardOptions = KeyboardOptions.Default.copy(autoCorrectEnabled = true,
+        keyboardOptions = KeyboardOptions.Default.copy(
+            autoCorrectEnabled = true,
             imeAction = ImeAction.Done,
             showKeyboardOnFocus = true,
             capitalization = KeyboardCapitalization.Sentences,
-            keyboardType = KeyboardType.Text),
+            keyboardType = KeyboardType.Text
+        ),
         keyboardActions = KeyboardActions(onDone = {
             manager.moveFocus(FocusDirection.Down) }),
         singleLine = true,
-        modifier = Modifier.size(height = 50.dp,width = 100.dp),
+        modifier = Modifier
+            .height(50.dp)
+            .fillMaxWidth(0.5f),
         shape = CircleShape
     )
 }
