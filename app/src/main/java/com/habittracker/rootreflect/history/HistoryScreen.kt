@@ -43,6 +43,9 @@ fun HistoryScreen(
         Text(text = "History Screen")
         Background(onEvent = onEvent, state = state)
         Spacer(modifier = Modifier.weight(1f))
+        Row(){
+            Text(text = state.selectedYear.toString())
+        }
         Row(modifier = Modifier.height(165.dp)) {
             MonthSelector(onEvent = onEvent, state = state)
             MonthlyHistory(onEvent = onEvent, state = state)
@@ -104,14 +107,15 @@ fun MonthSelector(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
     /*
     Picker where the calendar month can be selected
      */
-    val months = Month.entries
+    //val months: List<Month> = state.monthsWithRecord
+    val months = state.monthsWithRecord.toList()
     ListItemPicker(
         modifier = Modifier
             .width(160.dp)
             .padding(horizontal = 10.dp),
-        label = {it.toString()},
-        value = state.selectedMonth,
-        onValueChange = { onEvent(HistoryEvent.ChangeCurrentMonth(it)) },
+        label = {Month.of(it%100).toString()},
+        value = state.selectedYear * 100 + state.selectedMonth.value,
+        onValueChange = { onEvent(HistoryEvent.ChangeCurrentMonth(Month.of(it%100))) },
         list = months,
     )
 }

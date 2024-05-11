@@ -67,4 +67,11 @@ interface HabitDao{
     @Query("UPDATE MoodRecord SET mood = :mood WHERE moodDate = :date")
     suspend fun updateMoodRec(date: String, mood: MoodType)
 
+    // debug
+    @Query("insert into MoodRecord (moodDate, mood) values (:date, :mood)")
+    suspend fun debugCalendar(date: LocalDate, mood: MoodType)
+
+    @Query("select moodDate from MoodRecord")
+    fun fetchDates():Flow<List<LocalDate>>
+
 }

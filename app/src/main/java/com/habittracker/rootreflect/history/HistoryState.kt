@@ -6,7 +6,7 @@ import java.time.Month
 
 data class HistoryState(
     // stores all the months which recorded moods
-    val monthsWithRecord: MutableList<Month> = mutableStateListOf(),
+    val monthsWithRecord: MutableList<Int> = mutableStateListOf(),
     // stores each day of selected month and its mood
     val dayList: MutableList<DayOfMonth> = mutableStateListOf(),
     // day which the user selects when clicking on a calendar day

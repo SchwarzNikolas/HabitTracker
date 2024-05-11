@@ -16,6 +16,38 @@ class HistoryViewModel(
     val state = _state
 
     init {
+        // recordedDates has this format: yyyymm as an integer
+        val recordedDates: MutableSet<Int> = mutableSetOf()
+        viewModelScope.launch {
+            dao.fetchDates().collect { dates ->
+                run {
+                    for (date in dates) {
+                        recordedDates.add(date.year*100 + date.month.value)
+                    }
+                    recordedDates.forEach(System.out::println)
+                    _state.update {
+                        it.copy(
+                            monthsWithRecord = IntRange(recordedDates.min(), recordedDates.max()).toMutableList()
+                        )
+                    }
+                }
+            }
+        }
+        // debug
+//        viewModelScope.launch {
+//            dao.debugCalendar(LocalDate.of(2024, 2, 1), MoodType.GOOD)
+//            dao.debugCalendar(LocalDate.of(2024, 2, 2), MoodType.GOOD)
+//            dao.debugCalendar(LocalDate.of(2024, 2, 3), MoodType.GOOD)
+//            dao.debugCalendar(LocalDate.of(2024, 3, 4), MoodType.GOOD)
+//            dao.debugCalendar(LocalDate.of(2024, 3, 5), MoodType.GOOD)
+//            dao.debugCalendar(LocalDate.of(2024, 3, 6), MoodType.GOOD)
+//            dao.debugCalendar(LocalDate.of(2024, 5, 7), MoodType.GOOD)
+//            dao.debugCalendar(LocalDate.of(2024, 5, 20), MoodType.GOOD)
+//            dao.debugCalendar(LocalDate.of(2024, 5, 25), MoodType.GOOD)
+//            dao.debugCalendar(LocalDate.of(2024, 5, 30), MoodType.GOOD)
+//            dao.debugCalendar(LocalDate.of(2024, 5, 12), MoodType.GOOD)
+//            dao.debugCalendar(LocalDate.of(2024, 5, 6), MoodType.GOOD)
+//        }
         // update the current month when app is launched
         updateDays()
     }
@@ -73,7 +105,7 @@ class HistoryViewModel(
                 // loop trough every day in selected month
                 val date = LocalDate.of(
                     state.value.selectedYear,
-                    state.value.selectedMonth.ordinal + 1,
+                    state.value.selectedMonth.value,
                     i
                 )
                 // get the mood of the current date out of the database
