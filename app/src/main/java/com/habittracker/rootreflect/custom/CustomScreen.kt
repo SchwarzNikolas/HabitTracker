@@ -1,7 +1,12 @@
 package com.habittracker.rootreflect.custom
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,10 +15,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
@@ -25,6 +35,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
@@ -32,6 +43,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -42,7 +54,9 @@ fun CustomScreen(
 ){
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp)
     ) {
         Text(
             text = "Create new Habit!",
@@ -76,6 +90,8 @@ fun CustomScreen(
         ) {
             EditWindow(onEvent, state)
         }
+        Spacer(modifier = Modifier.weight(1f))
+        HabitPreview(state = state)
     }
 }
 
@@ -129,6 +145,10 @@ fun EditWindow(onEvent: (CustomHabitEvent) -> Unit, state: CustomState) {
                 fontSize = 24.sp
             )
         }
+        Spacer(modifier = Modifier.weight(1f))
+        if (state.habitName.isNotBlank()){
+            HabitPreview(state = state)
+        }
     }
 }
 
@@ -151,7 +171,9 @@ fun SwitchHabit(state: CustomState, onEvent: (CustomHabitEvent) -> Unit) {
 fun WeeklyFields(state: CustomState, onEvent: (CustomHabitEvent) -> Unit, focusManager: FocusManager) {
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp)
     ) {
         Text("Days")
 
@@ -223,4 +245,64 @@ fun CustomTextField(
             .fillMaxWidth(0.5f),
         shape = CircleShape
     )
+}
+
+@Composable
+fun HabitPreview(state: CustomState){
+    ElevatedCard(
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 6.dp
+        ),
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        Box {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                val w = 300.dp
+                val h = 50.dp
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    BasicText(
+                        text = state.habitName,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(start = 10.dp),
+                        style = LocalTextStyle.current.copy(fontSize = 30.sp)
+                    )
+                    Spacer(Modifier.weight(1f))
+                }
+                Row(modifier = Modifier.padding(bottom = 5.dp)) {
+                    Box() {
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(10.dp))
+                                .size(w, h)
+                                .background(Color.DarkGray)
+                        )
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(Color.Green)
+                                .animateContentSize(
+                                    animationSpec = tween(
+                                        durationMillis = 500,
+                                        easing = FastOutSlowInEasing
+                                    )
+                                )
+                                .size(
+                                    w * (1/2),
+                                    h
+                                )
+                        )
+                    }
+                    Button(
+                        onClick = {},
+                        enabled = false,
+                        modifier = Modifier.padding(start = 5.dp)
+                    ) {
+                        Text(text = state.habitFrequency)
+                    }
+                }
+            }
+        }
+    }
 }
