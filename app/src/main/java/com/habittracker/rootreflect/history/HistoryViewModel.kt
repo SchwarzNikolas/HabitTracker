@@ -18,12 +18,12 @@ class HistoryViewModel(
     val state = _state
 
     init {
-        // recordedDates has this format: yyyymm as an integer
-        val recordedDates: MutableSet<Int> = mutableSetOf()
-        val filledDates: MutableList<Int> = mutableStateListOf()
         viewModelScope.launch {
             dao.fetchDates().collect { dates ->
                 run {
+                    // recordedDates has this format: yyyymm as an integer
+                    val recordedDates: MutableSet<Int> = mutableSetOf()
+                    val filledDates: MutableList<Int> = mutableStateListOf()
                     for (date in dates) {
                         recordedDates.add(date.year*100 + date.month.value)
                     }
