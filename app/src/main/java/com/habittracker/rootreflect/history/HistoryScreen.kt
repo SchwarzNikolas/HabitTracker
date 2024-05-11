@@ -56,6 +56,10 @@ fun HistoryScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InfoSheet(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
+    /*
+    Bottom sheet which will display additional information either about the selected day
+    or about specific habits
+     */
     ModalBottomSheet(
         onDismissRequest = {
             onEvent(HistoryEvent.DisableBottomSheet)
@@ -64,16 +68,24 @@ fun InfoSheet(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
         Box(modifier = Modifier
             .height(500.dp)
             .align(Alignment.CenterHorizontally)){
-            Button(
-                onClick = { onEvent(HistoryEvent.DisableBottomSheet)}) {
-                Text("Hide bottom sheet")
+            Column {
+                Text(text = state.selectedDate.toString())
+                Text(text = state.selectedMood)
             }
+
+//            Button(
+//                onClick = { onEvent(HistoryEvent.DisableBottomSheet)}) {
+//                Text("Hide bottom sheet")
+//            }
         }
     }
 }
 
 @Composable
 fun MonthlyHistory(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
+    /*
+    Grid to display every day in of the month which its associated mood
+     */
     LazyVerticalGrid(
         modifier = Modifier
             .padding(10.dp)
@@ -83,12 +95,15 @@ fun MonthlyHistory(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
         verticalArrangement = Arrangement.spacedBy(4.dp),
 ) {
         items(state.dayList.size){
-            DailyBox(onEvent, state, it)
+            DailyBox(onEvent, state.dayList[it])
         }
     }
 }
 @Composable
 fun MonthSelector(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
+    /*
+    Picker where the calendar month can be selected
+     */
     val months = Month.entries
     ListItemPicker(
         modifier = Modifier
@@ -102,14 +117,18 @@ fun MonthSelector(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
 }
 
 @Composable
-fun DailyBox(onEvent: (HistoryEvent) -> Unit, state: HistoryState, dayNum: Int){
+fun DailyBox(onEvent: (HistoryEvent) -> Unit, dayOfMonth: DayOfMonth){
+    /*
+    Button which acts as a day in the calendar, will show information about the day if clicked
+     */
     Button(
         modifier = Modifier
             .size(width = 25.dp, height = 25.dp),
         shape = RoundedCornerShape(5.dp),
-        colors = ButtonDefaults.buttonColors(Color(state.dayList[dayNum].colour)),
+        colors = ButtonDefaults.buttonColors(Color(dayOfMonth.colour)),
         onClick = {
-            onEvent(HistoryEvent.EnableBottomSheet)}
+            onEvent(HistoryEvent.EnableBottomSheet)
+            onEvent(HistoryEvent.ChangeSelectedDay(dayOfMonth.date, dayOfMonth.mood))}
     ) {
     }
 }
