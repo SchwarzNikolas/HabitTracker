@@ -107,7 +107,6 @@ fun MonthSelector(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
     /*
     Picker where the calendar month can be selected
      */
-    //val months: List<Month> = state.monthsWithRecord
     val months = state.monthsWithRecord.toList()
     ListItemPicker(
         modifier = Modifier

@@ -4,7 +4,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.habittracker.rootreflect.database.HabitDao
-import com.habittracker.rootreflect.mood.MoodType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -42,22 +41,6 @@ class HistoryViewModel(
                 }
             }
         }
-        // debug
-//        viewModelScope.launch {
-//              dao.debugCalendar(LocalDate.of(2023, 11, 1), MoodType.GOOD)
-//            dao.debugCalendar(LocalDate.of(2024, 2, 2), MoodType.GOOD)
-//            dao.debugCalendar(LocalDate.of(2024, 2, 3), MoodType.GOOD)
-//            dao.debugCalendar(LocalDate.of(2024, 3, 4), MoodType.GOOD)
-//            dao.debugCalendar(LocalDate.of(2024, 3, 5), MoodType.GOOD)
-//            dao.debugCalendar(LocalDate.of(2024, 3, 6), MoodType.GOOD)
-//            dao.debugCalendar(LocalDate.of(2024, 5, 7), MoodType.GOOD)
-//            dao.debugCalendar(LocalDate.of(2024, 5, 20), MoodType.GOOD)
-//            dao.debugCalendar(LocalDate.of(2024, 5, 25), MoodType.GOOD)
-//            dao.debugCalendar(LocalDate.of(2024, 5, 30), MoodType.GOOD)
-//            dao.debugCalendar(LocalDate.of(2024, 5, 12), MoodType.GOOD)
-//            dao.debugCalendar(LocalDate.of(2024, 5, 6), MoodType.GOOD)
-//        }
-        // update the current month when app is launched
         updateDays()
     }
 

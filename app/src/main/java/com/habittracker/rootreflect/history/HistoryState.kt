@@ -13,7 +13,7 @@ data class HistoryState(
     val selectedDate: LocalDate? = null,
     // month which the user selects when selecting it in the ListPicker
     val selectedMonth: Month = LocalDate.now().month,
-    // TODO: Change year to be selectable
+    // the selected year of the displayed month
     val selectedYear: Int = LocalDate.now().year,
     // state of the bottom sheet (if it is up or hidden)
     val bottomSheetActive: Boolean = false,
