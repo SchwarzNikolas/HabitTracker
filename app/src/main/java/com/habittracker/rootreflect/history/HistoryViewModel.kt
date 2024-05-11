@@ -39,9 +39,9 @@ class HistoryViewModel(
                         )
                     }
                 }
+                updateDays()
             }
         }
-        updateDays()
     }
 
     fun onEvent(event: HistoryEvent) {
