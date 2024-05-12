@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import java.io.IOException
@@ -43,8 +44,8 @@ fun HistoryScreen(
         Text(text = "History Screen")
         Background(onEvent = onEvent, state = state)
         Spacer(modifier = Modifier.weight(1f))
-        Row(){
-            Text(text = state.selectedYear.toString())
+        Row(modifier = Modifier.padding(10.dp)){
+            DateText(state = state)
         }
         Row(modifier = Modifier.height(165.dp)) {
             MonthSelector(onEvent = onEvent, state = state)
@@ -52,6 +53,23 @@ fun HistoryScreen(
         }
         if (state.bottomSheetActive){
             InfoSheet(onEvent = onEvent, state = state)
+        }
+    }
+}
+
+@Composable
+fun DateText(state: HistoryState){
+    /*
+    Text which displays the year and the day
+     */
+    Spacer(modifier = Modifier.width(48.dp))
+    Text(text = state.selectedYear.toString(),
+        modifier = Modifier.width(112.dp))
+    val days = listOf("M", "T", "W", "T", "F", "S", "S")
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(7)){
+        items(days.size){
+            Text(text = days[it], textAlign = TextAlign.Center)
         }
     }
 }
@@ -75,11 +93,6 @@ fun InfoSheet(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
                 Text(text = state.selectedDate.toString())
                 Text(text = state.selectedMood)
             }
-
-//            Button(
-//                onClick = { onEvent(HistoryEvent.DisableBottomSheet)}) {
-//                Text("Hide bottom sheet")
-//            }
         }
     }
 }
@@ -89,6 +102,7 @@ fun MonthlyHistory(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
     /*
     Grid to display every day in of the month which its associated mood
      */
+    // TODO: place the first day of the month on the correct weekday
     LazyVerticalGrid(
         modifier = Modifier
             .padding(10.dp)
@@ -102,6 +116,7 @@ fun MonthlyHistory(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
         }
     }
 }
+
 @Composable
 fun MonthSelector(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
     /*
@@ -135,6 +150,7 @@ fun DailyBox(onEvent: (HistoryEvent) -> Unit, dayOfMonth: DayOfMonth){
     ) {
     }
 }
+
 @Composable
 fun Background (onEvent: (HistoryEvent) -> Unit, state: HistoryState){
     val drawable = loadImageFromAssets(LocalContext.current, "images/background.png")
