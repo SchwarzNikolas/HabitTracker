@@ -113,21 +113,13 @@ fun EditWindow(onEvent: (CustomHabitEvent) -> Unit, state: CustomState) {
         Spacer(modifier = Modifier.height(16.dp))
 
 
-        /*Slider(
+        Slider(
             value = state.habitFrequency.toFloat(),
-            onValueChange = { onEvent(CustomHabitEvent.EditFreq(it.toInt().toString()))
+            onValueChange = { onEvent(CustomHabitEvent.EditFreq(it.toInt()))
             },
-            valueRange = 1f..10f,
-            steps = 9,
+            valueRange = 1f..9f,
+            steps = 7,
             modifier = Modifier.fillMaxWidth()
-        )*/
-
-
-        CustomTextField(
-            value = state.habitFrequency,
-            label = "Frequency",
-            onchange = {onEvent(CustomHabitEvent.EditFreq(it))},
-            manager = focusManager
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -299,7 +291,7 @@ fun HabitPreview(state: CustomState){
                         enabled = false,
                         modifier = Modifier.padding(start = 5.dp)
                     ) {
-                        Text(text = state.habitFrequency)
+                        Text(text = state.habitFrequency.toString())
                     }
                 }
             }

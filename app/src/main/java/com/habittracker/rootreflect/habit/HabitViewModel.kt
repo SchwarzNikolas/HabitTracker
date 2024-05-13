@@ -233,7 +233,9 @@ class HabitViewModel (
     private fun checkHabitCompletion(join: Habit, completion: HabitCompletion) {
         val habitRecord = HabitRecord(
             habitName = join.name,
+            habitFrequency = join.frequency,
             date = date
+
         )
         var comp: HabitCompletion = completion
         if (join.frequency == completion.completion && !completion.done){

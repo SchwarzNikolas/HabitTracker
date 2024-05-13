@@ -16,12 +16,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
@@ -67,7 +67,7 @@ import com.habittracker.rootreflect.mood.MoodType
 
 data class Item(
     val name: String,
-    val onClick: () -> Unit,
+    val onClick: (DisplayHabit) -> Unit,
     val icon: ImageVector
     )
 private val moods: List<MoodType> = enumValues<MoodType>().toList()
@@ -76,93 +76,92 @@ private val moods: List<MoodType> = enumValues<MoodType>().toList()
 fun MainScreen (
     state: HabitState,
     onEvent: (HabitEvent) -> Unit,
-    moodEvent: (MoodEvent) -> Unit
-){
-    Column(
-        //horizontalAlignment = Alignment.CenterHorizontally,
+    moodEvent: (MoodEvent) -> Unit,
+
+) {
+    val dropdownItems: List<Item> = listOf(
+        Item(
+            name = "Edit",
+            onClick = { habit: DisplayHabit -> onEvent(HabitEvent.EditHabit(habit)) },
+            Icons.Default.Edit
+        ),
+        Item(
+            name = "Undo",
+            onClick = { habit: DisplayHabit -> onEvent(HabitEvent.DecCompletion(habit.habitJoin)) },
+            Icons.Default.ArrowBack
+        ),
+        Item(
+            name = "Delete",
+            onClick = { habit: DisplayHabit -> onEvent(HabitEvent.DeleteHabit(habit.habitJoin)) },
+            Icons.Default.Delete
+        )
     )
-    {
+    Column {
         // Mood part of the screen
-        MoodSection(state, moodEvent, Modifier)
+        MoodSection(state, moodEvent, Modifier, onEvent)
+        Divider(
+            modifier = Modifier
+                .fillMaxWidth()
+                .width(4.dp)
+        )
 
-        Divider(modifier = Modifier
-            .fillMaxWidth()
-            .width(4.dp))
-
-        LazyVerticalGrid(columns = GridCells.Fixed(1) ) {
-            // Daily Habits
-            items(state.displayHabits.size){
-
-                val mod  = Modifier
-
-                if (state.displayHabits[it].beingEdited.value) {
+        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+            for (displayHabit in state.displayHabits) {
+                val mod = Modifier
+                if (displayHabit.beingEdited.value) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(modifier = mod.weight(1f),
-                        onClick = { onEvent(HabitEvent.ModifyHabit(state.displayHabits[it].habitJoin)) }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = "ContextMenu"
-                        )
-                    }
-                    EditMode(onEvent = onEvent, displayHabit = state.displayHabits[it], state = state, modifier = mod.weight(12f))
-                    IconButton(modifier = mod.weight(1f),
-                        onClick = { onEvent(HabitEvent.CancelEdit(state.displayHabits[it])) }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "cancel edit"
-                        )
-                    }
+                        IconButton(modifier = mod.weight(1f),
+                            onClick = { onEvent(HabitEvent.ModifyHabit(displayHabit.habitJoin)) }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = "ContextMenu"
+                            )
                         }
-                } else {
-                        DisplayMode(
+                        EditMode(
                             onEvent = onEvent,
-                            displayHabit = state.displayHabits[it],
+                            displayHabit = displayHabit,
+                            state = state,
+                            modifier = mod.weight(12f)
                         )
+                        IconButton(modifier = mod.weight(1f),
+                            onClick = { onEvent(HabitEvent.CancelEdit(displayHabit)) }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "cancel edit"
+                            )
+                        }
+                    }
+                } else {
+                    DisplayMode(
+                        onEvent = onEvent,
+                        displayHabit = displayHabit,
+                        dropdownItems = dropdownItems
+                    )
                 }
             }
-            // Weekly Habits
-            items(state.weeklyDisplayHabits.size){
-                BarHabit(
-                    displayHabit = state.weeklyDisplayHabits[it],
-                    onEvent = onEvent,
-                    state
-                )
+            // debug
+            Button(onClick = { onEvent(HabitEvent.ResetCompletion) }) {
+                Text(text = "test")
+            }
+            Button(onClick = { onEvent(HabitEvent.NextDay) }) {
+                Text(text = "next day")
+            }
+            Text(text = state.date.dayOfWeek.toString())
+            //Text(text = state.date2.dayOfWeek.toString())
+
+            Text(text = state.habitRecord.size.toString())
+            for (habitRecord in state.habitRecord) {
+                Text(text = habitRecord.habitName)
+                Text(text = habitRecord.date.toString())
             }
         }
-
-
-        // debug
-        Button(onClick = { onEvent(HabitEvent.ResetCompletion)}) {
-                Text(text = "test")
-        }
-        Button(onClick = { onEvent(HabitEvent.NextDay)}) {
-            Text(text = "next day")
-        }
-        Text(text = state.date.dayOfWeek.toString())
-        //Text(text = state.date2.dayOfWeek.toString())
-
-        Text(text = state.habitRecord.size.toString())
-        for (habitRecord in state.habitRecord) {
-            Text(text = habitRecord.habitName)
-            Text(text = habitRecord.date.toString())
-        }
     }
 }
 
 @Composable
-fun BarHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit, state: HabitState){
-    if (displayHabit.beingEdited.value) {
-        EditMode(onEvent = onEvent, displayHabit = displayHabit, state = state)
-    } else {
-        DisplayMode(onEvent = onEvent, displayHabit = displayHabit,  modifier = Modifier)
-    }
-}
-
-
-@Composable
-fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, modifier: Modifier = Modifier){
+fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, dropdownItems: List<Item> , modifier: Modifier = Modifier){
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
@@ -172,115 +171,101 @@ fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, modif
             .padding(vertical = 5.dp, horizontal = 5.dp),
         colors = CardDefaults.cardColors(Color.Gray)
     ) {
-        val dropdownItems: List<Item> = listOf(
-            Item(
-                name = "Edit",
-                onClick = { onEvent(HabitEvent.EditHabit(displayHabit)) },
-                Icons.Default.Edit
-            ),
-            Item(
-                name = "Undo",
-                onClick = { onEvent(HabitEvent.DecCompletion(displayHabit.habitJoin)) },
-                Icons.Default.ArrowBack
-            ),
-            Item(
-                name = "Delete",
-                onClick = { onEvent(HabitEvent.DeleteHabit(displayHabit.habitJoin)) },
-                Icons.Default.Delete
+        Row {
+            BasicText(
+                text = displayHabit.habitJoin.habit.name,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = modifier
+                    .padding(start = 10.dp)
+                    .weight(17f),
+                style = LocalTextStyle.current.copy(fontSize = 30.sp)
             )
-        )
-                val w = 300.dp
-                val h = 50.dp
-
-                Row() {
-                    BasicText(
-                        text = displayHabit.habitJoin.habit.name,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = modifier.padding(start = 10.dp).weight(17f),
-                        style = LocalTextStyle.current.copy(fontSize = 30.sp)
-                    )
-                    IconButton(
-                        onClick = { onEvent(HabitEvent.ContextMenuVisibility(displayHabit)) },
-                        modifier = modifier.weight(2f)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = "ContextMenu"
+            IconButton(
+                onClick = { onEvent(HabitEvent.ContextMenuVisibility(displayHabit)) },
+                modifier = modifier.weight(2f)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = "ContextMenu"
+                )
+                DropdownMenu(
+                    expanded = displayHabit.isMenuVisible.value,
+                    onDismissRequest = {
+                        onEvent(
+                            HabitEvent.ContextMenuVisibility(
+                                displayHabit
+                            )
                         )
-                        DropdownMenu(
-                            expanded = displayHabit.isMenuVisible.value,
-                            onDismissRequest = {
-                                onEvent(
-                                    HabitEvent.ContextMenuVisibility(
-                                        displayHabit
-                                    )
+                    }
+                ) {
+                    dropdownItems.forEach { item ->
+                        DropdownMenuItem(
+                            text = { Text(text = item.name) },
+                            onClick = {
+                                item.onClick(displayHabit)
+                                onEvent(HabitEvent.ContextMenuVisibility(displayHabit))
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = item.icon,
+                                    contentDescription = null
                                 )
                             }
-                        ) {
-                            dropdownItems.forEach { item ->
-                                DropdownMenuItem(
-                                    text = { Text(text = item.name) },
-                                    onClick = {
-                                        item.onClick()
-                                        onEvent(HabitEvent.ContextMenuVisibility(displayHabit))
-                                    },
-                                    leadingIcon = {
-                                        Icon(
-                                            imageVector = item.icon,
-                                            contentDescription = null
-                                        )
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
-                Row(modifier = modifier.padding(bottom = 5.dp, start = 10.dp, end = 5.dp),
-                    verticalAlignment = Alignment.CenterVertically) {
-
-                    BoxWithConstraints (modifier = modifier.weight(6f).height(50.dp)){
-                        Box(
-                            modifier = modifier
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(Color.Black)
-                                .size(width = maxWidth, height = maxHeight)
-                        ){
-                            Text(text = "")
-                        }
-                        Box(
-                            modifier = modifier
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(Color.Green)
-                                .animateContentSize(
-                                    animationSpec = tween(
-                                        durationMillis = 500,
-                                        easing = FastOutSlowInEasing
-                                    )
-                                )
-                                .size(
-                                    maxWidth * (displayHabit.habitJoin.completion.completion.toFloat() / displayHabit.habitJoin.habit.frequency),
-                                    maxHeight
-                                )
-                        ){
-                            Text(text = "")
-                        }
-                    }
-                    Box(modifier = modifier.padding(start = 10.dp, end = 5.dp).weight(1f),
-                        contentAlignment = Alignment.Center) {
-                        Text(
-                            modifier = modifier
-                                .drawBehind {
-                                    drawCircle(
-                                        color = Color.Transparent,
-                                        radius = 60f
-                                    )
-                                },
-                            text = displayHabit.habitJoin.habit.frequency.toString()
                         )
                     }
                 }
             }
+        }
+        Row(modifier = modifier.padding(bottom = 5.dp, start = 10.dp, end = 5.dp),
+            verticalAlignment = Alignment.CenterVertically) {
+
+            BoxWithConstraints (modifier = modifier
+                .weight(6f)
+                .height(50.dp)){
+                Box(
+                    modifier = modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(Color.Black)
+                        .size(width = maxWidth, height = maxHeight)
+                ){
+                    Text(text = "")
+                }
+                Box(
+                    modifier = modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(Color.Green)
+                        .animateContentSize(
+                            animationSpec = tween(
+                                durationMillis = 500,
+                                easing = FastOutSlowInEasing
+                            )
+                        )
+                        .size(
+                            maxWidth * (displayHabit.habitJoin.completion.completion.toFloat() / displayHabit.habitJoin.habit.frequency),
+                            maxHeight
+                        )
+                ){
+                    Text(text = "")
+                }
+            }
+            Box(modifier = modifier
+                .padding(start = 10.dp, end = 5.dp)
+                .weight(1f),
+                contentAlignment = Alignment.Center) {
+                Text(
+                    modifier = modifier
+                        .drawBehind {
+                            drawCircle(
+                                color = Color.Transparent,
+                                radius = 60f
+                            )
+                        },
+                    text = displayHabit.habitJoin.habit.frequency.toString()
+                )
+            }
+        }
+    }
 }
 
 
@@ -294,56 +279,56 @@ fun EditMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, state: H
             .padding(vertical = 5.dp, horizontal = 5.dp),
         colors = CardDefaults.cardColors(Color.Gray)
     ) {
-                Row() {
-                    BasicTextField(
-                        value = state.editString,
-                        onValueChange = { onEvent(HabitEvent.UpDateEditString(it)) },
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            autoCorrectEnabled = true,
-                            imeAction = ImeAction.Done,
-                            showKeyboardOnFocus = true,
-                            capitalization = KeyboardCapitalization.Sentences,
-                            keyboardType = KeyboardType.Text
-                        ),
-                        maxLines = 2,
-                        textStyle = LocalTextStyle.current.copy(
-                            fontSize = 30.sp,
-                            textDecoration = TextDecoration.Underline
-                        ),
-                        modifier = modifier.padding(start = 10.dp),
-                    )
-                }
-                Row(modifier = Modifier.padding(bottom = 8.dp, end = 5.dp),
-                    verticalAlignment = Alignment.CenterVertically) {
-                    Slider(
-                        value = state.editFreq.toFloat(),
-                        onValueChange = { onEvent(HabitEvent.UpDateEditFreq(it.toInt()))
+        Row {
+            BasicTextField(
+                value = state.editString,
+                onValueChange = { onEvent(HabitEvent.UpDateEditString(it)) },
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    autoCorrectEnabled = true,
+                    imeAction = ImeAction.Done,
+                    showKeyboardOnFocus = true,
+                    capitalization = KeyboardCapitalization.Sentences,
+                    keyboardType = KeyboardType.Text
+                ),
+                maxLines = 2,
+                textStyle = LocalTextStyle.current.copy(
+                    fontSize = 30.sp,
+                    textDecoration = TextDecoration.Underline
+                ),
+                modifier = modifier.padding(start = 10.dp),
+            )
+        }
+        Row(modifier = Modifier.padding(bottom = 8.dp, end = 5.dp),
+            verticalAlignment = Alignment.CenterVertically) {
+            Slider(
+                value = state.editFreq.toFloat(),
+                onValueChange = { onEvent(HabitEvent.UpDateEditFreq(it.toInt()))
+                },
+                valueRange = 1f..9f,
+                steps = 7,
+                modifier = Modifier
+                    .weight(6f)
+                    .height(50.dp)
+            )
+            Box(modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.Center) {
+                Text(
+                    modifier = Modifier
+                        .drawBehind {
+                            drawCircle(
+                                color = Color.Transparent,
+                                radius = 60f
+                            )
                         },
-                        valueRange = 1f..9f,
-                        steps = 7,
-                        modifier = Modifier.weight(6f).height(50.dp)
-                    )
-                    Box(modifier = Modifier.weight(1f),
-                        contentAlignment = Alignment.Center) {
-                        Text(
-                            modifier = Modifier
-                                .drawBehind {
-                                    drawCircle(
-                                        color = Color.Transparent,
-                                        radius = 60f
-                                    )
-                                },
-                            text = state.editFreq.toString()
-                        )
-                    }
-                }
-                // chose days
-                if (displayHabit.habitJoin.completion.occurrence.contains("0")) {
-                    DaysSelection(onEvent, state)
-                }
+                    text = state.editFreq.toString()
+                )
             }
-
-
+        }
+        // chose days
+        if (displayHabit.habitJoin.completion.occurrence.contains("0")) {
+            DaysSelection(onEvent, state)
+        }
+    }
 }
 
 @Composable
@@ -382,12 +367,12 @@ fun DayButton(
             colors = ButtonDefaults.outlinedButtonColors(
                 containerColor = if (clicked) Color.Black else Color.White,
             )
-        ) {}
+        ){}
     }
 }
 
 @Composable
-fun MoodSection(state: HabitState, onEvent: (MoodEvent) -> Unit, modifier: Modifier) {
+fun MoodSection(state: HabitState, onEvent: (MoodEvent) -> Unit, modifier: Modifier, event : (HabitEvent)-> Unit) {
     Column (
         modifier = modifier
             .fillMaxWidth()
@@ -407,13 +392,13 @@ fun MoodSection(state: HabitState, onEvent: (MoodEvent) -> Unit, modifier: Modif
                 text = "Bad",
                 fontSize = 16.sp
             )
-
             // Mood radio buttons
             Row(verticalAlignment = Alignment.CenterVertically) {
                 for (moodType in moods) {
                     RadioButton(
                         selected = state.selectedMood == moodType,
                         onClick = {
+                            //event(HabitEvent.MoodChange(moodType))
                             onEvent(
                                 when (moodType) {
                                     MoodType.BAD -> MoodEvent.BadSelected(moodType)
@@ -432,7 +417,6 @@ fun MoodSection(state: HabitState, onEvent: (MoodEvent) -> Unit, modifier: Modif
                     )
                 }
             }
-
             Text(
                 text = "Good",
                 fontSize = 16.sp

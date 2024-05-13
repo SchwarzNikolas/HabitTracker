@@ -9,7 +9,7 @@ data class CustomState(
     // Habit name that will be displayed by the edit box
     val habitName: String = "",
     // Frequency that will be displayed by the edit box
-val habitFrequency: String = "",
+    val habitFrequency: Int = 1,
     // Represent days for weekly habits
     val completion: MutableList<MutableState<Boolean>> = MutableList(size = 7){ mutableStateOf(false) },
 )
