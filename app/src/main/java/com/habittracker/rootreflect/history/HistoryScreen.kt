@@ -111,7 +111,7 @@ fun MonthlyHistory(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
 ) {
-        val offsetDays = LocalDate.now().withDayOfMonth(1).dayOfWeek.value - 1
+        val offsetDays = LocalDate.of(state.selectedYear, state.selectedMonth, 1).dayOfWeek.value - 1
         items(offsetDays){
             DisabledDay()
         }
@@ -140,6 +140,9 @@ fun MonthSelector(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
 
 @Composable
 fun DisabledDay(){
+    /*
+    Button which represents a day of the previous month in the calendar
+     */
     Button(onClick = { /*This button does nothing ;)*/ },
         modifier = Modifier.size(width = 25.dp, height = 25.dp),
         shape = RoundedCornerShape(5.dp),
