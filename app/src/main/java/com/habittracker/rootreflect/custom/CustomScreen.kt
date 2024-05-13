@@ -241,7 +241,7 @@ fun CustomTextField(
             manager.moveFocus(FocusDirection.Down) }),
         singleLine = true,
         modifier = Modifier
-            .height(50.dp)
+            //.height(50.dp)
             .fillMaxWidth(0.5f),
         shape = CircleShape
     )
