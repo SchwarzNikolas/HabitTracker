@@ -27,12 +27,13 @@ class HistoryViewModel(
                     for (date in dates) {
                         recordedDates.add(date.year*100 + date.month.value)
                     }
-                    IntRange(recordedDates.min(), recordedDates.max()).forEach{date ->
-                        if (date%100 < 13 && date%100 != 0){
-                            filledDates.add(date)
+                    if (recordedDates.size > 0) {
+                        IntRange(recordedDates.min(), recordedDates.max()).forEach { date ->
+                            if (date % 100 < 13 && date % 100 != 0) {
+                                filledDates.add(date)
+                            }
                         }
                     }
-                    filledDates.forEach(System.out::println)
                     _state.update {
                         it.copy(
                             monthsWithRecord = filledDates
