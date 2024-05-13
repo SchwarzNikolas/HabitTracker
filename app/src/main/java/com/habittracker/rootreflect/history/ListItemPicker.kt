@@ -100,7 +100,9 @@ fun <T> ListItemPicker(
                 -((list.count() - 1) - index) * halfNumbersColumnHeightPx to
                         index * halfNumbersColumnHeightPx
             }
-            updateBounds(offsetRange.first, offsetRange.second)
+            if (offsetRange.first < offsetRange.second) {
+                updateBounds(offsetRange.first, offsetRange.second)
+            }
         }
 
     val coercedAnimatedOffset = animatedOffset.value % halfNumbersColumnHeightPx

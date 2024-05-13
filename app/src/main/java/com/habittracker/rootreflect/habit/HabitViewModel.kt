@@ -28,7 +28,7 @@ class HabitViewModel (
 ): ViewModel() {
     private val _state = MutableStateFlow(HabitState())
     val state = _state
-    private lateinit var date: LocalDate
+    private var date: LocalDate = LocalDate.now()
     private lateinit var job: Job
     init {
         viewModelScope.launch {
