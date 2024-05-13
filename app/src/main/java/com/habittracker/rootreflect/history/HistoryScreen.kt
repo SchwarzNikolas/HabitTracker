@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
@@ -284,20 +286,32 @@ fun BushRandom(){
 @Composable
 fun TreeClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
     val drawable = loadImageFromAssets(LocalContext.current, "images/tree.png")
-    val bitmap = drawable?.toBitmap()?.asImageBitmap()
+    val bitmap = drawable!!.toBitmap()
 
-    bitmap?.let { BitmapPainter(it) }?.let {
-        Image(
-            painter = it,
+    Image(
+            painter = BitmapPainter(bitmap.asImageBitmap()),
             contentDescription = null,
             alignment = Alignment.Center,
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .height(height =  225.dp)
                 .offset(100.dp, 15.dp)
-                .clickable { onEvent(HistoryEvent.EnableBottomSheet) }
-     )
-    }
+                .pointerInput(Unit){
+                    detectTapGestures {
+                        val ofset = 225.dp.toPx()/ bitmap.height
+                        if(bitmap.getPixel((it.x/ofset).toInt(),
+                                (it.y/ofset).toInt()
+                            ) != 0){
+                        onEvent(HistoryEvent.EnableBottomSheet)
+                    }
+                    }
+                }
+//                .clickable(indication = null,
+//                    interactionSource = remember {
+//                    MutableInteractionSource()
+//                    }) {
+//                    onEvent(HistoryEvent.EnableBottomSheet) }
+        )
 }
 
 @Composable
