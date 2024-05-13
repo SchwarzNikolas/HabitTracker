@@ -38,7 +38,7 @@ class HistoryViewModel(
                         filledDates.add(recordedDates.last())
                     }
                     else{
-                        filledDates.add(LocalDate.now().year * 100 + 1)
+                        filledDates.add(LocalDate.now().year * 100 + LocalDate.now().month.value)
                     }
                     _state.update {
                         it.copy(
