@@ -3,11 +3,13 @@ package com.habittracker.rootreflect.history
 import android.content.Context
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -18,6 +20,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -27,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -43,7 +47,11 @@ fun HistoryScreen(
 ) {
     Column {
         Text(text = "History Screen")
-        Background(onEvent = onEvent, state = state)
+        Box(){
+            Background()
+            TreeClick(onEvent = onEvent, state = state)
+
+        }
         Spacer(modifier = Modifier.weight(1f))
         Row(modifier = Modifier.padding(10.dp)){
             DateText(state = state)
@@ -89,10 +97,56 @@ fun InfoSheet(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
     ) {
         Box(modifier = Modifier
             .height(500.dp)
-            .align(Alignment.CenterHorizontally)){
-            Column {
-                Text(text = state.selectedDate.toString())
-                Text(text = state.selectedMood)
+            .align(Alignment.CenterHorizontally)
+            .padding(10.dp)){
+            if (state.habitInfo) {
+                // display information about habits
+            }
+            else {
+                Column {
+                    if (state.selectedMood != "No mood") {
+                        Text(
+                            text = "On the " + state.selectedDate?.dayOfMonth.toString() + ". of "
+                                    + state.selectedDate?.month?.name?.substring(0, 1)
+                                    + state.selectedDate?.month?.name?.substring(1)?.lowercase()
+                                    + " " + state.selectedYear.toString()
+                                    + " you felt " + state.selectedMood.lowercase() + ".",
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                    else {
+                        Text(
+                            text = "On the " + state.selectedDate?.dayOfMonth.toString() + ". of "
+                                + state.selectedDate?.month?.name?.substring(0, 1)
+                                + state.selectedDate?.month?.name?.substring(1)?.lowercase()
+                                + " " + state.selectedYear.toString()
+                                + " you logged no mood.",
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth())
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Divider(modifier = Modifier
+                        .fillMaxWidth()
+                        .height(2.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    if (state.habitList.isEmpty()){
+                        Text(text = "You have not completed any habits on that day.",
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth())
+                    }
+                    else{
+                        Text(text = "You have completed the following habits:",
+                            textAlign = TextAlign.Center)
+                        for (habit in state.habitList){
+                            Text(text = "• " + habit.habitName,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth())
+                        }
+                    }
+                }
             }
         }
     }
@@ -168,16 +222,87 @@ fun DailyBox(onEvent: (HistoryEvent) -> Unit, dayOfMonth: DayOfMonth){
 }
 
 @Composable
-fun Background (onEvent: (HistoryEvent) -> Unit, state: HistoryState){
-    val drawable = loadImageFromAssets(LocalContext.current, "images/background.png")
+fun Background (){
+    val drawable = loadImageFromAssets(LocalContext.current, "images/backgroundboardered.png")
     val bitmap = drawable?.toBitmap()?.asImageBitmap()
-    Box() {
-        bitmap?.let { BitmapPainter(it) }?.let {
-            Image(
-                painter = it,
-                contentDescription = null)
-        }
+    bitmap?.let { BitmapPainter(it) }?.let {
+    Image(
+        painter = it,
+        contentDescription = null,
+        alignment = Alignment.Center,
+        contentScale = ContentScale.Fit,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(height = 400.dp) // to alter image height
+        )
     }
+}
+
+@Composable
+fun FlowerClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, flower: String){
+    val drawable = loadImageFromAssets(LocalContext.current, flower)
+    val bitmap = drawable?.toBitmap()?.asImageBitmap()
+    bitmap?.let { BitmapPainter(it) }?.let {
+        Image(
+            painter = it,
+            contentDescription = null,
+            alignment = Alignment.Center,
+            contentScale = ContentScale.Fit,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(height = 400.dp))
+
+    }
+}
+
+@Composable
+fun FlowerRandom(){
+
+}
+@Composable
+fun BushClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, bush: String){
+    val drawable = loadImageFromAssets(LocalContext.current, bush)
+    val bitmap = drawable?.toBitmap()?.asImageBitmap()
+    bitmap?.let { BitmapPainter(it) }?.let {
+        Image(
+            painter = it,
+            contentDescription = null,
+            alignment = Alignment.Center,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .height(height = 225.dp)
+                .offset(100.dp, 15.dp)
+                .clickable { onEvent(HistoryEvent.EnableBottomSheet) })
+
+    }
+}
+
+@Composable
+fun BushRandom(){
+
+}
+@Composable
+fun TreeClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
+    val drawable = loadImageFromAssets(LocalContext.current, "images/tree.png")
+    val bitmap = drawable?.toBitmap()?.asImageBitmap()
+
+    bitmap?.let { BitmapPainter(it) }?.let {
+        Image(
+            painter = it,
+            contentDescription = null,
+            alignment = Alignment.Center,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .height(height =  225.dp)
+                .offset(100.dp, 15.dp)
+                .clickable { onEvent(HistoryEvent.EnableBottomSheet) }
+     )
+    }
+}
+
+@Composable
+fun TreeRandom(){
+
 }
 
 fun loadImageFromAssets(context: Context, filename: String): Drawable? {
@@ -189,4 +314,3 @@ fun loadImageFromAssets(context: Context, filename: String): Drawable? {
     }
     return null
 }
-

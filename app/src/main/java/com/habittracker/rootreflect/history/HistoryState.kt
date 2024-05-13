@@ -1,6 +1,7 @@
 package com.habittracker.rootreflect.history
 
 import androidx.compose.runtime.mutableStateListOf
+import com.habittracker.rootreflect.database.HabitRecord
 import java.time.LocalDate
 import java.time.Month
 
@@ -20,5 +21,12 @@ data class HistoryState(
     // the users mood on the selected day
     val selectedMood: String = "",
     // Colour variable for days without a logged mood
-    val dayPassiveColour: Long = 0xFF000000
+    val dayPassiveColour: Long = 0xFF000000,
+    /*
+     if the variable is false information about the day will be displayed in the bottom sheet
+     otherwise habit information will be displayed
+     */
+    val habitInfo: Boolean = false,
+    // list of habits of the selected day
+    val habitList: MutableList<HabitRecord> = mutableStateListOf()
 )
