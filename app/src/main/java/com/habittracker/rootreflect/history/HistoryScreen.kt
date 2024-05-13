@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,6 +35,7 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import java.io.IOException
@@ -47,9 +50,18 @@ fun HistoryScreen(
 ) {
     Column {
         Text(text = "History Screen")
-        Box(){
+        Box {
             Background()
             TreeClick(onEvent = onEvent, state = state)
+            BushClick(onEvent = onEvent, state = state, bush = "images/bush1.png", offsetX = 50.dp, offsetY = 200.dp ) // do again with bush random return val
+            BushClick(onEvent = onEvent, state = state, bush = "images/bush2.png", offsetX = 160.dp, offsetY = 250.dp)
+            BushClick(onEvent = onEvent, state = state, bush = "images/bush3.png", offsetX = 260.dp, offsetY = 220.dp)
+            FlowerClick(onEvent = onEvent, state = state, flower = "images/blueflower.png", offsetX = 55.dp, offsetY = 295.dp)
+            FlowerClick(onEvent = onEvent, state = state, flower = "images/orangeflower.png", offsetX = (-100).dp, offsetY = 275.dp)
+            FlowerClick(onEvent = onEvent, state = state, flower = "images/pinkflower.png", offsetX = (-65).dp, offsetY = 300.dp)
+            FlowerClick(onEvent = onEvent, state = state, flower = "images/yelloworangeflower.png", offsetX = 120.dp, offsetY = 310.dp)
+            FlowerClick(onEvent = onEvent, state = state, flower = "images/blueflower.png", offsetX = (-120).dp, offsetY = 320.dp)
+            FlowerClick(onEvent = onEvent, state = state, flower = "images/yelloworangeflower.png", offsetX = (-10).dp, offsetY = 315.dp)
 
         }
         Spacer(modifier = Modifier.weight(1f))
@@ -106,7 +118,7 @@ fun InfoSheet(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
                 Column {
                     if (state.selectedMood != "No mood") {
                         Text(
-                            text = "On the " + state.selectedDate?.dayOfMonth.toString() + ". of "
+                            text = "On the " + state.selectedDate?.dayOfMonth.toString() + " of "
                                     + state.selectedDate?.month?.name?.substring(0, 1)
                                     + state.selectedDate?.month?.name?.substring(1)?.lowercase()
                                     + " " + state.selectedYear.toString()
@@ -117,7 +129,7 @@ fun InfoSheet(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
                     }
                     else {
                         Text(
-                            text = "On the " + state.selectedDate?.dayOfMonth.toString() + ". of "
+                            text = "On the " + state.selectedDate?.dayOfMonth.toString() + " of "
                                 + state.selectedDate?.month?.name?.substring(0, 1)
                                 + state.selectedDate?.month?.name?.substring(1)?.lowercase()
                                 + " " + state.selectedYear.toString()
@@ -239,7 +251,7 @@ fun Background (){
 }
 
 @Composable
-fun FlowerClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, flower: String){
+fun FlowerClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, flower: String, offsetX: Dp, offsetY: Dp){
     val drawable = loadImageFromAssets(LocalContext.current, flower)
     val bitmap = drawable?.toBitmap()?.asImageBitmap()
     bitmap?.let { BitmapPainter(it) }?.let {
@@ -250,17 +262,23 @@ fun FlowerClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, flower: St
             contentScale = ContentScale.Fit,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(height = 400.dp))
-
+                .height(height = 65.dp)
+                .offset(offsetX, offsetY)
+                .clickable(indication = null,
+                    interactionSource = remember {
+                        MutableInteractionSource()
+                    }) { onEvent(HistoryEvent.EnableBottomSheet) }
+        )
     }
 }
 
-@Composable
-fun FlowerRandom(){
+//@Composable
+//fun FlowerRandom(){
+//
+//}
 
-}
 @Composable
-fun BushClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, bush: String){
+fun BushClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, bush: String, offsetX: Dp, offsetY: Dp){
     val drawable = loadImageFromAssets(LocalContext.current, bush)
     val bitmap = drawable?.toBitmap()?.asImageBitmap()
     bitmap?.let { BitmapPainter(it) }?.let {
@@ -270,17 +288,21 @@ fun BushClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, bush: String
             alignment = Alignment.Center,
             contentScale = ContentScale.Crop,
             modifier = Modifier
-                .height(height = 225.dp)
-                .offset(100.dp, 15.dp)
-                .clickable { onEvent(HistoryEvent.EnableBottomSheet) })
-
+                .height(height = 65.dp)
+                .offset(offsetX, offsetY)
+                .clickable(indication = null,
+                    interactionSource = remember {
+                        MutableInteractionSource()
+                    }) { onEvent(HistoryEvent.EnableBottomSheet) }
+        )
     }
 }
 
-@Composable
-fun BushRandom(){
+//@Composable
+//fun BushRandom(){
+//
+//}
 
-}
 @Composable
 fun TreeClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
     val drawable = loadImageFromAssets(LocalContext.current, "images/tree.png")
@@ -293,16 +315,14 @@ fun TreeClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
             alignment = Alignment.Center,
             contentScale = ContentScale.Crop,
             modifier = Modifier
-                .height(height =  225.dp)
+                .height(height = 225.dp)
                 .offset(100.dp, 15.dp)
-                .clickable { onEvent(HistoryEvent.EnableBottomSheet) }
-     )
+                .clickable(indication = null,
+                    interactionSource = remember {
+                        MutableInteractionSource()
+                    }) { onEvent(HistoryEvent.EnableBottomSheet) }
+        )
     }
-}
-
-@Composable
-fun TreeRandom(){
-
 }
 
 fun loadImageFromAssets(context: Context, filename: String): Drawable? {
