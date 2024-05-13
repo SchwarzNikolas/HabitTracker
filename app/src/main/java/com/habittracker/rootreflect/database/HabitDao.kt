@@ -42,6 +42,9 @@ interface HabitDao{
     @Query("SELECT * FROM HabitRecord")
     fun fetchHabitRecords():Flow<List<HabitRecord>>
 
+    @Query("SELECT * FROM HabitRecord WHERE date = :date")
+    fun fetchHabitRecordsByDate(date: LocalDate):Flow<List<HabitRecord>>
+
     @Insert
     suspend fun insertRecord(record: HabitRecord)
 
@@ -58,8 +61,6 @@ interface HabitDao{
 
     @Query("SELECT * FROM MoodRecord WHERE moodDate = :date LIMIT 1")
     suspend fun getMoodRecByDate(date: String): MoodRecord?
-
-
 
     @Upsert
     suspend fun insertMoodRec(moodRec: MoodRecord)

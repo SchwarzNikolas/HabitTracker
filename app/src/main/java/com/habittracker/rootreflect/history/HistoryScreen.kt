@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -18,6 +19,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -89,10 +91,56 @@ fun InfoSheet(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
     ) {
         Box(modifier = Modifier
             .height(500.dp)
-            .align(Alignment.CenterHorizontally)){
-            Column {
-                Text(text = state.selectedDate.toString())
-                Text(text = state.selectedMood)
+            .align(Alignment.CenterHorizontally)
+            .padding(10.dp)){
+            if (state.habitInfo) {
+                // display information about habits
+            }
+            else {
+                Column {
+                    if (state.selectedMood != "No mood") {
+                        Text(
+                            text = "On the " + state.selectedDate?.dayOfMonth.toString() + ". of "
+                                    + state.selectedDate?.month?.name?.substring(0, 1)
+                                    + state.selectedDate?.month?.name?.substring(1)?.lowercase()
+                                    + " " + state.selectedYear.toString()
+                                    + " you felt " + state.selectedMood.lowercase() + ".",
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                    else {
+                        Text(
+                            text = "On the " + state.selectedDate?.dayOfMonth.toString() + ". of "
+                                + state.selectedDate?.month?.name?.substring(0, 1)
+                                + state.selectedDate?.month?.name?.substring(1)?.lowercase()
+                                + " " + state.selectedYear.toString()
+                                + " you logged no mood.",
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth())
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Divider(modifier = Modifier
+                        .fillMaxWidth()
+                        .height(2.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    if (state.habitList.isEmpty()){
+                        Text(text = "You have not completed any habits on that day.",
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth())
+                    }
+                    else{
+                        Text(text = "You have completed the following habits:",
+                            textAlign = TextAlign.Center)
+                        for (habit in state.habitList){
+                            Text(text = "• " + habit.habitName,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth())
+                        }
+                    }
+                }
             }
         }
     }

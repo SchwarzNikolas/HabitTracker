@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.habittracker.rootreflect.database.HabitDao
+import com.habittracker.rootreflect.database.HabitRecord
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -80,12 +81,29 @@ class HistoryViewModel(
                 updateDays()
             }
             is HistoryEvent.ChangeSelectedDay -> {
-                // change selected date (is invoked when user selects a day in the calendar)
-                _state.update {
-                    it.copy(
-                        selectedDate = event.day,
-                        selectedMood = event.moodName
-                    )
+                /*
+                change selected date (is invoked when user selects a day in the calendar)
+                additionally this event changes the selected mood and will change what the bottom
+                sheet should display. It also fetches the completed habits from the selected day.
+                 */
+                viewModelScope.launch {
+                    dao.fetchHabitRecordsByDate(event.day).collect {
+                    habitRecords ->
+                        run {
+                            val records: MutableList<HabitRecord> = mutableStateListOf()
+                            for (record in habitRecords){
+                                records.add(record)
+                            }
+                            _state.update {
+                                it.copy(
+                                    habitList = records,
+                                    selectedDate = event.day,
+                                    selectedMood = event.moodName,
+                                    habitInfo = false
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -111,7 +129,7 @@ class HistoryViewModel(
                 // get the mood of the current date out of the database
                 val mood = dao.getMoodRecByDate(date.toString())?.mood
                 val colour = mood?.moodColor ?: state.value.dayPassiveColour
-                val moodName = mood?.name ?: "No mood logged for this day."
+                val moodName = mood?.name ?: "No mood"
                 // add it to the list
                 days.add(
                     DayOfMonth(
