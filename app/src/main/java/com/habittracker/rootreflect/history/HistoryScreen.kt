@@ -32,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import java.io.IOException
+import java.time.LocalDate
 import java.time.Month
 
 
@@ -102,7 +103,6 @@ fun MonthlyHistory(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
     /*
     Grid to display every day in of the month which its associated mood
      */
-    // TODO: place the first day of the month on the correct weekday
     LazyVerticalGrid(
         modifier = Modifier
             .padding(10.dp)
@@ -111,6 +111,10 @@ fun MonthlyHistory(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
 ) {
+        val offsetDays = LocalDate.now().withDayOfMonth(1).dayOfWeek.value - 1
+        items(offsetDays){
+            DisabledDay()
+        }
         items(state.dayList.size){
             DailyBox(onEvent, state.dayList[it])
         }
@@ -132,6 +136,15 @@ fun MonthSelector(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
         onValueChange = { onEvent(HistoryEvent.ChangeCurrentMonth(it)) },
         list = months,
     )
+}
+
+@Composable
+fun DisabledDay(){
+    Button(onClick = { /*This button does nothing ;)*/ },
+        modifier = Modifier.size(width = 25.dp, height = 25.dp),
+        shape = RoundedCornerShape(5.dp),
+        enabled = false) {
+    }
 }
 
 @Composable
