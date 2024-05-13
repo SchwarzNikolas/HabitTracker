@@ -30,6 +30,8 @@ class HabitViewModel (
     val state = _state
     private lateinit var date: LocalDate
     private lateinit var job: Job
+    private val maxHabitNameLength = 10
+    private val maxHabitFrequency = 9
     init {
         viewModelScope.launch {
 
@@ -112,6 +114,7 @@ class HabitViewModel (
             }
 
             is HabitEvent.EditHabit -> {
+                state.value.editDisplayHabit.beingEdited.value = false
                 event.displayHabit.beingEdited.value = event.displayHabit.beingEdited.value.not()
                 state.update {
                     it.copy(
@@ -124,19 +127,23 @@ class HabitViewModel (
             }
             // when text is entered by the user into the text field is updated here and temporarily stored in the habit state.
             is HabitEvent.UpDateEditFreq -> {
-                state.update {
-                    it.copy(
-                        editFreq = event.newFreq
-                    )
+                if(event.newFreq <=  maxHabitFrequency) {
+                    state.update {
+                        it.copy(
+                            editFreq = event.newFreq
+                        )
+                    }
                 }
             }
 
             // when text is entered by the user into the text field is updated here and temporarily stored in the habit state.
             is HabitEvent.UpDateEditString -> {
-                state.update {
-                    it.copy(
-                        editString = event.newString
-                    )
+                if (event.newString.length <= maxHabitNameLength) {
+                    state.update {
+                        it.copy(
+                            editString = event.newString
+                        )
+                    }
                 }
             }
 

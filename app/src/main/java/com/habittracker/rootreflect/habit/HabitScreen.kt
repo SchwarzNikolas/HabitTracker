@@ -8,10 +8,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -27,8 +28,6 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -43,12 +42,13 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.ImeAction
@@ -71,6 +71,7 @@ data class Item(
     val icon: ImageVector
     )
 private val moods: List<MoodType> = enumValues<MoodType>().toList()
+
 @Composable
 fun MainScreen (
     state: HabitState,
@@ -78,8 +79,7 @@ fun MainScreen (
     moodEvent: (MoodEvent) -> Unit
 ){
     Column(
-        modifier = Modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
+        //horizontalAlignment = Alignment.CenterHorizontally,
     )
     {
         // Mood part of the screen
@@ -92,11 +92,35 @@ fun MainScreen (
         LazyVerticalGrid(columns = GridCells.Fixed(1) ) {
             // Daily Habits
             items(state.displayHabits.size){
-                BarHabit(
-                    displayHabit = state.displayHabits[it],
-                    onEvent = onEvent,
-                    state
-                )
+
+                val mod  = Modifier
+
+                if (state.displayHabits[it].beingEdited.value) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(modifier = mod.weight(1f),
+                        onClick = { onEvent(HabitEvent.ModifyHabit(state.displayHabits[it].habitJoin)) }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "ContextMenu"
+                        )
+                    }
+                    EditMode(onEvent = onEvent, displayHabit = state.displayHabits[it], state = state, modifier = mod.weight(12f))
+                    IconButton(modifier = mod.weight(1f),
+                        onClick = { onEvent(HabitEvent.CancelEdit(state.displayHabits[it])) }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "cancel edit"
+                        )
+                    }
+                        }
+                } else {
+                        DisplayMode(
+                            onEvent = onEvent,
+                            displayHabit = state.displayHabits[it],
+                        )
+                }
             }
             // Weekly Habits
             items(state.weeklyDisplayHabits.size){
@@ -132,57 +156,53 @@ fun BarHabit(displayHabit: DisplayHabit, onEvent: (HabitEvent) -> Unit, state: H
     if (displayHabit.beingEdited.value) {
         EditMode(onEvent = onEvent, displayHabit = displayHabit, state = state)
     } else {
-        DisplayMode(onEvent = onEvent, displayHabit = displayHabit)
+        DisplayMode(onEvent = onEvent, displayHabit = displayHabit,  modifier = Modifier)
     }
 }
 
 
 @Composable
-fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit){
+fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, modifier: Modifier = Modifier){
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
         ),
-        modifier = Modifier
+        modifier = modifier
             .clickable { onEvent(HabitEvent.IncCompletion(displayHabit.habitJoin)) }
-            .fillMaxWidth()
             .padding(vertical = 5.dp, horizontal = 5.dp),
         colors = CardDefaults.cardColors(Color.Gray)
     ) {
-        Box {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                val dropdownItems: List<Item> = listOf(
-                    Item(
-                        name = "Edit",
-                        onClick = { onEvent(HabitEvent.EditHabit(displayHabit)) },
-                        Icons.Default.Edit
-                    ),
-                    Item(
-                        name = "Undo",
-                        onClick = { onEvent(HabitEvent.DecCompletion(displayHabit.habitJoin)) },
-                        Icons.Default.ArrowBack
-                    ),
-                    Item(
-                        name = "Delete",
-                        onClick = { onEvent(HabitEvent.DeleteHabit(displayHabit.habitJoin)) },
-                        Icons.Default.Delete
-                    )
-                )
+        val dropdownItems: List<Item> = listOf(
+            Item(
+                name = "Edit",
+                onClick = { onEvent(HabitEvent.EditHabit(displayHabit)) },
+                Icons.Default.Edit
+            ),
+            Item(
+                name = "Undo",
+                onClick = { onEvent(HabitEvent.DecCompletion(displayHabit.habitJoin)) },
+                Icons.Default.ArrowBack
+            ),
+            Item(
+                name = "Delete",
+                onClick = { onEvent(HabitEvent.DeleteHabit(displayHabit.habitJoin)) },
+                Icons.Default.Delete
+            )
+        )
                 val w = 300.dp
                 val h = 50.dp
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row() {
                     BasicText(
                         text = displayHabit.habitJoin.habit.name,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(start = 10.dp),
+                        modifier = modifier.padding(start = 10.dp).weight(17f),
                         style = LocalTextStyle.current.copy(fontSize = 30.sp)
                     )
-                    Spacer(Modifier.weight(1f))
                     IconButton(
                         onClick = { onEvent(HabitEvent.ContextMenuVisibility(displayHabit)) },
-                        modifier = Modifier
+                        modifier = modifier.weight(2f)
                     ) {
                         Icon(
                             imageVector = Icons.Default.MoreVert,
@@ -216,16 +236,20 @@ fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit){
                         }
                     }
                 }
-                Row(modifier = Modifier.padding(bottom = 5.dp)) {
-                    Box() {
+                Row(modifier = modifier.padding(bottom = 5.dp, start = 10.dp, end = 5.dp),
+                    verticalAlignment = Alignment.CenterVertically) {
+
+                    BoxWithConstraints (modifier = modifier.weight(6f).height(50.dp)){
                         Box(
-                            modifier = Modifier
+                            modifier = modifier
                                 .clip(RoundedCornerShape(10.dp))
-                                .size(w, h)
-                                .background(Color.DarkGray)
-                        )
+                                .background(Color.Black)
+                                .size(width = maxWidth, height = maxHeight)
+                        ){
+                            Text(text = "")
+                        }
                         Box(
-                            modifier = Modifier
+                            modifier = modifier
                                 .clip(RoundedCornerShape(10.dp))
                                 .background(Color.Green)
                                 .animateContentSize(
@@ -235,118 +259,90 @@ fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit){
                                     )
                                 )
                                 .size(
-                                    w * (displayHabit.habitJoin.completion.completion.toFloat() / displayHabit.habitJoin.habit.frequency),
-                                    h
+                                    maxWidth * (displayHabit.habitJoin.completion.completion.toFloat() / displayHabit.habitJoin.habit.frequency),
+                                    maxHeight
                                 )
-                        )
+                        ){
+                            Text(text = "")
+                        }
                     }
-                    Button(
-                        onClick = {},
-                        enabled = false,
-                        modifier = Modifier.padding(start = 5.dp)
-                    ) {
-                        Text(text = displayHabit.habitJoin.habit.frequency.toString())
+                    Box(modifier = modifier.padding(start = 10.dp, end = 5.dp).weight(1f),
+                        contentAlignment = Alignment.Center) {
+                        Text(
+                            modifier = modifier
+                                .drawBehind {
+                                    drawCircle(
+                                        color = Color.Transparent,
+                                        radius = 60f
+                                    )
+                                },
+                            text = displayHabit.habitJoin.habit.frequency.toString()
+                        )
                     }
                 }
             }
-        }
-    }
 }
 
 
 @Composable
-fun EditMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, state: HabitState) {
+fun EditMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, state: HabitState, modifier: Modifier = Modifier) {
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
         ),
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
             .padding(vertical = 5.dp, horizontal = 5.dp),
         colors = CardDefaults.cardColors(Color.Gray)
     ) {
-        Box {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    val w = 300.dp
-                    val h = 50.dp
-
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        BasicTextField(
-                            value = state.editString,
-                            onValueChange = { onEvent(HabitEvent.UpDateEditString(it)) },
-                            keyboardOptions = KeyboardOptions.Default.copy(
-                                autoCorrectEnabled = true,
-                                imeAction = ImeAction.Done,
-                                showKeyboardOnFocus = true,
-                                capitalization = KeyboardCapitalization.Sentences,
-                                keyboardType = KeyboardType.Text
-                            ),
-                            maxLines = 2,
-                            textStyle = LocalTextStyle.current.copy(
-                                fontSize = 30.sp,
-                                textDecoration = TextDecoration.Underline
-                            ),
-                            modifier = Modifier.padding(start = 10.dp),
+                Row() {
+                    BasicTextField(
+                        value = state.editString,
+                        onValueChange = { onEvent(HabitEvent.UpDateEditString(it)) },
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            autoCorrectEnabled = true,
+                            imeAction = ImeAction.Done,
+                            showKeyboardOnFocus = true,
+                            capitalization = KeyboardCapitalization.Sentences,
+                            keyboardType = KeyboardType.Text
+                        ),
+                        maxLines = 2,
+                        textStyle = LocalTextStyle.current.copy(
+                            fontSize = 30.sp,
+                            textDecoration = TextDecoration.Underline
+                        ),
+                        modifier = modifier.padding(start = 10.dp),
+                    )
+                }
+                Row(modifier = Modifier.padding(bottom = 8.dp, end = 5.dp),
+                    verticalAlignment = Alignment.CenterVertically) {
+                    Slider(
+                        value = state.editFreq.toFloat(),
+                        onValueChange = { onEvent(HabitEvent.UpDateEditFreq(it.toInt()))
+                        },
+                        valueRange = 1f..9f,
+                        steps = 7,
+                        modifier = Modifier.weight(6f).height(50.dp)
+                    )
+                    Box(modifier = Modifier.weight(1f),
+                        contentAlignment = Alignment.Center) {
+                        Text(
+                            modifier = Modifier
+                                .drawBehind {
+                                    drawCircle(
+                                        color = Color.Transparent,
+                                        radius = 60f
+                                    )
+                                },
+                            text = state.editFreq.toString()
                         )
-                        Spacer(Modifier.weight(1f))
-                        IconButton(
-                            onClick = { onEvent(HabitEvent.ModifyHabit(displayHabit.habitJoin)) }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = "ContextMenu"
-                            )
-                        }
-                        IconButton(onClick = { onEvent(HabitEvent.CancelEdit(displayHabit)) }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = "cancel edit"
-                            )
-                        }
-                    }
-                    Row(modifier = Modifier.padding(bottom = 5.dp)) {
-                        TextButton(
-                            onClick = { onEvent(HabitEvent.DecFrequency(state.editFreq)) },
-                            modifier = Modifier
-                                .background(Color.DarkGray)
-                                .size(w / 2, h)
-                                .background(Color.Red)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.KeyboardArrowDown,
-                                contentDescription = ""
-                            )
-                        }
-                        TextButton(
-                            onClick = { onEvent(HabitEvent.IncFrequency(state.editFreq)) },
-                            modifier = Modifier
-                                .background(Color.DarkGray)
-                                .size(w / 2, h)
-                                .background(Color.Green)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.KeyboardArrowUp,
-                                contentDescription = ""
-                            )
-                        }
-                        Button(
-                            onClick = { /*TODO*/ },
-                            enabled = false,
-                            modifier = Modifier.padding(start = 5.dp)
-                        ) {
-                            Text(text = state.editFreq.toString())
-                        }
-                    }
-                    // chose days
-                    if (displayHabit.habitJoin.completion.occurrence.contains("0")) {
-                        DaysSelection(onEvent, state)
                     }
                 }
+                // chose days
+                if (displayHabit.habitJoin.completion.occurrence.contains("0")) {
+                    DaysSelection(onEvent, state)
+                }
             }
-        }
-    }
+
 
 }
 
