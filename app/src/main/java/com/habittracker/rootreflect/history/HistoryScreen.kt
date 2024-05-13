@@ -3,6 +3,7 @@ package com.habittracker.rootreflect.history
 import android.content.Context
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -45,7 +47,11 @@ fun HistoryScreen(
 ) {
     Column {
         Text(text = "History Screen")
-        Background(onEvent = onEvent, state = state)
+        Box(){
+            Background()
+            TreeClick(onEvent = onEvent, state = state)
+
+        }
         Spacer(modifier = Modifier.weight(1f))
         Row(modifier = Modifier.padding(10.dp)){
             DateText(state = state)
@@ -216,16 +222,87 @@ fun DailyBox(onEvent: (HistoryEvent) -> Unit, dayOfMonth: DayOfMonth){
 }
 
 @Composable
-fun Background (onEvent: (HistoryEvent) -> Unit, state: HistoryState){
-    val drawable = loadImageFromAssets(LocalContext.current, "images/background.png")
+fun Background (){
+    val drawable = loadImageFromAssets(LocalContext.current, "images/backgroundboardered.png")
     val bitmap = drawable?.toBitmap()?.asImageBitmap()
-    Box() {
-        bitmap?.let { BitmapPainter(it) }?.let {
-            Image(
-                painter = it,
-                contentDescription = null)
-        }
+    bitmap?.let { BitmapPainter(it) }?.let {
+    Image(
+        painter = it,
+        contentDescription = null,
+        alignment = Alignment.Center,
+        contentScale = ContentScale.Fit,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(height = 400.dp) // to alter image height
+        )
     }
+}
+
+@Composable
+fun FlowerClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, flower: String){
+    val drawable = loadImageFromAssets(LocalContext.current, flower)
+    val bitmap = drawable?.toBitmap()?.asImageBitmap()
+    bitmap?.let { BitmapPainter(it) }?.let {
+        Image(
+            painter = it,
+            contentDescription = null,
+            alignment = Alignment.Center,
+            contentScale = ContentScale.Fit,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(height = 400.dp))
+
+    }
+}
+
+@Composable
+fun FlowerRandom(){
+
+}
+@Composable
+fun BushClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, bush: String){
+    val drawable = loadImageFromAssets(LocalContext.current, bush)
+    val bitmap = drawable?.toBitmap()?.asImageBitmap()
+    bitmap?.let { BitmapPainter(it) }?.let {
+        Image(
+            painter = it,
+            contentDescription = null,
+            alignment = Alignment.Center,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .height(height = 225.dp)
+                .offset(100.dp, 15.dp)
+                .clickable { onEvent(HistoryEvent.EnableBottomSheet) })
+
+    }
+}
+
+@Composable
+fun BushRandom(){
+
+}
+@Composable
+fun TreeClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
+    val drawable = loadImageFromAssets(LocalContext.current, "images/tree.png")
+    val bitmap = drawable?.toBitmap()?.asImageBitmap()
+
+    bitmap?.let { BitmapPainter(it) }?.let {
+        Image(
+            painter = it,
+            contentDescription = null,
+            alignment = Alignment.Center,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .height(height =  225.dp)
+                .offset(100.dp, 15.dp)
+                .clickable { onEvent(HistoryEvent.EnableBottomSheet) }
+     )
+    }
+}
+
+@Composable
+fun TreeRandom(){
+
 }
 
 fun loadImageFromAssets(context: Context, filename: String): Drawable? {
@@ -237,4 +314,3 @@ fun loadImageFromAssets(context: Context, filename: String): Drawable? {
     }
     return null
 }
-
