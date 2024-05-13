@@ -10,8 +10,6 @@ import java.time.LocalDate
 // This contains all the data that the UI displays
 data class HabitState(
 
-    // contains what habits were completed on which dates
-    val habitRecord: MutableList<HabitRecord> = mutableStateListOf(),
     // string that will be displayed by the edit window
     val editString: String = "",
     // int that will be displayed by the edit window
@@ -28,7 +26,6 @@ data class HabitState(
 
     //val date2: LocalDate = LocalDate.now().plusDays(1),
     // temp
-    val date: LocalDate = LocalDate.now(),
 
     val selectedMood: MoodType = MoodType.OK,
     )

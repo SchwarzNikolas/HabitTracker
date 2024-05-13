@@ -11,8 +11,6 @@ sealed interface HabitEvent {
     data class MoodChange(val moodType: MoodType): HabitEvent
     data class IncCompletion(val habitJoin: HabitJoin): HabitEvent
     data class DecCompletion(val habitJoin: HabitJoin): HabitEvent
-    data class IncFrequency(val frequency: Int): HabitEvent
-    data class DecFrequency(val frequency: Int): HabitEvent
     data class EditHabit(val displayHabit: DisplayHabit): HabitEvent
     data class UpDateEditString(val newString : String): HabitEvent
     data class UpDateEditFreq(val newFreq : Int): HabitEvent
@@ -23,6 +21,5 @@ sealed interface HabitEvent {
     data class ContextMenuVisibility(val displayHabit: DisplayHabit): HabitEvent
     // Deprecated
     data object ResetCompletion: HabitEvent
-    data object NextDay: HabitEvent
 
 }

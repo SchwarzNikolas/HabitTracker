@@ -142,20 +142,16 @@ fun MainScreen (
                 }
             }
             // debug
-            Button(onClick = { onEvent(HabitEvent.ResetCompletion) }) {
-                Text(text = "test")
-            }
-            Button(onClick = { onEvent(HabitEvent.NextDay) }) {
-                Text(text = "next day")
-            }
-            Text(text = state.date.dayOfWeek.toString())
+//            Button(onClick = { onEvent(HabitEvent.ResetCompletion) }) {
+//                Text(text = "test")
+//            }
+//            Button(onClick = { onEvent(HabitEvent.NextDay) }) {
+//                Text(text = "next day")
+//            }
+//            Text(text = state.date.dayOfWeek.toString())
             //Text(text = state.date2.dayOfWeek.toString())
 
-            Text(text = state.habitRecord.size.toString())
-            for (habitRecord in state.habitRecord) {
-                Text(text = habitRecord.habitName)
-                Text(text = habitRecord.date.toString())
-            }
+
         }
     }
 }

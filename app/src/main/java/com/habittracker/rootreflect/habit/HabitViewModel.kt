@@ -22,7 +22,6 @@ private fun Boolean.toChar(): Char {
     return if(this) '1' else '0'
 }
 
-//TODO update completion on edit
 class HabitViewModel (
     private val dao: HabitDao
 ): ViewModel() {
@@ -76,20 +75,6 @@ class HabitViewModel (
 //            dao.insertHabit(Habit(name = "test7", frequency = 4,))
 //            dao.insertCompletion(HabitCompletion(occurrence = "0000001"))
         }
-
-        viewModelScope.launch {
-            dao.fetchHabitRecords().collect{habitRecords -> run{
-                val displayHabitRecordList: MutableList<HabitRecord> = mutableListOf()
-                for (record in habitRecords){
-                    displayHabitRecordList.add(record)
-                }
-                _state.update { it.copy(
-                    habitRecord = displayHabitRecordList
-                )
-                }
-            }
-            }
-        }
     }
 
     // Handles the events triggered by the UI
@@ -97,11 +82,10 @@ class HabitViewModel (
         when (event) {
             // handles ModifyHabit event
             is HabitEvent.ModifyHabit -> {
-                val habitCompletion: HabitCompletion
-                if (state.value.editFreq <= event.joinHabit.completion.completion){
-                    habitCompletion = event.joinHabit.completion.copy(completion = state.value.editFreq,occurrence = state.value.editDays)
+                val habitCompletion: HabitCompletion = if (state.value.editFreq <= event.joinHabit.completion.completion){
+                    event.joinHabit.completion.copy(completion = state.value.editFreq,occurrence = state.value.editDays)
                 }else{
-                    habitCompletion = event.joinHabit.completion.copy(occurrence = state.value.editDays)
+                    event.joinHabit.completion.copy(occurrence = state.value.editDays)
                 }
                 val habit = event.joinHabit.habit.copy(
                     frequency = state.value.editFreq,
@@ -192,21 +176,7 @@ class HabitViewModel (
             HabitEvent.ResetCompletion -> {
                 resetCompletion()
             }
-            // Deprecated
-            HabitEvent.NextDay -> {
-                //state.update { it.copy(date2 = state.value.date2.plusDays(1)) }
-            }
 
-            is HabitEvent.DecFrequency -> {
-                if (event.frequency > 1){
-                    state.update {it.copy(editFreq =  state.value.editFreq.dec())}
-                }
-            }
-            is HabitEvent.IncFrequency -> {
-                if (event.frequency < 10){
-                    state.update {it.copy(editFreq =  state.value.editFreq.inc())}
-                }
-            }
             is HabitEvent.MoodChange -> {
                 _state.update {
                     it.copy(
@@ -215,15 +185,6 @@ class HabitViewModel (
                 }
                 viewModelScope.launch {
                     dao.upsertMoodRec(MoodRecord(date, event.moodType))
-//                    val existingRec = dao.getMoodRecByDate(date = state.value.date.toString())
-//                    if (existingRec == null) {
-//                        dao.upsertMoodRec(moodRec = MoodRecord(
-//                            moodDate = state.value.date,
-//                            mood = event.moodType)
-//                        )
-//                    } else {
-//                        dao.updateMoodRec(state.value.date.toString(), event.moodType)
-//                    }
                 }
             }
         }
@@ -302,7 +263,7 @@ class HabitViewModel (
     }
 
     private fun dayToString(day : Int): String{
-        val test: String = "_______"
+        val test = "_______"
         val sb = StringBuilder(test)
         sb.setCharAt(day, '1')
         return sb.toString()
