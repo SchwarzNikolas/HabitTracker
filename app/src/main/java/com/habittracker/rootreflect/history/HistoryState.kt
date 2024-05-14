@@ -45,5 +45,7 @@ data class HistoryState(
     // list for habits (frequency 3+)
     val habitListF3Above: MutableList<HabitRecord> = mutableStateListOf(),
 
+    // store selected habit
+    val habitStored: HabitRecord? = null
 
 )

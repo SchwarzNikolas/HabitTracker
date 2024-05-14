@@ -1,6 +1,8 @@
 package com.habittracker.rootreflect.history
 
+
 import androidx.compose.ui.unit.DpOffset
+import com.habittracker.rootreflect.database.HabitRecord
 import java.time.LocalDate
 
 sealed interface HistoryEvent {
@@ -12,8 +14,13 @@ sealed interface HistoryEvent {
     data class ChangeCurrentMonth(val date: Int): HistoryEvent
     // event to change selected day
     data class ChangeSelectedDay(val day: LocalDate, val moodName: String): HistoryEvent
+
     data object NameTagToggle: HistoryEvent
 
     data class SetOffSet(val offSet: DpOffset): HistoryEvent
-    data class SetName (val name :String): HistoryEvent
+    data class SetName (val name :HabitRecord): HistoryEvent
+
+    // event to select a plant
+    data class SelectPlant(val recordedHabit: HabitRecord): HistoryEvent
 }
+

@@ -54,6 +54,15 @@ class HistoryViewModel(
 
     fun onEvent(event: HistoryEvent) {
         when (event) {
+            is HistoryEvent.SelectPlant -> {
+                _state.update {
+                    it.copy(
+                        bottomSheetActive = true,
+                        habitInfo = true,
+                        habitStored = event.recordedHabit
+                    )
+                }
+            }
             is HistoryEvent.EnableBottomSheet -> {
                 // enables the bottom sheet (is invoked when the user clicks on anything that contains additional information)
                 _state.update {
@@ -120,7 +129,7 @@ class HistoryViewModel(
             }
 
             is HistoryEvent.SetName -> {
-                state.update { it.copy(name = event.name) }
+                state.update { it.copy(name = event.name.habitName) }
             }
         }
     }
