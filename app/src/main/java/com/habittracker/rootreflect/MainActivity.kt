@@ -18,7 +18,6 @@ import com.habittracker.rootreflect.custom.CustomViewModel
 import com.habittracker.rootreflect.database.HabitDatabase
 import com.habittracker.rootreflect.habit.HabitViewModel
 import com.habittracker.rootreflect.history.HistoryViewModel
-import com.habittracker.rootreflect.mood.MoodViewModel
 import com.habittracker.rootreflect.navigation.AppNavigation
 import com.habittracker.rootreflect.notification.NotificationService
 import com.habittracker.rootreflect.ui.theme.HabitTrackerTheme
@@ -56,17 +55,6 @@ class MainActivity : ComponentActivity() {
         }
     )
 
-    // Creating view model for Moods
-    private val moodViewModel by viewModels<MoodViewModel>(
-        factoryProducer = {
-            object : ViewModelProvider.Factory{
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return MoodViewModel(db.dao) as T
-                }
-            }
-        }
-    )
-
     // Creating view model for History
     private val historyViewModel by viewModels<HistoryViewModel>(
         factoryProducer = {
@@ -91,7 +79,6 @@ class MainActivity : ComponentActivity() {
 //                    val habitState by habitViewModel.state.collectAsState()
 //                    MainScreen(state = habitState, onEvent = habitViewModel::onEvent)
                     AppNavigation(
-                        moodViewModel = moodViewModel,
                         customViewModel = customViewModel,
                         habitViewModel = habitViewModel,
                         historyViewModel = historyViewModel

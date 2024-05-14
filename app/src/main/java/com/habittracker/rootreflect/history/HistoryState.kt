@@ -13,7 +13,7 @@ data class HistoryState(
     // stores each day of selected month and its mood
     val dayList: MutableList<DayOfMonth> = mutableStateListOf(),
     // day which the user selects when clicking on a calendar day
-    val selectedDate: LocalDate? = null,
+    val selectedDate: LocalDate = LocalDate.now(),
     // month which the user selects when selecting it in the ListPicker
     val selectedMonth: Month = LocalDate.now().month,
     // the selected year of the displayed month

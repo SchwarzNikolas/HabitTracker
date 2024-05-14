@@ -93,7 +93,6 @@ fun HistoryScreen(
             if (state.habitListF3Above.isNotEmpty()){
                 TreeClick(onEvent = onEvent, state = state, habitRecord = state.habitListF3Above[0])
             }
-            NameTag(show = state.nameTagActive, showe = state.offset, onEvent, state.name)
 
         }
         Spacer(modifier = Modifier.height(10.dp))
@@ -271,7 +270,8 @@ fun DailyBox(onEvent: (HistoryEvent) -> Unit, dayOfMonth: DayOfMonth, state: His
         onClick = {
             onEvent(HistoryEvent.EnableBottomSheet)
             onEvent(HistoryEvent.ChangeSelectedDay(dayOfMonth.date, dayOfMonth.mood))},
-        border = if(state.selectedDate == dayOfMonth.date){ BorderStroke(2.dp, Color.Yellow)} else {null}
+        border = if (dayOfMonth.date == state.selectedDate) {BorderStroke(1.dp, Color.Yellow)} else {null}
+
     ) {
     }
 }
@@ -298,7 +298,6 @@ fun Background(){
 fun FlowerClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, flower: String, offsetX: Dp, offsetY: Dp, habitRecord: HabitRecord) {
     val drawable = loadImageFromAssets(LocalContext.current, flower)
     val bitmap = drawable!!.toBitmap()
-    val den = LocalDensity.current
     Image(
         painter = BitmapPainter(bitmap.asImageBitmap()),
         contentDescription = null,
@@ -309,9 +308,8 @@ fun FlowerClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, flower: St
             .offset(offsetX, offsetY)
             .pointerInput(Unit) {
                 detectTapGestures {
-                    //onEvent(HistoryEvent.SelectPlant(habitRecord))
-                    onEvent(HistoryEvent.SetName(habitRecord))
-                    clickPixel(65.dp.toPx(), it, bitmap, onEvent, den, offsetX, offsetY)
+                    if (clickPixel(65.dp.toPx(), it, bitmap))
+                        onEvent(HistoryEvent.SelectPlant(habitRecord))
                 }
             }
     )
@@ -321,7 +319,6 @@ fun FlowerClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, flower: St
 fun BushClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, bush: String, offsetX: Dp, offsetY: Dp, habitRecord: HabitRecord){
     val drawable = loadImageFromAssets(LocalContext.current, bush)
     val bitmap = drawable!!.toBitmap()
-    val den = LocalDensity.current
     Image(
         painter = BitmapPainter(bitmap.asImageBitmap()),
         contentDescription = null,
@@ -333,9 +330,8 @@ fun BushClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, bush: String
             .pointerInput(Unit) {
                 detectTapGestures {
                     // calcs offset scale due to height setting
-                    //onEvent(HistoryEvent.SelectPlant(habitRecord))
-                    onEvent(HistoryEvent.EnableBottomSheet)
-                    //clickPixel(65.dp.toPx(), it, bitmap, onEvent, den, offsetX, offsetY)
+                    if (clickPixel(65.dp.toPx(), it, bitmap))
+                        onEvent(HistoryEvent.SelectPlant(habitRecord))
                 }
             }
     )
@@ -345,8 +341,8 @@ fun BushClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, bush: String
 fun TreeClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, habitRecord: HabitRecord){
     val drawable = loadImageFromAssets(LocalContext.current, "images/tree.png")
     val bitmap = drawable!!.toBitmap()
+
     // all in box so offset is relative to sprite
-    val den = LocalDensity.current
     Image(
         painter = BitmapPainter(bitmap.asImageBitmap()),
         contentDescription = null,
@@ -359,48 +355,27 @@ fun TreeClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, habitRecord:
                 detectTapGestures {
                     // calcs offset scale due to height setting
                     // check pixel is not transparent
-                    onEvent(HistoryEvent.EnableBottomSheet)
-                    //clickPixel(225.dp.toPx(), it, bitmap, onEvent, den, 100.dp, 15.dp)
+                    if (clickPixel(225.dp.toPx(), it, bitmap))
+                        onEvent(HistoryEvent.SelectPlant(habitRecord))
+
                 }
             }
     )
 }
 
-@Composable
-fun NameTag(show: Boolean, showe: DpOffset, onEvent: (HistoryEvent) -> Unit, name:String = "test"){
-    DropdownMenu(
-        expanded = show,
-        onDismissRequest = {
-            onEvent(HistoryEvent.NameTagToggle)
-        },
-        // add click off set to the sprite offset, y negative since it needs to go up
-        offset = DpOffset(showe.x, (-400).dp + showe.y),
-        modifier = Modifier.padding(horizontal = 10.dp)
-    ) {
-        Text(text = name)
-    }
-}
 
 
 fun clickPixel(
     height: Float,
     it: Offset,
     map: Bitmap,
-    onEvent: (HistoryEvent) -> Unit,
-    density: Density,
-    x: Dp,
-    y: Dp
-){
+):Boolean{
     val scala = height / map.height
-    if (map.getPixel(
-            (it.x / scala).toInt(),
-            (it.y / scala).toInt()
-        ) != 0
-    ) {
-        // if real pixel show drop down menu and set off set based on click
-        onEvent(HistoryEvent.NameTagToggle)
-        onEvent(HistoryEvent.SetOffSet(DpOffset(with(density){ (it.x).toDp()}+x, with(density){ (it.y).toDp()}+y)))
-    }
+    // if real pixel show drop down menu and set off set based on click
+    return map.getPixel(
+        (it.x / scala).toInt(),
+        (it.y / scala).toInt()
+    ) != 0
 }
 
 fun loadImageFromAssets(context: Context, filename: String): Drawable? {

@@ -46,6 +46,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -94,7 +95,9 @@ fun CustomScreen(
         ) {
             EditWindow(onEvent, state)
         }
+
         Spacer(modifier = Modifier.weight(1f))
+
         HabitPreview(state = state)
     }
 }
@@ -116,6 +119,7 @@ fun EditWindow(onEvent: (CustomHabitEvent) -> Unit, state: CustomState) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        Text("Frequency")
 
         Slider(
             value = state.habitFrequency.toFloat(),
@@ -123,15 +127,16 @@ fun EditWindow(onEvent: (CustomHabitEvent) -> Unit, state: CustomState) {
             },
             valueRange = 1f..9f,
             steps = 7,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)
+            modifier = Modifier.fillMaxWidth(0.8f)
+
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        // Spacer(modifier = Modifier.height(16.dp))
 
         if (!state.isDaily)
             WeeklyFields(state, onEvent, focusManager)
 
-        Spacer(modifier = Modifier.height(16.dp))
+        // Spacer(modifier = Modifier.height(8.dp))
 
         Button(
             onClick = { onEvent(CustomHabitEvent.SaveEdit)}
@@ -186,6 +191,8 @@ fun WeeklyFields(state: CustomState, onEvent: (CustomHabitEvent) -> Unit, focusM
                 DayButton(day, clicked, onEvent, index)
             }
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 

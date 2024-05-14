@@ -12,7 +12,7 @@ import com.habittracker.rootreflect.database.HabitJoin
 import com.habittracker.rootreflect.database.HabitRecord
 import com.habittracker.rootreflect.database.MoodRecord
 import com.habittracker.rootreflect.habit.HabitViewModel
-import com.habittracker.rootreflect.mood.MoodType
+import com.habittracker.rootreflect.habit.MoodType
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.After

@@ -2,7 +2,6 @@ package com.habittracker.rootreflect.habit
 
 
 import androidx.compose.runtime.mutableStateListOf
-import com.habittracker.rootreflect.mood.MoodType
 
 
 // This contains all the data that the UI displays
@@ -24,5 +23,5 @@ data class HabitState(
     //val date2: LocalDate = LocalDate.now().plusDays(1),
     // temp
 
-    val selectedMood: MoodType = MoodType.OK,
+    val selectedMood: MoodType? = null,
     )
