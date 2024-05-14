@@ -51,18 +51,34 @@ fun HistoryScreen(
     Column {
         Text(text = "History Screen")
         Box {
-            Background()
-            TreeClick(onEvent = onEvent, state = state)
-            BushClick(onEvent = onEvent, state = state, bush = "images/bush1.png", offsetX = 50.dp, offsetY = 200.dp ) // do again with bush random return val
-            BushClick(onEvent = onEvent, state = state, bush = "images/bush2.png", offsetX = 160.dp, offsetY = 250.dp)
-            BushClick(onEvent = onEvent, state = state, bush = "images/bush3.png", offsetX = 260.dp, offsetY = 220.dp)
-            FlowerClick(onEvent = onEvent, state = state, flower = "images/blueflower.png", offsetX = 55.dp, offsetY = 295.dp)
-            FlowerClick(onEvent = onEvent, state = state, flower = "images/orangeflower.png", offsetX = (-100).dp, offsetY = 275.dp)
-            FlowerClick(onEvent = onEvent, state = state, flower = "images/pinkflower.png", offsetX = (-65).dp, offsetY = 300.dp)
-            FlowerClick(onEvent = onEvent, state = state, flower = "images/yelloworangeflower.png", offsetX = 120.dp, offsetY = 310.dp)
-            FlowerClick(onEvent = onEvent, state = state, flower = "images/blueflower.png", offsetX = (-120).dp, offsetY = 320.dp)
-            FlowerClick(onEvent = onEvent, state = state, flower = "images/yelloworangeflower.png", offsetX = (-10).dp, offsetY = 315.dp)
+            val flowerFrequency: List<@Composable () -> Unit> = listOf(
+                {FlowerClick(onEvent = onEvent, state = state, flower = "images/blueflower.png", offsetX = 55.dp, offsetY = 295.dp)},
+                {FlowerClick(onEvent = onEvent, state = state, flower = "images/orangeflower.png", offsetX = (-100).dp, offsetY = 275.dp)},
+                {FlowerClick(onEvent = onEvent, state = state, flower = "images/pinkflower.png", offsetX = (-65).dp, offsetY = 300.dp)},
+                {FlowerClick(onEvent = onEvent, state = state, flower = "images/yelloworangeflower.png", offsetX = 120.dp, offsetY = 310.dp)},
+                {FlowerClick(onEvent = onEvent, state = state, flower = "images/blueflower.png", offsetX = (-120).dp, offsetY = 320.dp)},
+                {FlowerClick(onEvent = onEvent, state = state, flower = "images/yelloworangeflower.png", offsetX = (-10).dp, offsetY = 315.dp)})
 
+            val bushFrequency: List<@Composable () -> Unit> = listOf(
+                {BushClick(onEvent = onEvent, state = state, bush = "images/bush1.png", offsetX = 50.dp, offsetY = 200.dp )}, // do again with bush random return val
+                {BushClick(onEvent = onEvent, state = state, bush = "images/bush2.png", offsetX = 160.dp, offsetY = 250.dp)},
+                {BushClick(onEvent = onEvent, state = state, bush = "images/bush3.png", offsetX = 260.dp, offsetY = 220.dp)})
+
+            Background()
+
+            for(i in flowerFrequency.indices) {
+                 if (state.habitListF1.size > i){
+                     flowerFrequency[i]()
+                 }
+            }
+            for(i in bushFrequency.indices) {
+                if (state.habitListF2.size > i){
+                    bushFrequency[i]()
+                }
+            }
+            if (state.habitListF3Above.isNotEmpty()){
+                TreeClick(onEvent = onEvent, state = state)
+            }
         }
         Spacer(modifier = Modifier.weight(1f))
         Row(modifier = Modifier.padding(10.dp)){

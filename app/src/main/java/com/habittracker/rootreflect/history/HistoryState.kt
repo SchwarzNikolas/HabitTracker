@@ -28,5 +28,12 @@ data class HistoryState(
      */
     val habitInfo: Boolean = false,
     // list of habits of the selected day
-    val habitList: MutableList<HabitRecord> = mutableStateListOf()
+    val habitList: MutableList<HabitRecord> = mutableStateListOf(),
+    // list for habits (frequency 1)
+    val habitListF1: MutableList<HabitRecord> = mutableStateListOf(),
+    // list for habits (frequency 2)
+    val habitListF2: MutableList<HabitRecord> = mutableStateListOf(),
+    // list for habits (frequency 3+)
+    val habitListF3Above: MutableList<HabitRecord> = mutableStateListOf(),
+
 )

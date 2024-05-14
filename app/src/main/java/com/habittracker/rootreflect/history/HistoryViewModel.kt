@@ -99,7 +99,11 @@ class HistoryViewModel(
                                     habitList = records,
                                     selectedDate = event.day,
                                     selectedMood = event.moodName,
-                                    habitInfo = false
+                                    habitInfo = false,
+                                    // filter the habits by their frequency into three separate lists
+                                    habitListF1 = records.filter {record -> record.habitFrequency == 1 }.toList().toMutableList(),
+                                    habitListF2 = records.filter {record -> record.habitFrequency == 2 }.toList().toMutableList(),
+                                    habitListF3Above = records.filter {record -> record.habitFrequency >= 3 }.toList().toMutableList(),
                                 )
                             }
                         }
