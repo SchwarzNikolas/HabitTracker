@@ -38,6 +38,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
+import com.habittracker.rootreflect.database.Habit
+import com.habittracker.rootreflect.database.HabitRecord
+import com.habittracker.rootreflect.habit.HabitState
 import java.io.IOException
 import java.time.LocalDate
 import java.time.Month
@@ -49,37 +52,43 @@ fun HistoryScreen(
     onEvent: (HistoryEvent) -> Unit
 ) {
     Column {
-        Text(text = "History Screen")
+        Text(text = "Select a Plant to display a Habit",
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth())
         Box {
-            val flowerFrequency: List<@Composable () -> Unit> = listOf(
-                {FlowerClick(onEvent = onEvent, state = state, flower = "images/blueflower.png", offsetX = 55.dp, offsetY = 295.dp)},
-                {FlowerClick(onEvent = onEvent, state = state, flower = "images/orangeflower.png", offsetX = (-100).dp, offsetY = 275.dp)},
-                {FlowerClick(onEvent = onEvent, state = state, flower = "images/pinkflower.png", offsetX = (-65).dp, offsetY = 300.dp)},
-                {FlowerClick(onEvent = onEvent, state = state, flower = "images/yelloworangeflower.png", offsetX = 120.dp, offsetY = 310.dp)},
-                {FlowerClick(onEvent = onEvent, state = state, flower = "images/blueflower.png", offsetX = (-120).dp, offsetY = 320.dp)},
-                {FlowerClick(onEvent = onEvent, state = state, flower = "images/yelloworangeflower.png", offsetX = (-10).dp, offsetY = 315.dp)})
+            val flowerFrequency: List<@Composable (HabitRecord) -> Unit> = listOf(
+                {FlowerClick(onEvent = onEvent, state = state, flower = "images/blueflower.png", offsetX = 255.dp, offsetY = 295.dp, habitRecord = it)},
+                {FlowerClick(onEvent = onEvent, state = state, flower = "images/orangeflower.png", offsetX = 100.dp, offsetY = 275.dp, habitRecord = it)},
+                {FlowerClick(onEvent = onEvent, state = state, flower = "images/pinkflower.png", offsetX = 135.dp, offsetY = 300.dp, habitRecord = it)},
+                {FlowerClick(onEvent = onEvent, state = state, flower = "images/yelloworangeflower.png", offsetX = 320.dp, offsetY = 310.dp, habitRecord = it)},
+                {FlowerClick(onEvent = onEvent, state = state, flower = "images/blueflower.png", offsetX = 80.dp, offsetY = 320.dp, habitRecord = it)},
+                {FlowerClick(onEvent = onEvent, state = state, flower = "images/yelloworangeflower.png", offsetX = 190.dp, offsetY = 315.dp, habitRecord = it)})
 
-            val bushFrequency: List<@Composable () -> Unit> = listOf(
-                {BushClick(onEvent = onEvent, state = state, bush = "images/bush1.png", offsetX = 50.dp, offsetY = 200.dp )}, // do again with bush random return val
-                {BushClick(onEvent = onEvent, state = state, bush = "images/bush2.png", offsetX = 160.dp, offsetY = 250.dp)},
-                {BushClick(onEvent = onEvent, state = state, bush = "images/bush3.png", offsetX = 260.dp, offsetY = 220.dp)})
+            val bushFrequency: List<@Composable (HabitRecord) -> Unit> = listOf(
+                {BushClick(onEvent = onEvent, state = state, bush = "images/bush1.png", offsetX = 50.dp, offsetY = 200.dp, habitRecord = it )}, // do again with bush random return val
+                {BushClick(onEvent = onEvent, state = state, bush = "images/bush2.png", offsetX = 160.dp, offsetY = 250.dp, habitRecord = it)},
+                {BushClick(onEvent = onEvent, state = state, bush = "images/bush3.png", offsetX = 260.dp, offsetY = 220.dp, habitRecord = it)})
 
             Background()
 
             for(i in flowerFrequency.indices) {
                  if (state.habitListF1.size > i){
-                     flowerFrequency[i]()
+                     flowerFrequency[i](state.habitListF1[i])
                  }
             }
             for(i in bushFrequency.indices) {
                 if (state.habitListF2.size > i){
-                    bushFrequency[i]()
+                    bushFrequency[i](state.habitListF2[i])
                 }
             }
             if (state.habitListF3Above.isNotEmpty()){
-                TreeClick(onEvent = onEvent, state = state)
+                TreeClick(onEvent = onEvent, state = state, habitRecord = state.habitListF3Above[0])
             }
         }
+        Spacer(modifier = Modifier.height(10.dp))
+        Text(text = "Select a Day to display your daily summary",
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.weight(1f))
         Row(modifier = Modifier.padding(10.dp)){
             DateText(state = state)
@@ -124,11 +133,16 @@ fun InfoSheet(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
         },
     ) {
         Box(modifier = Modifier
-            .height(500.dp)
+            .height(300.dp)
             .align(Alignment.CenterHorizontally)
             .padding(10.dp)){
             if (state.habitInfo) {
+                Column {
+                    Text(text = "Good job! You completed: " + (state.habitStored?.habitName))
+
+                }
                 // display information about habits
+
             }
             else {
                 Column {
@@ -167,7 +181,8 @@ fun InfoSheet(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
                     }
                     else{
                         Text(text = "You have completed the following habits:",
-                            textAlign = TextAlign.Center)
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth())
                         for (habit in state.habitList){
                             Text(text = "• " + habit.habitName,
                                 textAlign = TextAlign.Center,
@@ -267,7 +282,7 @@ fun Background (){
 }
 
 @Composable
-fun FlowerClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, flower: String, offsetX: Dp, offsetY: Dp){
+fun FlowerClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, flower: String, offsetX: Dp, offsetY: Dp, habitRecord: HabitRecord){
     val drawable = loadImageFromAssets(LocalContext.current, flower)
     val bitmap = drawable?.toBitmap()?.asImageBitmap()
     bitmap?.let { BitmapPainter(it) }?.let {
@@ -275,26 +290,20 @@ fun FlowerClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, flower: St
             painter = it,
             contentDescription = null,
             alignment = Alignment.Center,
-            contentScale = ContentScale.Fit,
+            contentScale = ContentScale.Crop,
             modifier = Modifier
-                .fillMaxWidth()
                 .height(height = 65.dp)
                 .offset(offsetX, offsetY)
                 .clickable(indication = null,
                     interactionSource = remember {
                         MutableInteractionSource()
-                    }) { onEvent(HistoryEvent.EnableBottomSheet) }
+                    }) { onEvent(HistoryEvent.SelectPlant(habitRecord)) }
         )
     }
 }
 
-//@Composable
-//fun FlowerRandom(){
-//
-//}
-
 @Composable
-fun BushClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, bush: String, offsetX: Dp, offsetY: Dp){
+fun BushClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, bush: String, offsetX: Dp, offsetY: Dp, habitRecord: HabitRecord){
     val drawable = loadImageFromAssets(LocalContext.current, bush)
     val bitmap = drawable?.toBitmap()?.asImageBitmap()
     bitmap?.let { BitmapPainter(it) }?.let {
@@ -309,18 +318,13 @@ fun BushClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, bush: String
                 .clickable(indication = null,
                     interactionSource = remember {
                         MutableInteractionSource()
-                    }) { onEvent(HistoryEvent.EnableBottomSheet) }
+                    }) { onEvent(HistoryEvent.SelectPlant(habitRecord)) }
         )
     }
 }
 
-//@Composable
-//fun BushRandom(){
-//
-//}
-
 @Composable
-fun TreeClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
+fun TreeClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, habitRecord: HabitRecord){
     val drawable = loadImageFromAssets(LocalContext.current, "images/tree.png")
     val bitmap = drawable?.toBitmap()?.asImageBitmap()
 
@@ -336,7 +340,7 @@ fun TreeClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
                 .clickable(indication = null,
                     interactionSource = remember {
                         MutableInteractionSource()
-                    }) { onEvent(HistoryEvent.EnableBottomSheet) }
+                    }) { onEvent(HistoryEvent.SelectPlant(habitRecord)) }
         )
     }
 }
