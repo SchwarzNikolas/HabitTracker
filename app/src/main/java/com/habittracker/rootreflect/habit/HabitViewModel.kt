@@ -27,9 +27,9 @@ class HabitViewModel (
 ): ViewModel() {
     private val _state = MutableStateFlow(HabitState())
     val state = _state
-    private var date: LocalDate = LocalDate.now()
+    private lateinit var date:LocalDate
     private lateinit var job: Job
-    private val maxHabitNameLength = 10
+    private val maxHabitNameLength = 50
     private val maxHabitFrequency = 9
     init {
         viewModelScope.launch {
@@ -37,6 +37,7 @@ class HabitViewModel (
             val dateRecord = dao.getDate()
             if (dateRecord == null){
                 dao.upsertDate(DateRecord(key = 1, date = LocalDate.now()))
+                date = LocalDate.now()
             }else{
                date = dateRecord.date
             }
