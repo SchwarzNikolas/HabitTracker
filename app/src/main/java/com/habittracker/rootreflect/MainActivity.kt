@@ -55,17 +55,6 @@ class MainActivity : ComponentActivity() {
         }
     )
 
-    // Creating view model for Moods
-    private val moodViewModel by viewModels<MoodViewModel>(
-        factoryProducer = {
-            object : ViewModelProvider.Factory{
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return MoodViewModel(db.dao) as T
-                }
-            }
-        }
-    )
-
     // Creating view model for History
     private val historyViewModel by viewModels<HistoryViewModel>(
         factoryProducer = {
@@ -90,7 +79,6 @@ class MainActivity : ComponentActivity() {
 //                    val habitState by habitViewModel.state.collectAsState()
 //                    MainScreen(state = habitState, onEvent = habitViewModel::onEvent)
                     AppNavigation(
-                        moodViewModel = moodViewModel,
                         customViewModel = customViewModel,
                         habitViewModel = habitViewModel,
                         historyViewModel = historyViewModel
