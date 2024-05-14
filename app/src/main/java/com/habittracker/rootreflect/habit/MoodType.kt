@@ -1,4 +1,4 @@
-package com.habittracker.rootreflect.mood
+package com.habittracker.rootreflect.habit
 
 enum class MoodType (val moodColor: Long) {
     BAD (0xFFFF0000),

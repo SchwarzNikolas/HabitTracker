@@ -18,7 +18,6 @@ import com.habittracker.rootreflect.custom.CustomViewModel
 import com.habittracker.rootreflect.database.HabitDatabase
 import com.habittracker.rootreflect.habit.HabitViewModel
 import com.habittracker.rootreflect.history.HistoryViewModel
-import com.habittracker.rootreflect.mood.MoodViewModel
 import com.habittracker.rootreflect.navigation.AppNavigation
 import com.habittracker.rootreflect.notification.NotificationService
 import com.habittracker.rootreflect.ui.theme.HabitTrackerTheme

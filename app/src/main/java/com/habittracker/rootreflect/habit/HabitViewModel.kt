@@ -177,7 +177,7 @@ class HabitViewModel (
                 resetCompletion()
             }
 
-            is HabitEvent.MoodChange -> {
+            /*is HabitEvent.MoodChange -> {
                 _state.update {
                     it.copy(
                         selectedMood = event.moodType
@@ -186,9 +186,30 @@ class HabitViewModel (
                 viewModelScope.launch {
                     dao.upsertMoodRec(MoodRecord(date, event.moodType))
                 }
+            }*/
+
+            is HabitEvent.MoodSelected -> {
+                _state.update {
+                    it.copy(
+                        selectedMood = event.moodType
+                    )
+                }
+                viewModelScope.launch {
+                    val existingRec = dao.getMoodRecByDate(date.toString())
+                    if (existingRec == null) {
+                        dao.insertMoodRec(
+                            moodRec = MoodRecord(
+                                moodDate = date,
+                                mood = event.moodType
+                            )
+                        )
+                    }
+                }
             }
         }
     }
+
+
 
     // logic for habit completion, components are explained individually below
     private fun checkHabitCompletion(join: Habit, completion: HabitCompletion) {

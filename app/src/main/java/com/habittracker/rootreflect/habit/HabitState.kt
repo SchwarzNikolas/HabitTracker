@@ -2,9 +2,6 @@ package com.habittracker.rootreflect.habit
 
 
 import androidx.compose.runtime.mutableStateListOf
-import com.habittracker.rootreflect.database.HabitRecord
-import com.habittracker.rootreflect.mood.MoodType
-import java.time.LocalDate
 
 
 // This contains all the data that the UI displays
