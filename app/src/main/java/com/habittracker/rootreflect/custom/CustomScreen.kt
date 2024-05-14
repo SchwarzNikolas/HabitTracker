@@ -1,12 +1,10 @@
 package com.habittracker.rootreflect.custom
 
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,10 +17,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -36,6 +38,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
@@ -62,6 +65,7 @@ fun CustomScreen(
             text = "Create new Habit!",
             fontSize = 24.sp
         )
+        HabitPreview(state = state)
         Row (
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
@@ -119,7 +123,7 @@ fun EditWindow(onEvent: (CustomHabitEvent) -> Unit, state: CustomState) {
             },
             valueRange = 1f..9f,
             steps = 7,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -138,9 +142,9 @@ fun EditWindow(onEvent: (CustomHabitEvent) -> Unit, state: CustomState) {
             )
         }
         Spacer(modifier = Modifier.weight(1f))
-        if (state.habitName.isNotBlank()){
-            HabitPreview(state = state)
-        }
+//        if (state.habitName.isNotBlank()){
+//            HabitPreview(state = state)
+//        }
     }
 }
 
@@ -246,54 +250,58 @@ fun HabitPreview(state: CustomState){
             defaultElevation = 6.dp
         ),
         modifier = Modifier
-            .fillMaxWidth()
+            .padding(vertical = 5.dp, horizontal = 5.dp),
+        colors = CardDefaults.cardColors(Color.Gray)
     ) {
-        Box {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                val w = 300.dp
-                val h = 50.dp
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    BasicText(
-                        text = state.habitName,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(start = 10.dp),
-                        style = LocalTextStyle.current.copy(fontSize = 30.sp)
-                    )
-                    Spacer(Modifier.weight(1f))
+        Row {
+            BasicText(
+                text = state.habitName,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .padding(start = 10.dp)
+                    .weight(17f),
+                style = LocalTextStyle.current.copy(fontSize = 30.sp)
+            )
+            IconButton(
+                onClick = { },
+                modifier = Modifier.weight(2f)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = "ContextMenu"
+                )
+            }
+        }
+        Row(modifier = Modifier.padding(bottom = 5.dp, start = 10.dp, end = 5.dp),
+            verticalAlignment = Alignment.CenterVertically) {
+
+            BoxWithConstraints (modifier = Modifier
+                .weight(6f)
+                .height(50.dp)){
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(Color.Black)
+                        .size(width = maxWidth, height = maxHeight)
+                ){
+                    Text(text = "")
                 }
-                Row(modifier = Modifier.padding(bottom = 5.dp)) {
-                    Box() {
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(10.dp))
-                                .size(w, h)
-                                .background(Color.DarkGray)
-                        )
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(Color.Green)
-                                .animateContentSize(
-                                    animationSpec = tween(
-                                        durationMillis = 500,
-                                        easing = FastOutSlowInEasing
-                                    )
-                                )
-                                .size(
-                                    w * (1/2),
-                                    h
-                                )
-                        )
-                    }
-                    Button(
-                        onClick = {},
-                        enabled = false,
-                        modifier = Modifier.padding(start = 5.dp)
-                    ) {
-                        Text(text = state.habitFrequency.toString())
-                    }
-                }
+            }
+            Box(modifier = Modifier
+                .padding(start = 10.dp, end = 5.dp)
+                .weight(1f),
+                contentAlignment = Alignment.Center) {
+                Text(
+                    modifier = Modifier
+                        .drawBehind {
+                            drawCircle(
+                                color = Color.Transparent,
+                                radius = 60f
+                            )
+                        },
+                    text = state.habitFrequency.toString()
+                )
             }
         }
     }

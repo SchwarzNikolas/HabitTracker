@@ -54,6 +54,12 @@ class HabitViewModel (
             }
         }
 
+        viewModelScope.launch {
+            val mood  = dao.getMoodRecByDate(date.toString())
+            if (mood != null){
+                state.update { it.copy(selectedMood = mood.mood) }
+            }
+        }
 
         viewModelScope.launch {
 ////             sync data base and state

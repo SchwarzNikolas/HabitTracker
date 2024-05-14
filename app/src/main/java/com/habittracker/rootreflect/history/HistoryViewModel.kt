@@ -94,6 +94,7 @@ class HistoryViewModel(
                             for (record in habitRecords){
                                 records.add(record)
                             }
+                            println("test")
                             _state.update {
                                 it.copy(
                                     habitList = records,
@@ -105,6 +106,13 @@ class HistoryViewModel(
                         }
                     }
                 }
+            }
+
+            HistoryEvent.NameTagToggle -> {
+                state.update { it.copy(nameTagActive = state.value.nameTagActive.not()) }
+            }
+            is HistoryEvent.SetOffSet -> {
+                state.update { it.copy(offset = event.offSet) }
             }
         }
     }

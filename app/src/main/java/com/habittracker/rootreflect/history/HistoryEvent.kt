@@ -1,7 +1,7 @@
 package com.habittracker.rootreflect.history
 
+import androidx.compose.ui.unit.DpOffset
 import java.time.LocalDate
-import java.time.Month
 
 sealed interface HistoryEvent {
     // event to enable bottom sheet
@@ -12,5 +12,8 @@ sealed interface HistoryEvent {
     data class ChangeCurrentMonth(val date: Int): HistoryEvent
     // event to change selected day
     data class ChangeSelectedDay(val day: LocalDate, val moodName: String): HistoryEvent
+    data object NameTagToggle: HistoryEvent
+
+    data class SetOffSet(val offSet: DpOffset): HistoryEvent
 
 }

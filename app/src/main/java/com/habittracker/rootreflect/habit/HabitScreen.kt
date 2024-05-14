@@ -29,7 +29,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -47,6 +46,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
@@ -163,8 +163,8 @@ fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, dropd
             defaultElevation = 6.dp
         ),
         modifier = modifier
-            .clickable { onEvent(HabitEvent.IncCompletion(displayHabit.habitJoin)) }
-            .padding(vertical = 5.dp, horizontal = 5.dp),
+            .padding(vertical = 5.dp, horizontal = 5.dp).alpha(if (displayHabit.habitJoin.completion.done){ 0.5f} else{1f})
+            .clickable { onEvent(HabitEvent.IncCompletion(displayHabit.habitJoin)) },
         colors = CardDefaults.cardColors(Color.Gray)
     ) {
         Row {
@@ -394,16 +394,16 @@ fun MoodSection(state: HabitState, onEvent: (MoodEvent) -> Unit, modifier: Modif
                     RadioButton(
                         selected = state.selectedMood == moodType,
                         onClick = {
-                            //event(HabitEvent.MoodChange(moodType))
-                            onEvent(
-                                when (moodType) {
-                                    MoodType.BAD -> MoodEvent.BadSelected(moodType)
-                                    MoodType.SO_SO -> MoodEvent.SoSoSelected(moodType)
-                                    MoodType.OK -> MoodEvent.OkSelected(moodType)
-                                    MoodType.ALRIGHT -> MoodEvent.AlrightSelected(moodType)
-                                    MoodType.GOOD -> MoodEvent.GoodSelected(moodType)
-                                }
-                            )
+                            event(HabitEvent.MoodChange(moodType))
+//                            onEvent(
+//                                when (moodType) {
+//                                    MoodType.BAD -> MoodEvent.BadSelected(moodType)
+//                                    MoodType.SO_SO -> MoodEvent.SoSoSelected(moodType)
+//                                    MoodType.OK -> MoodEvent.OkSelected(moodType)
+//                                    MoodType.ALRIGHT -> MoodEvent.AlrightSelected(moodType)
+//                                    MoodType.GOOD -> MoodEvent.GoodSelected(moodType)
+//                                }
+//                            )
                         },
                         colors = RadioButtonDefaults.colors(
                             selectedColor = Color(moodType.moodColor),
