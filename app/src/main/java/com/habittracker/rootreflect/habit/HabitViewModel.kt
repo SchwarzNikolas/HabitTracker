@@ -251,17 +251,18 @@ class HabitViewModel (
      private suspend fun dataSupRoutine(){
          dao.fetchHabitByDay(dayToString(date.dayOfWeek.value-1)).collect{habitJoin -> run{
              val displayHabitRecordList: MutableList<DisplayHabit> = mutableListOf()
-             val weeklyDisplayHabitRecordList: MutableList<DisplayHabit> = mutableListOf()
+             val finishedDisplayHabitRecordList: MutableList<DisplayHabit> = mutableListOf()
              for (habit in habitJoin){
-                if (habit.completion.occurrence == "1111111"){
+                 if (habit.completion.done){
+                     finishedDisplayHabitRecordList.add(DisplayHabit(habitJoin = habit))
+                 }
+                else {
                     displayHabitRecordList.add(DisplayHabit(habitJoin = habit))
-                }else{
-                    weeklyDisplayHabitRecordList.add(DisplayHabit(habitJoin = habit))
                 }
              }
                 _state.update { it.copy(
                     displayHabits = displayHabitRecordList,
-                    weeklyDisplayHabits = weeklyDisplayHabitRecordList
+                    finishedDisplayHabits = finishedDisplayHabitRecordList
                 )
                 }
          }

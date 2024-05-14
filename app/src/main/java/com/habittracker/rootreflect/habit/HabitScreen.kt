@@ -107,41 +107,17 @@ fun MainScreen (
 
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             for (displayHabit in state.displayHabits) {
-                val mod = Modifier
-                if (displayHabit.beingEdited.value) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(modifier = mod.weight(1f),
-                            onClick = { onEvent(HabitEvent.ModifyHabit(displayHabit.habitJoin)) }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = "ContextMenu"
-                            )
-                        }
-                        EditMode(
-                            onEvent = onEvent,
-                            displayHabit = displayHabit,
-                            state = state,
-                            modifier = mod.weight(12f)
-                        )
-                        IconButton(modifier = mod.weight(1f),
-                            onClick = { onEvent(HabitEvent.CancelEdit(displayHabit)) }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = "cancel edit"
-                            )
-                        }
-                    }
-                } else {
-                    DisplayMode(
-                        onEvent = onEvent,
-                        displayHabit = displayHabit,
-                        dropdownItems = dropdownItems
-                    )
-                }
+                HabitDisplay(onEvent, state, displayHabit, dropdownItems)
             }
-            // debug
+            for (finishedHabit in state.finishedDisplayHabits) {
+                HabitDisplay(
+                    onEvent = onEvent,
+                    state = state,
+                    displayHabit = finishedHabit,
+                    dropdownItems = dropdownItems
+                )
+            }
+                // debug
 //            Button(onClick = { onEvent(HabitEvent.ResetCompletion) }) {
 //                Text(text = "test")
 //            }
@@ -149,10 +125,48 @@ fun MainScreen (
 //                Text(text = "next day")
 //            }
 //            Text(text = state.date.dayOfWeek.toString())
-            //Text(text = state.date2.dayOfWeek.toString())
+                //Text(text = state.date2.dayOfWeek.toString())
 
 
+            
         }
+    }
+}
+
+@Composable
+fun HabitDisplay(onEvent: (HabitEvent) -> Unit, state: HabitState, displayHabit: DisplayHabit, dropdownItems: List<Item>){
+    val mod = Modifier
+    if (displayHabit.beingEdited.value) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(modifier = mod.weight(1f),
+                onClick = { onEvent(HabitEvent.ModifyHabit(displayHabit.habitJoin)) }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "ContextMenu"
+                )
+            }
+            EditMode(
+                onEvent = onEvent,
+                displayHabit = displayHabit,
+                state = state,
+                modifier = mod.weight(12f)
+            )
+            IconButton(modifier = mod.weight(1f),
+                onClick = { onEvent(HabitEvent.CancelEdit(displayHabit)) }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "cancel edit"
+                )
+            }
+        }
+    } else {
+        DisplayMode(
+            onEvent = onEvent,
+            displayHabit = displayHabit,
+            dropdownItems = dropdownItems
+        )
     }
 }
 
@@ -163,7 +177,14 @@ fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, dropd
             defaultElevation = 6.dp
         ),
         modifier = modifier
-            .padding(vertical = 5.dp, horizontal = 5.dp).alpha(if (displayHabit.habitJoin.completion.done){ 0.5f} else{1f})
+            .padding(vertical = 5.dp, horizontal = 5.dp)
+            .alpha(
+                if (displayHabit.habitJoin.completion.done) {
+                    0.5f
+                } else {
+                    1f
+                }
+            )
             .clickable { onEvent(HabitEvent.IncCompletion(displayHabit.habitJoin)) },
         colors = CardDefaults.cardColors(Color.Gray)
     ) {

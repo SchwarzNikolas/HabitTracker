@@ -2,9 +2,7 @@ package com.habittracker.rootreflect.habit
 
 
 import androidx.compose.runtime.mutableStateListOf
-import com.habittracker.rootreflect.database.HabitRecord
 import com.habittracker.rootreflect.mood.MoodType
-import java.time.LocalDate
 
 
 // This contains all the data that the UI displays
@@ -21,8 +19,7 @@ data class HabitState(
 
     // list of all the habits that will be displayed
     val displayHabits: MutableList<DisplayHabit> = mutableStateListOf(),
-    val weeklyDisplayHabits: MutableList<DisplayHabit> = mutableStateListOf(),
-
+    val finishedDisplayHabits: MutableList<DisplayHabit> = mutableStateListOf(),
 
     //val date2: LocalDate = LocalDate.now().plusDays(1),
     // temp

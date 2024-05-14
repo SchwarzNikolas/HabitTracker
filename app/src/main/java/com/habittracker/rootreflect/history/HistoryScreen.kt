@@ -3,6 +3,7 @@ package com.habittracker.rootreflect.history
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -47,6 +48,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
+import com.habittracker.rootreflect.database.HabitRecord
 import java.io.IOException
 import java.time.LocalDate
 import java.time.Month
@@ -60,18 +62,55 @@ fun HistoryScreen(
     Column {
         Text(text = "History Screen")
         Box {
+
+//            Background()
+//            TreeClick(onEvent = onEvent, state = state)
+//            BushClick(onEvent = onEvent, state = state, bush = "images/bush1.png", offsetX = 50.dp, offsetY = 200.dp ) // do again with bush random return val
+//            BushClick(onEvent = onEvent, state = state, bush = "images/bush2.png", offsetX = 160.dp, offsetY = 250.dp)
+//            BushClick(onEvent = onEvent, state = state, bush = "images/bush3.png", offsetX = 260.dp, offsetY = 220.dp)
+//            FlowerClick(onEvent = onEvent, state = state, flower = "images/blueflower.png", offsetX = 235.dp, offsetY = 295.dp)
+//            FlowerClick(onEvent = onEvent, state = state, flower = "images/orangeflower.png", offsetX = 80.dp, offsetY = 275.dp)
+//            FlowerClick(onEvent = onEvent, state = state, flower = "images/pinkflower.png", offsetX = 115.dp, offsetY = 300.dp)
+//            FlowerClick(onEvent = onEvent, state = state, flower = "images/yelloworangeflower.png", offsetX = 300.dp, offsetY = 310.dp)
+//            FlowerClick(onEvent = onEvent, state = state, flower = "images/blueflower.png", offsetX = 60.dp, offsetY = 320.dp)
+//            FlowerClick(onEvent = onEvent, state = state, flower = "images/yelloworangeflower.png", offsetX = 170.dp, offsetY = 315.dp)
+            val flowerFrequency: List<@Composable (it:String) -> Unit> = listOf(
+                {FlowerClick(onEvent = onEvent, state = state, flower = "images/blueflower.png", offsetX = 235.dp, offsetY = 295.dp, it)},
+                {FlowerClick(onEvent = onEvent, state = state, flower = "images/orangeflower.png", offsetX = 80.dp, offsetY = 275.dp, it)},
+                {FlowerClick(onEvent = onEvent, state = state, flower = "images/pinkflower.png", offsetX = 115.dp, offsetY = 300.dp, it)},
+                {FlowerClick(onEvent = onEvent, state = state, flower = "images/yelloworangeflower.png", offsetX = 300.dp, offsetY = 310.dp, it)},
+                {FlowerClick(onEvent = onEvent, state = state, flower = "images/blueflower.png", offsetX = 60.dp, offsetY = 320.dp, it)},
+                {FlowerClick(onEvent = onEvent, state = state, flower = "images/yelloworangeflower.png", offsetX = 170.dp, offsetY = 315.dp, it)}
+            )
+//                {FlowerClick(onEvent = onEvent, state = state, flower = "images/blueflower.png", offsetX = 55.dp, offsetY = 295.dp)},
+//                {FlowerClick(onEvent = onEvent, state = state, flower = "images/orangeflower.png", offsetX = (-100).dp, offsetY = 275.dp)},
+//                {FlowerClick(onEvent = onEvent, state = state, flower = "images/pinkflower.png", offsetX = (-65).dp, offsetY = 300.dp)},
+//                {FlowerClick(onEvent = onEvent, state = state, flower = "images/yelloworangeflower.png", offsetX = 120.dp, offsetY = 310.dp)},
+//                {FlowerClick(onEvent = onEvent, state = state, flower = "images/blueflower.png", offsetX = (-120).dp, offsetY = 320.dp)},
+//                {FlowerClick(onEvent = onEvent, state = state, flower = "images/yelloworangeflower.png", offsetX = (-10).dp, offsetY = 315.dp)})
+
+
+            val bushFrequency: List<@Composable () -> Unit> = listOf(
+                {BushClick(onEvent = onEvent, state = state, bush = "images/bush1.png", offsetX = 50.dp, offsetY = 200.dp )}, // do again with bush random return val
+                {BushClick(onEvent = onEvent, state = state, bush = "images/bush2.png", offsetX = 160.dp, offsetY = 250.dp)},
+                {BushClick(onEvent = onEvent, state = state, bush = "images/bush3.png", offsetX = 260.dp, offsetY = 220.dp)})
+
             Background()
-            TreeClick(onEvent = onEvent, state = state)
-            BushClick(onEvent = onEvent, state = state, bush = "images/bush1.png", offsetX = 50.dp, offsetY = 200.dp ) // do again with bush random return val
-            BushClick(onEvent = onEvent, state = state, bush = "images/bush2.png", offsetX = 160.dp, offsetY = 250.dp)
-            BushClick(onEvent = onEvent, state = state, bush = "images/bush3.png", offsetX = 260.dp, offsetY = 220.dp)
-            FlowerClick(onEvent = onEvent, state = state, flower = "images/blueflower.png", offsetX = 235.dp, offsetY = 295.dp)
-            FlowerClick(onEvent = onEvent, state = state, flower = "images/orangeflower.png", offsetX = 80.dp, offsetY = 275.dp)
-            FlowerClick(onEvent = onEvent, state = state, flower = "images/pinkflower.png", offsetX = 115.dp, offsetY = 300.dp)
-            FlowerClick(onEvent = onEvent, state = state, flower = "images/yelloworangeflower.png", offsetX = 300.dp, offsetY = 310.dp)
-            FlowerClick(onEvent = onEvent, state = state, flower = "images/blueflower.png", offsetX = 60.dp, offsetY = 320.dp)
-            FlowerClick(onEvent = onEvent, state = state, flower = "images/yelloworangeflower.png", offsetX = 170.dp, offsetY = 315.dp)
-            NameTag(show = state.nameTagActive, showe = state.offset, onEvent)
+
+            for(i in flowerFrequency.indices) {
+                 if (state.habitListF1.size > i){
+                     flowerFrequency[i](state.habitListF1[i].habitName)
+                 }
+            }
+            for(i in bushFrequency.indices) {
+                if (state.habitListF2.size > i){
+                    bushFrequency[i]()
+                }
+            }
+            if (state.habitListF3Above.isNotEmpty()){
+                TreeClick(onEvent = onEvent, state = state)
+            }
+            NameTag(show = state.nameTagActive, showe = state.offset, onEvent, state.name)
 
         }
         Spacer(modifier = Modifier.weight(1f))
@@ -192,7 +231,7 @@ fun MonthlyHistory(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
             DisabledDay()
         }
         items(state.dayList.size){
-            DailyBox(onEvent, state.dayList[it])
+            DailyBox(onEvent, state.dayList[it], state)
         }
     }
 }
@@ -227,7 +266,7 @@ fun DisabledDay(){
 }
 
 @Composable
-fun DailyBox(onEvent: (HistoryEvent) -> Unit, dayOfMonth: DayOfMonth){
+fun DailyBox(onEvent: (HistoryEvent) -> Unit, dayOfMonth: DayOfMonth, state: HistoryState){
     /*
     Button which acts as a day in the calendar, will show information about the day if clicked
      */
@@ -238,7 +277,8 @@ fun DailyBox(onEvent: (HistoryEvent) -> Unit, dayOfMonth: DayOfMonth){
         colors = ButtonDefaults.buttonColors(Color(dayOfMonth.colour)),
         onClick = {
             onEvent(HistoryEvent.EnableBottomSheet)
-            onEvent(HistoryEvent.ChangeSelectedDay(dayOfMonth.date, dayOfMonth.mood))}
+            onEvent(HistoryEvent.ChangeSelectedDay(dayOfMonth.date, dayOfMonth.mood))},
+        border = if(state.selectedDate == dayOfMonth.date){ BorderStroke(2.dp, Color.Yellow)} else {null}
     ) {
     }
 }
@@ -261,7 +301,7 @@ fun Background(){
 }
 
 @Composable
-fun FlowerClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, flower: String, offsetX: Dp, offsetY: Dp){
+fun FlowerClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, flower: String, offsetX: Dp, offsetY: Dp, name: String){
     val drawable = loadImageFromAssets(LocalContext.current, flower)
     val bitmap = drawable!!.toBitmap()
     val den = LocalDensity.current
@@ -271,13 +311,13 @@ fun FlowerClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, flower: St
         alignment = Alignment.Center,
         contentScale = ContentScale.Crop,
         modifier = Modifier
-            //.fillMaxWidth()
             .height(height = 65.dp)
             .offset(offsetX, offsetY)
             .pointerInput(Unit) {
                 detectTapGestures {
+                    //onEvent(HistoryEvent.EnableBottomSheet)
+                    onEvent(HistoryEvent.SetName(name))
                     clickPixel(65.dp.toPx(), it, bitmap, onEvent, den, offsetX, offsetY)
-
                 }
             }
     )
@@ -304,7 +344,8 @@ fun BushClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, bush: String
             .pointerInput(Unit) {
                 detectTapGestures {
                     // calcs offset scale due to height setting
-                    clickPixel(65.dp.toPx(), it, bitmap, onEvent, den, offsetX, offsetY)
+                    onEvent(HistoryEvent.EnableBottomSheet)
+                    //clickPixel(65.dp.toPx(), it, bitmap, onEvent, den, offsetX, offsetY)
                 }
             }
     )
@@ -333,14 +374,15 @@ fun TreeClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
                 detectTapGestures {
                     // calcs offset scale due to height setting
                     // check pixel is not transparent
-                    clickPixel(225.dp.toPx(), it, bitmap, onEvent, den, 100.dp, 15.dp)
+                    onEvent(HistoryEvent.EnableBottomSheet)
+                    //clickPixel(225.dp.toPx(), it, bitmap, onEvent, den, 100.dp, 15.dp)
                 }
             }
     )
 }
 
 @Composable
-fun NameTag(show: Boolean, showe: DpOffset, onEvent: (HistoryEvent) -> Unit ){
+fun NameTag(show: Boolean, showe: DpOffset, onEvent: (HistoryEvent) -> Unit, name:String = "test"){
     DropdownMenu(
         expanded = show,
         onDismissRequest = {
@@ -350,7 +392,7 @@ fun NameTag(show: Boolean, showe: DpOffset, onEvent: (HistoryEvent) -> Unit ){
         offset = DpOffset(showe.x, (-400).dp + showe.y),
         modifier = Modifier.padding(horizontal = 10.dp)
     ) {
-        Text(text = "habit name")
+        Text(text = name)
     }
 }
 

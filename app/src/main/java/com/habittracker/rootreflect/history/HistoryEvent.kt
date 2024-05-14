@@ -15,5 +15,5 @@ sealed interface HistoryEvent {
     data object NameTagToggle: HistoryEvent
 
     data class SetOffSet(val offSet: DpOffset): HistoryEvent
-
+    data class SetName (val name :String): HistoryEvent
 }
