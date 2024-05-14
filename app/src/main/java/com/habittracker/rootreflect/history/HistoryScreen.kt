@@ -2,6 +2,7 @@ package com.habittracker.rootreflect.history
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -213,7 +214,7 @@ fun MonthlyHistory(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
             DisabledDay()
         }
         items(state.dayList.size){
-            DailyBox(onEvent, state.dayList[it])
+            DailyBox(onEvent, state.dayList[it], state)
         }
     }
 }
@@ -248,7 +249,7 @@ fun DisabledDay(){
 }
 
 @Composable
-fun DailyBox(onEvent: (HistoryEvent) -> Unit, dayOfMonth: DayOfMonth){
+fun DailyBox(onEvent: (HistoryEvent) -> Unit, dayOfMonth: DayOfMonth, state: HistoryState){
     /*
     Button which acts as a day in the calendar, will show information about the day if clicked
      */
@@ -259,7 +260,8 @@ fun DailyBox(onEvent: (HistoryEvent) -> Unit, dayOfMonth: DayOfMonth){
         colors = ButtonDefaults.buttonColors(Color(dayOfMonth.colour)),
         onClick = {
             onEvent(HistoryEvent.EnableBottomSheet)
-            onEvent(HistoryEvent.ChangeSelectedDay(dayOfMonth.date, dayOfMonth.mood))}
+            onEvent(HistoryEvent.ChangeSelectedDay(dayOfMonth.date, dayOfMonth.mood))},
+        border = if (dayOfMonth.date == state.selectedDate) {BorderStroke(1.dp, Color.Yellow)} else {null}
     ) {
     }
 }
@@ -326,23 +328,21 @@ fun BushClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, bush: String
 @Composable
 fun TreeClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, habitRecord: HabitRecord){
     val drawable = loadImageFromAssets(LocalContext.current, "images/tree.png")
-    val bitmap = drawable?.toBitmap()?.asImageBitmap()
+    val bitmap = drawable!!.toBitmap()
 
-    bitmap?.let { BitmapPainter(it) }?.let {
-        Image(
-            painter = it,
-            contentDescription = null,
-            alignment = Alignment.Center,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .height(height = 225.dp)
-                .offset(100.dp, 15.dp)
-                .clickable(indication = null,
-                    interactionSource = remember {
-                        MutableInteractionSource()
-                    }) { onEvent(HistoryEvent.SelectPlant(habitRecord)) }
-        )
-    }
+    Image(
+        painter = BitmapPainter(bitmap.asImageBitmap()),
+        contentDescription = null,
+        alignment = Alignment.Center,
+        contentScale = ContentScale.Crop,
+        modifier = Modifier
+            .height(height = 225.dp)
+            .offset(100.dp, 15.dp)
+            .clickable(indication = null,
+                interactionSource = remember {
+                    MutableInteractionSource()
+                }) { onEvent(HistoryEvent.SelectPlant(habitRecord)) }
+    )
 }
 
 fun loadImageFromAssets(context: Context, filename: String): Drawable? {

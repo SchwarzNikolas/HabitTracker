@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.habittracker.rootreflect.database.HabitDao
 import com.habittracker.rootreflect.database.HabitRecord
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -16,6 +17,7 @@ class HistoryViewModel(
       private val dao: HabitDao
 ): ViewModel() {
     private val _state = MutableStateFlow(HistoryState())
+    private var job:Job? = null
     val state = _state
 
     init {
@@ -95,7 +97,10 @@ class HistoryViewModel(
                 additionally this event changes the selected mood and will change what the bottom
                 sheet should display. It also fetches the completed habits from the selected day.
                  */
-                viewModelScope.launch {
+                if (job != null){
+                    job!!.cancel()
+                }
+                job = viewModelScope.launch {
                     dao.fetchHabitRecordsByDate(event.day).collect {
                     habitRecords ->
                         run {
