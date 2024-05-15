@@ -9,6 +9,7 @@ import com.habittracker.rootreflect.database.Habit
 import com.habittracker.rootreflect.database.HabitCompletion
 import com.habittracker.rootreflect.database.HabitDao
 import com.habittracker.rootreflect.database.HabitDatabase
+import com.habittracker.rootreflect.database.HabitJoin
 import com.habittracker.rootreflect.database.HabitRecord
 import com.habittracker.rootreflect.database.MoodRecord
 import com.habittracker.rootreflect.habit.HabitViewModel
@@ -30,6 +31,7 @@ class HabitDaoTest {
     private var habitList: List<Habit> = listOf()
     private var habitRecords: List<HabitRecord> = listOf()
     private var habitCompletion: List<HabitCompletion> = listOf()
+    private var habitJoin: List<HabitJoin> = listOf()
     private lateinit var fetchMood: List<MoodRecord>
 
     @Before
@@ -179,7 +181,7 @@ class HabitDaoTest {
         assertThat(habitCompletion.size).isEqualTo(0)
     }
 
-    /*@Test
+    @Test
     fun updateCompletionTest() = runBlocking {
         // create habitCompletion and insert them into the database
         var completedHabit = HabitCompletion(1, 0, false, "1111111")
@@ -193,8 +195,8 @@ class HabitDaoTest {
             cancelAndIgnoreRemainingEvents()
         }
         // check that data got updated
-        assertThat(habitCompletion[0].completion.done).isEqualTo(true)
-        assertThat(habitCompletion[0].completion.completion).isEqualTo(1)
+        assertThat(habitCompletion[0].done).isEqualTo(true)
+        assertThat(habitCompletion[0].completion).isEqualTo(1)
     }
 
     @Test
@@ -210,8 +212,8 @@ class HabitDaoTest {
             cancelAndIgnoreRemainingEvents()
         }
         // check if the stats got reset
-        assertThat(habitCompletion[0].completion.done).isEqualTo(false)
-        assertThat(habitCompletion[0].completion.completion).isEqualTo(0)
+        assertThat(habitCompletion[0].done).isEqualTo(false)
+        assertThat(habitCompletion[0].completion).isEqualTo(0)
     }
 
     @Test
@@ -221,13 +223,13 @@ class HabitDaoTest {
         dao.upsertHabit(Habit())
         dao.upsertCompletion(completedHabit)
         dao.fetchHabitByDay("1111111").test {
-            habitCompletion = awaitItem()
+            habitJoin = awaitItem()
             cancelAndIgnoreRemainingEvents()
         }
-        assertThat(habitCompletion.size).isEqualTo(1)
+        assertThat(habitJoin.size).isEqualTo(1)
     }
 
-    @Test
+    /*@Test
     fun insertMoodRecTest() = runBlocking{
         val moodRecord = MoodRecord()
         dao.upsertMoodRec(moodRecord)
