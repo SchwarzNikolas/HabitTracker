@@ -25,6 +25,7 @@ interface HabitDao{
     // defines sql query to be executed on the database
     @Query("SELECT * FROM Habit JOIN HabitCompletion ON Habit.habitId = HabitCompletion.habitID WHERE HabitCompletion.occurrence LIKE :day")
     fun fetchHabitByDay(day: String): Flow<List<HabitJoin>>
+
     @Upsert
     suspend fun upsertHabit(habit: Habit)
 
@@ -72,4 +73,13 @@ interface HabitDao{
     @Query("select moodDate from MoodRecord")
     fun fetchDates():Flow<List<LocalDate>>
 
+    // for testing
+    @Query("SELECT * FROM Habit")
+    fun fetchHabits(): Flow<List<Habit>>
+
+    @Query("SELECT * FROM HabitCompletion")
+    fun getHabit(): Flow<List<HabitCompletion>>
+
+    @Upsert
+    fun updateHabit(habit: Habit)
 }

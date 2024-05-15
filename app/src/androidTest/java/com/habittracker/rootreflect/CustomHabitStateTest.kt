@@ -4,17 +4,17 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import app.cash.turbine.test
+import com.google.common.truth.Truth.assertThat
 import com.habittracker.rootreflect.custom.CustomHabitEvent
 import com.habittracker.rootreflect.custom.CustomViewModel
 import com.habittracker.rootreflect.database.Habit
 import com.habittracker.rootreflect.database.HabitDao
 import com.habittracker.rootreflect.database.HabitDatabase
-import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
-import java.io.IOException
 import org.junit.Test
+import java.io.IOException
 
 class CustomHabitStateTest {
     private lateinit var dao: HabitDao
@@ -45,7 +45,7 @@ class CustomHabitStateTest {
 
     @Test
     fun editFreqTest(){
-        val event = CustomHabitEvent.EditFreq("3")
+        val event = CustomHabitEvent.EditFreq(3)
         viewModel.onEvent(event)
         assertThat("3").isEqualTo(viewModel.state.value.habitFrequency)
     }
