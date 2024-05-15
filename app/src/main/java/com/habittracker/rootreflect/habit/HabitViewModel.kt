@@ -96,10 +96,10 @@ class HabitViewModel (
                     frequency = state.value.editFreq,
                     name = state.value.editString
                 )
-
-                updateCompletion(habitCompletion)
-                checkHabitCompletion(habit, habitCompletion)
                 updateHabit(habit)
+                updateCompletion(habitCompletion)
+
+                checkHabitCompletion(habit, habitCompletion)
             }
 
             is HabitEvent.EditHabit -> {
@@ -163,7 +163,9 @@ class HabitViewModel (
                 if (event.habitJoin.completion.completion < event.habitJoin.habit.frequency) {
                     viewModelScope.launch {
                         val habitCompletion = event.habitJoin.completion.copy(completion = event.habitJoin.completion.completion.inc())
-                        checkHabitCompletion(event.habitJoin.habit, habitCompletion)
+                        updateCompletion(habitCompletion)
+                        //delay(500)
+                        //checkHabitCompletion(event.habitJoin.habit, habitCompletion)
                     }
                 }
             }
@@ -172,7 +174,9 @@ class HabitViewModel (
                 if(event.habitJoin.completion.completion > 0){
                     viewModelScope.launch {
                         val habitCompletion = event.habitJoin.completion.copy(completion = event.habitJoin.completion.completion.dec())
-                        checkHabitCompletion(event.habitJoin.habit, habitCompletion)
+                        updateCompletion(habitCompletion)
+                        //delay(500)
+                        //checkHabitCompletion(event.habitJoin.habit, habitCompletion)
                     }
                 }
             }
@@ -208,6 +212,10 @@ class HabitViewModel (
                         )
                 }
             }
+
+            is HabitEvent.CheckCompleion -> {
+                checkHabitCompletion(event.habit.habit, event.habit.completion)
+            }
         }
     }
 
@@ -219,17 +227,18 @@ class HabitViewModel (
             habitName = join.name,
             habitFrequency = join.frequency,
             date = date
-
         )
+
         var comp: HabitCompletion = completion
         if (join.frequency == completion.completion && !completion.done){
             comp = completion.copy(done = true)
             insertRecord(habitRecord)
+            updateCompletion(comp)
         }else if(completion.done && join.frequency != completion.completion){
             comp = completion.copy(done = false)
             removeRecord(habitRecord)
+            updateCompletion(comp)
         }
-        updateCompletion(comp)
     }
 
     // removes record from the database using the dao (database access object)
@@ -278,8 +287,8 @@ class HabitViewModel (
                 }
              }
                 _state.update { it.copy(
-                    displayHabits = displayHabitRecordList,
-                    finishedDisplayHabits = finishedDisplayHabitRecordList
+                    displayHabits = (displayHabitRecordList + finishedDisplayHabitRecordList).toMutableList(),
+                    //finishedDisplayHabits = finishedDisplayHabitRecordList
                 )
                 }
          }
