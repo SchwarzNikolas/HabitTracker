@@ -18,7 +18,6 @@ data class HabitState(
 
     // list of all the habits that will be displayed
     val displayHabits: MutableList<DisplayHabit> = mutableStateListOf(),
-    val finishedDisplayHabits: MutableList<DisplayHabit> = mutableStateListOf(),
 
     //val date2: LocalDate = LocalDate.now().plusDays(1),
     // temp

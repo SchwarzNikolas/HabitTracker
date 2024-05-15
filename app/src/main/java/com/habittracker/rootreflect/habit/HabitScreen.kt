@@ -1,8 +1,9 @@
 package com.habittracker.rootreflect.habit
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,12 +17,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
@@ -44,6 +44,7 @@ import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -69,6 +70,7 @@ data class Item(
     val icon: ImageVector
     )
 private val moods: List<MoodType> = enumValues<MoodType>().toList()
+
 
 @Composable
 fun MainScreen (
@@ -102,36 +104,30 @@ fun MainScreen (
                 .width(4.dp)
         )
 
-        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-            for (displayHabit in state.displayHabits) {
-                HabitDisplay(onEvent, state, displayHabit, dropdownItems)
-            }
-            for (finishedHabit in state.finishedDisplayHabits) {
-                HabitDisplay(
-                    onEvent = onEvent,
-                    state = state,
-                    displayHabit = finishedHabit,
-                    dropdownItems = dropdownItems
+        LazyColumn (modifier = Modifier){
+            items(
+                count = state.displayHabits.size,
+                contentType = {index -> state.displayHabits[index]},
+                key = { index -> state.displayHabits[index].habitJoin.habit.habitId },
+
+            ){
+                HabitDisplay(onEvent, state, state.displayHabits[it], dropdownItems,
+                    Modifier.animateItem(
+                        fadeInSpec = spring(stiffness = Spring.StiffnessMediumLow, visibilityThreshold = 0.5f),
+                        fadeOutSpec = spring(stiffness = Spring.StiffnessMediumLow, visibilityThreshold = 0.5f),
+                        placementSpec = spring(
+                            stiffness = Spring.StiffnessMediumLow,
+                        )
+                    )
                 )
             }
-                // debug
-//            Button(onClick = { onEvent(HabitEvent.ResetCompletion) }) {
-//                Text(text = "test")
-//            }
-//            Button(onClick = { onEvent(HabitEvent.NextDay) }) {
-//                Text(text = "next day")
-//            }
-//            Text(text = state.date.dayOfWeek.toString())
-                //Text(text = state.date2.dayOfWeek.toString())
-
-
-            
+        }
         }
     }
-}
+
 
 @Composable
-fun HabitDisplay(onEvent: (HabitEvent) -> Unit, state: HabitState, displayHabit: DisplayHabit, dropdownItems: List<Item>){
+fun HabitDisplay(onEvent: (HabitEvent) -> Unit, state: HabitState, displayHabit: DisplayHabit, dropdownItems: List<Item>, modifier: Modifier = Modifier){
     val mod = Modifier
     if (displayHabit.beingEdited.value) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -162,42 +158,40 @@ fun HabitDisplay(onEvent: (HabitEvent) -> Unit, state: HabitState, displayHabit:
         DisplayMode(
             onEvent = onEvent,
             displayHabit = displayHabit,
-            dropdownItems = dropdownItems
+            dropdownItems = dropdownItems,
+            modifier = modifier
         )
     }
 }
 
 @Composable
 fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, dropdownItems: List<Item> , modifier: Modifier = Modifier){
+    println(displayHabit.habitJoin.habit.name)
+    val imageAlpha : Float by animateFloatAsState(targetValue = if(displayHabit.habitJoin.completion.done ){0.5f} else {1f})
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
         ),
         modifier = modifier
             .padding(vertical = 5.dp, horizontal = 5.dp)
-            .alpha(
-                if (displayHabit.habitJoin.completion.done) {
-                    0.5f
-                } else {
-                    1f
-                }
-            )
+            .alpha(imageAlpha)
             .clickable { onEvent(HabitEvent.IncCompletion(displayHabit.habitJoin)) },
         colors = CardDefaults.cardColors(Color.Gray)
     ) {
         Row {
             BasicText(
                 text = displayHabit.habitJoin.habit.name,
-                maxLines = 2,
+                maxLines = 4,
                 overflow = TextOverflow.Ellipsis,
-                modifier = modifier
+                modifier = Modifier
                     .padding(start = 10.dp)
                     .weight(17f),
-                style = LocalTextStyle.current.copy(fontSize = 30.sp)
+                style = LocalTextStyle.current.copy(fontSize = 30.sp,
+                    lineHeight = 30.sp)
             )
             IconButton(
                 onClick = { onEvent(HabitEvent.ContextMenuVisibility(displayHabit)) },
-                modifier = modifier.weight(2f)
+                modifier = Modifier.weight(2f)
             ) {
                 Icon(
                     imageVector = Icons.Default.MoreVert,
@@ -231,44 +225,43 @@ fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, dropd
                 }
             }
         }
-        Row(modifier = modifier.padding(bottom = 5.dp, start = 10.dp, end = 5.dp),
+        Row(modifier = Modifier.padding(bottom = 5.dp, start = 10.dp, end = 5.dp),
             verticalAlignment = Alignment.CenterVertically) {
 
-            BoxWithConstraints (modifier = modifier
+            BoxWithConstraints (modifier = Modifier
                 .weight(6f)
                 .height(50.dp)){
                 Box(
-                    modifier = modifier
+                    modifier = Modifier
                         .clip(RoundedCornerShape(10.dp))
                         .background(Color.Black)
                         .size(width = maxWidth, height = maxHeight)
-                ){
-                    Text(text = "")
-                }
+                )
                 Box(
-                    modifier = modifier
+                    modifier = Modifier
                         .clip(RoundedCornerShape(10.dp))
                         .background(Color.Green)
-                        .animateContentSize(
-                            animationSpec = tween(
-                                durationMillis = 500,
-                                easing = FastOutSlowInEasing
-                            )
+                        .animateContentSize(finishedListener = { x, y ->
+                            run {
+                                println("BBBBBBBBBBB " + displayHabit.habitJoin.habit.name)
+                                println(x)
+                                println(y)
+                                onEvent(HabitEvent.CheckCompleion(displayHabit.habitJoin))
+                            }
+                        }
                         )
                         .size(
                             maxWidth * (displayHabit.habitJoin.completion.completion.toFloat() / displayHabit.habitJoin.habit.frequency),
                             maxHeight
                         )
-                ){
-                    Text(text = "")
-                }
+                )
             }
-            Box(modifier = modifier
+            Box(modifier = Modifier
                 .padding(start = 10.dp, end = 5.dp)
                 .weight(1f),
                 contentAlignment = Alignment.Center) {
                 Text(
-                    modifier = modifier
+                    modifier = Modifier
                         .drawBehind {
                             drawCircle(
                                 color = Color.Transparent,
@@ -304,10 +297,11 @@ fun EditMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, state: H
                     capitalization = KeyboardCapitalization.Sentences,
                     keyboardType = KeyboardType.Text
                 ),
-                maxLines = 2,
+                maxLines = 4,
                 textStyle = LocalTextStyle.current.copy(
                     fontSize = 30.sp,
-                    textDecoration = TextDecoration.Underline
+                    textDecoration = TextDecoration.Underline,
+                    lineHeight = 30.sp
                 ),
                 modifier = modifier.padding(start = 10.dp),
             )
@@ -323,6 +317,7 @@ fun EditMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, state: H
                 modifier = Modifier
                     .weight(6f)
                     .height(50.dp)
+                    .padding(start = 5.dp)
             )
             Box(modifier = Modifier.weight(1f),
                 contentAlignment = Alignment.Center) {
