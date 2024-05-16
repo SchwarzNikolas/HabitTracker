@@ -12,5 +12,7 @@ sealed interface CustomHabitEvent {
     data class ToggleDay(val dayIndex: Int): CustomHabitEvent
     // SaveEdit
     data object SaveEdit: CustomHabitEvent
+    // change keyboard focus event
+    data class KeyboardFocus(val isFocused: Boolean): CustomHabitEvent
 
 }

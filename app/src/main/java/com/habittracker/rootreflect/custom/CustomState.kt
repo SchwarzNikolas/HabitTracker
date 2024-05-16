@@ -12,4 +12,6 @@ data class CustomState(
     val habitFrequency: Int = 1,
     // Represent days for weekly habits
     val completion: MutableList<MutableState<Boolean>> = MutableList(size = 7){ mutableStateOf(false) },
+    // state for keyboard focus
+    val keyboardFocus: Boolean = false
 )
