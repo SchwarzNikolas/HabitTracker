@@ -2,12 +2,14 @@ package com.habittracker.rootreflect.custom
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -41,7 +43,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -56,65 +60,72 @@ fun CustomScreen(
     state: CustomState,
     onEvent: (CustomHabitEvent) -> Unit
 ){
-    Column (
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 16.dp)
-    ) {
-        Text(
-            text = "Create new Habit!",
-            fontSize = 24.sp
-        )
-        HabitPreview(state = state)
-        Row (
-            verticalAlignment = Alignment.CenterVertically,
+    val focusManager = LocalFocusManager.current
+    Box(modifier = Modifier.pointerInput(Unit) {
+        detectTapGestures {
+            focusManager.clearFocus()
+        }
+    }){
+        Column (
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(10.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
+                .padding(top = 16.dp)
         ) {
             Text(
-                text = "Weekly",
-                modifier = Modifier.padding(end = 16.dp)
+                text = "Create new Habit!",
+                fontSize = 24.sp
             )
-            // Switch for daily/weekly habits
-            SwitchHabit(state, onEvent)
-            Text(
-                text = "Daily",
-                modifier = Modifier.padding(start = 16.dp)
-            )
+            HabitPreview(state = state)
+            Row (
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+            ) {
+                Text(
+                    text = "Weekly",
+                    modifier = Modifier.padding(end = 16.dp)
+                )
+                // Switch for daily/weekly habits
+                SwitchHabit(state, onEvent, focusManager)
+                Text(
+                    text = "Daily",
+                    modifier = Modifier.padding(start = 16.dp)
+                )
+            }
+
+            Row (
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                EditWindow(onEvent, state, focusManager)
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            HabitPreview(state = state)
         }
-
-        Row (
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            EditWindow(onEvent, state)
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        HabitPreview(state = state)
     }
 }
 
 @Composable
-fun EditWindow(onEvent: (CustomHabitEvent) -> Unit, state: CustomState) {
-    val focusManager = LocalFocusManager.current
+fun EditWindow(onEvent: (CustomHabitEvent) -> Unit, state: CustomState, manager: FocusManager) {
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth()
     ) {
-
         CustomTextField(
             value = state.habitName,
             label = "Name",
             onchange = {onEvent(CustomHabitEvent.EditName(it))},
-            manager = focusManager
+            manager = manager,
+            onEvent = onEvent,
+            state = state
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -123,23 +134,27 @@ fun EditWindow(onEvent: (CustomHabitEvent) -> Unit, state: CustomState) {
 
         Slider(
             value = state.habitFrequency.toFloat(),
-            onValueChange = { onEvent(CustomHabitEvent.EditFreq(it.toInt()))
+            onValueChange = {
+                onEvent(CustomHabitEvent.EditFreq(it.toInt()))
+                manager.clearFocus()
             },
             valueRange = 1f..9f,
             steps = 7,
-            modifier = Modifier.fillMaxWidth(0.8f)
-
+            modifier = Modifier
+                .fillMaxWidth(0.8f)
         )
 
         // Spacer(modifier = Modifier.height(16.dp))
 
         if (!state.isDaily)
-            WeeklyFields(state, onEvent, focusManager)
+            WeeklyFields(state, onEvent, manager)
 
         // Spacer(modifier = Modifier.height(8.dp))
 
         Button(
-            onClick = { onEvent(CustomHabitEvent.SaveEdit)}
+            onClick = {
+                onEvent(CustomHabitEvent.SaveEdit)
+                manager.clearFocus()}
         ) {
             Text(
                 text = "Save",
@@ -155,10 +170,12 @@ fun EditWindow(onEvent: (CustomHabitEvent) -> Unit, state: CustomState) {
 
 
 @Composable
-fun SwitchHabit(state: CustomState, onEvent: (CustomHabitEvent) -> Unit) {
+fun SwitchHabit(state: CustomState, onEvent: (CustomHabitEvent) -> Unit, manager: FocusManager) {
     Switch(
         checked = state.isDaily,
-        onCheckedChange = { onEvent(CustomHabitEvent.UpdateDaily)},
+        onCheckedChange = {
+            onEvent(CustomHabitEvent.UpdateDaily)
+            manager.clearFocus()},
         colors = SwitchDefaults.colors(
             checkedThumbColor = MaterialTheme.colorScheme.primary,
             checkedTrackColor = MaterialTheme.colorScheme.primaryContainer,
@@ -169,7 +186,7 @@ fun SwitchHabit(state: CustomState, onEvent: (CustomHabitEvent) -> Unit) {
 }
 
 @Composable
-fun WeeklyFields(state: CustomState, onEvent: (CustomHabitEvent) -> Unit, focusManager: FocusManager) {
+fun WeeklyFields(state: CustomState, onEvent: (CustomHabitEvent) -> Unit, manager: FocusManager) {
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -177,7 +194,6 @@ fun WeeklyFields(state: CustomState, onEvent: (CustomHabitEvent) -> Unit, focusM
             .padding(top = 16.dp)
     ) {
         Text("Days")
-
         // Days buttons
         Row (
             modifier = Modifier
@@ -188,10 +204,9 @@ fun WeeklyFields(state: CustomState, onEvent: (CustomHabitEvent) -> Unit, focusM
             for (index in 0 until 7) {
                 val day = listOf("M", "T", "W", "T", "F", "S", "S")[index]
                 val clicked = state.completion[index].value
-                DayButton(day, clicked, onEvent, index)
+                DayButton(day, clicked, onEvent, index, manager)
             }
         }
-
         Spacer(modifier = Modifier.height(16.dp))
     }
 }
@@ -201,7 +216,8 @@ fun DayButton(
     day: String,
     clicked: Boolean,
     onEvent: (CustomHabitEvent) -> Unit,
-    dayIndex: Int
+    dayIndex: Int,
+    manager: FocusManager
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -209,7 +225,9 @@ fun DayButton(
     ) {
         Text(text = day)
         OutlinedButton(
-            onClick = { onEvent(CustomHabitEvent.ToggleDay(dayIndex)) },
+            onClick = {
+                onEvent(CustomHabitEvent.ToggleDay(dayIndex))
+                manager.clearFocus()},
             modifier = Modifier
                 .size(width = 40.dp, height = 40.dp),
             border = BorderStroke(1.dp, Color.Black),
@@ -226,7 +244,9 @@ fun CustomTextField(
     value: String,
     label: String,
     onchange: (String) -> Unit,
-    manager: FocusManager
+    manager: FocusManager,
+    state: CustomState,
+    onEvent: (CustomHabitEvent) -> Unit
 ) {
     TextField(
         value = value,
@@ -241,10 +261,16 @@ fun CustomTextField(
             keyboardType = KeyboardType.Text
         ),
         keyboardActions = KeyboardActions(onDone = {
-            manager.moveFocus(FocusDirection.Down) }),
+            //manager.moveFocus(FocusDirection.Down)
+            manager.clearFocus()}),
         singleLine = true,
         modifier = Modifier
-            //.height(50.dp)
+            .onFocusChanged {
+                if (state.keyboardFocus && it.isFocused.not()) {
+                    manager.clearFocus()
+                }
+                onEvent(CustomHabitEvent.KeyboardFocus(it.isFocused))
+            }
             .fillMaxWidth(0.5f),
         shape = CircleShape
     )

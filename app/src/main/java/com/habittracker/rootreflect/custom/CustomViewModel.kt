@@ -82,6 +82,13 @@ class CustomViewModel(
                     dao.upsertCompletion(HabitCompletion(occurrence = habitOccurrence))
                 }
             }
+            is CustomHabitEvent.KeyboardFocus -> {
+                _state.update {
+                    it.copy(
+                        keyboardFocus = event.isFocused
+                    )
+                }
+            }
         }
     }
 }
