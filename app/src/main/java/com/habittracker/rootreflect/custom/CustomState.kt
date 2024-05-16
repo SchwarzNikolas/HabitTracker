@@ -1,6 +1,5 @@
 package com.habittracker.rootreflect.custom
 
-import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 
