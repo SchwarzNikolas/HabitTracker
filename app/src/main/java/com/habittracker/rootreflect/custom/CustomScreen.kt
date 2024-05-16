@@ -20,6 +20,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
@@ -36,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,6 +53,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
 
 @Composable
 fun CustomScreen(
@@ -106,6 +109,9 @@ fun CustomScreen(
             Spacer(modifier = Modifier.weight(1f))
 
             HabitPreview(state = state)
+            if (state.showDialog){
+                Save_Dialog(onEvent)
+            }
         }
     }
 }
@@ -151,6 +157,7 @@ fun EditWindow(onEvent: (CustomHabitEvent) -> Unit, state: CustomState, manager:
         Button(
             onClick = {
                 onEvent(CustomHabitEvent.SaveEdit)
+                onEvent(CustomHabitEvent.ToggleDialog)
                 manager.clearFocus()}
         ) {
             Text(
@@ -335,4 +342,28 @@ fun HabitPreview(state: CustomState){
             }
         }
     }
+}
+
+@Composable
+fun Save_Dialog(onEvent: (CustomHabitEvent) -> Unit){
+    LaunchedEffect(Unit) {
+        delay(1500)
+        onEvent(CustomHabitEvent.ToggleDialog)
+    }
+    AlertDialog(
+        onDismissRequest = { onEvent(CustomHabitEvent.ToggleDialog) },
+        title = {
+            Text(text = "Habit has been saved")
+        },
+        confirmButton = {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Button(onClick = { onEvent(CustomHabitEvent.ToggleDialog) }) {
+                    Text("OK")
+                }
+            }
+        }
+    )
 }
