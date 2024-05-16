@@ -13,5 +13,7 @@ data class CustomState(
     // Represent days for weekly habits
     val completion: MutableList<MutableState<Boolean>> = MutableList(size = 7){ mutableStateOf(false) },
     // state for keyboard focus
-    val keyboardFocus: Boolean = false
+    val keyboardFocus: Boolean = false,
+    // state for save dialog
+    val showDialog: Boolean = false
 )

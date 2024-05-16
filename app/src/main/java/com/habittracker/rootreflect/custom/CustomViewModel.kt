@@ -89,6 +89,13 @@ class CustomViewModel(
                     )
                 }
             }
+            is CustomHabitEvent.ToggleDialog -> {
+                _state.update {
+                    it.copy(
+                        showDialog = state.value.showDialog.not()
+                    )
+                }
+            }
         }
     }
 }
