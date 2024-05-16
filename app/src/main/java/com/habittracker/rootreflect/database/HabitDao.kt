@@ -5,7 +5,6 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Upsert
-import com.habittracker.rootreflect.habit.MoodType
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
@@ -68,7 +67,6 @@ interface HabitDao{
     @Query("SELECT * FROM Habit")
     fun fetchHabits(): Flow<List<Habit>>
 
-
     @Query("SELECT * FROM HabitCompletion")
     fun getHabit(): Flow<List<HabitCompletion>>
 
@@ -78,6 +76,4 @@ interface HabitDao{
     @Query("SELECT * FROM MoodRecord")
     fun fetchMoodRecords(): Flow<List<MoodRecord>>
 
-    @Query("UPDATE MoodRecord SET mood = :mood WHERE moodDate = :date")
-    suspend fun updateMoodRec(date: String, mood: MoodType)
 }
