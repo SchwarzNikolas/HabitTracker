@@ -285,7 +285,7 @@ fun HabitPreview(state: CustomState){
     ) {
         Row {
             BasicText(
-                text = state.habitName,
+                text = if (state.habitName == ""){"Habit preview"} else {state.habitName},
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
