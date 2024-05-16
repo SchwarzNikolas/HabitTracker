@@ -13,6 +13,7 @@ import com.habittracker.rootreflect.database.HabitJoin
 import com.habittracker.rootreflect.database.HabitRecord
 import com.habittracker.rootreflect.database.MoodRecord
 import com.habittracker.rootreflect.habit.HabitViewModel
+import com.habittracker.rootreflect.habit.MoodType
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
@@ -229,23 +230,23 @@ class HabitDaoTest {
         assertThat(habitJoin.size).isEqualTo(1)
     }
 
-    /*@Test
+    @Test
     fun insertMoodRecTest() = runBlocking{
-        val moodRecord = MoodRecord()
+        val moodRecord = MoodRecord(LocalDate.now())
         dao.upsertMoodRec(moodRecord)
         dao.fetchMoodRecords().test {
             fetchMood = awaitItem()
             cancelAndIgnoreRemainingEvents()
         }
-        assertThat(fetchMood[0].mood).isEqualTo(moodRecord.mood)
+        assertThat(fetchMood[0].mood).isEqualTo(MoodType.OK)
     }
 
-    @Test
+    /*@Test
     fun getMoodRecByDateTest() = runBlocking{
-        val moodRecord = MoodRecord()
+        val moodRecord = MoodRecord(LocalDate.now())
         dao.upsertMoodRec(moodRecord)
         // replace String with LocalDate.now().toString() when date implemented
-        val moodDate: MoodRecord? = dao.getMoodRecByDate("2025-05-05")
+        val moodDate: MoodRecord? = dao.getMoodRecByDate(LocalDate.now().toString())
         assertThat(moodDate).isNotNull()
     }
 

@@ -18,8 +18,6 @@ interface HabitDao{
     @Query("Select * from DateRecord limit 1")
     suspend fun getDate(): DateRecord
 
-    @Upsert
-    suspend fun upsertMoodRec(moodRec: MoodRecord)
     @Upsert()
     suspend fun upsertDate(dateRecord: DateRecord)
     // defines sql query to be executed on the database
@@ -53,33 +51,33 @@ interface HabitDao{
     @Query("DELETE FROM HabitRecord WHERE habitName = :name AND date = :date")
     suspend fun deleteRecord(name: String, date: LocalDate)
 
-
-
-    // Fetch all MoodRecords
-    // Updates or Inserts a moodRecord
-    @Query("SELECT * FROM MoodRecord")
-    fun fetchMoodRecords(): Flow<List<MoodRecord>>
-
+    // Get the moodRec by the date
     @Query("SELECT * FROM MoodRecord WHERE moodDate = :date LIMIT 1")
     suspend fun getMoodRecByDate(date: String): MoodRecord?
 
+    // Updates or Inserts a moodRecord
     @Upsert
-    suspend fun insertMoodRec(moodRec: MoodRecord)
-
-    @Query("UPDATE MoodRecord SET mood = :mood WHERE moodDate = :date")
-    suspend fun updateMoodRec(date: String, mood: MoodType)
-
+    suspend fun upsertMoodRec(moodRec: MoodRecord)
 
     @Query("select moodDate from MoodRecord")
     fun fetchDates():Flow<List<LocalDate>>
 
+
+
     // for testing
     @Query("SELECT * FROM Habit")
     fun fetchHabits(): Flow<List<Habit>>
+
 
     @Query("SELECT * FROM HabitCompletion")
     fun getHabit(): Flow<List<HabitCompletion>>
 
     @Upsert
     fun updateHabit(habit: Habit)
+
+    @Query("SELECT * FROM MoodRecord")
+    fun fetchMoodRecords(): Flow<List<MoodRecord>>
+
+    @Query("UPDATE MoodRecord SET mood = :mood WHERE moodDate = :date")
+    suspend fun updateMoodRec(date: String, mood: MoodType)
 }

@@ -204,7 +204,7 @@ class HabitViewModel (
                     )
                 }
                 viewModelScope.launch {
-                        dao.insertMoodRec(
+                        dao.upsertMoodRec(
                             moodRec = MoodRecord(
                                 moodDate = date,
                                 mood = event.moodType
