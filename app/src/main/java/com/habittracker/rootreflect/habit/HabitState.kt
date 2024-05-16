@@ -23,4 +23,6 @@ data class HabitState(
     // temp
 
     val selectedMood: MoodType? = null,
+
+    val showNotification: Boolean = false
     )

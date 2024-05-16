@@ -15,4 +15,6 @@ sealed interface CustomHabitEvent {
     // change keyboard focus event
     data class KeyboardFocus(val isFocused: Boolean): CustomHabitEvent
 
+    data object ToggleNotificationVisibility : CustomHabitEvent
+
 }

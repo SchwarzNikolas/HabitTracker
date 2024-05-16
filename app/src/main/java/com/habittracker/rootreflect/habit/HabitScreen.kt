@@ -1,9 +1,12 @@
 package com.habittracker.rootreflect.habit
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -81,40 +84,52 @@ fun MainScreen (
     val dropdownItems: List<Item> = listOf(
         Item(
             name = "Edit",
-            onClick = { habit: DisplayHabit -> onEvent(HabitEvent.EditHabit(habit)) },
+            onClick = { displayHabit: DisplayHabit -> onEvent(HabitEvent.EditHabit(displayHabit)) },
             Icons.Default.Edit
         ),
         Item(
             name = "Undo",
-            onClick = { habit: DisplayHabit -> onEvent(HabitEvent.DecCompletion(habit.habitJoin)) },
+            onClick = { displayHabit: DisplayHabit -> onEvent(HabitEvent.DecCompletion(displayHabit.habit)) },
             Icons.Default.ArrowBack
         ),
         Item(
             name = "Delete",
-            onClick = { habit: DisplayHabit -> onEvent(HabitEvent.DeleteHabit(habit.habitJoin)) },
+            onClick = { displayHabit: DisplayHabit -> onEvent(HabitEvent.DeleteHabit(displayHabit.habit)) },
             Icons.Default.Delete
         )
     )
+
     Column {
         // Mood part of the screen
-        MoodSection(state, Modifier, onEvent)
-        Divider(
+        Box {
+            MoodSection(state, Modifier, onEvent)
+            NotificationBox(visable = state.showNotification,
+                {onEvent(HabitEvent.ToggleVisability)} , state.editString)
+        }
+            Divider(
             modifier = Modifier
                 .fillMaxWidth()
                 .width(4.dp)
         )
 
-        LazyColumn (modifier = Modifier){
+        LazyColumn(modifier = Modifier) {
             items(
                 count = state.displayHabits.size,
-                contentType = {index -> state.displayHabits[index]},
-                key = { index -> state.displayHabits[index].habitJoin.habit.habitId },
+                contentType = { index -> state.displayHabits[index] },
+                key = { index -> state.displayHabits[index].habit.name },
 
-            ){
-                HabitDisplay(onEvent, state, state.displayHabits[it], dropdownItems,
+                ) {
+                HabitDisplay(
+                    onEvent, state, state.displayHabits[it], dropdownItems,
                     Modifier.animateItem(
-                        fadeInSpec = spring(stiffness = Spring.StiffnessMediumLow, visibilityThreshold = 0.5f),
-                        fadeOutSpec = spring(stiffness = Spring.StiffnessMediumLow, visibilityThreshold = 0.5f),
+                        fadeInSpec = spring(
+                            stiffness = Spring.StiffnessMediumLow,
+                            visibilityThreshold = 0.5f
+                        ),
+                        fadeOutSpec = spring(
+                            stiffness = Spring.StiffnessMediumLow,
+                            visibilityThreshold = 0.5f
+                        ),
                         placementSpec = spring(
                             stiffness = Spring.StiffnessMediumLow,
                         )
@@ -122,8 +137,9 @@ fun MainScreen (
                 )
             }
         }
-        }
     }
+}
+
 
 
 @Composable
@@ -132,7 +148,7 @@ fun HabitDisplay(onEvent: (HabitEvent) -> Unit, state: HabitState, displayHabit:
     if (displayHabit.beingEdited.value) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(modifier = mod.weight(1f),
-                onClick = { onEvent(HabitEvent.ModifyHabit(displayHabit.habitJoin)) }
+                onClick = { onEvent(HabitEvent.ModifyHabit(displayHabit)) }
             ) {
                 Icon(
                     imageVector = Icons.Default.Check,
@@ -166,8 +182,7 @@ fun HabitDisplay(onEvent: (HabitEvent) -> Unit, state: HabitState, displayHabit:
 
 @Composable
 fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, dropdownItems: List<Item> , modifier: Modifier = Modifier){
-    println(displayHabit.habitJoin.habit.name)
-    val imageAlpha : Float by animateFloatAsState(targetValue = if(displayHabit.habitJoin.completion.done ){0.5f} else {1f})
+    val imageAlpha : Float by animateFloatAsState(targetValue = if(displayHabit.habit.done ){0.5f} else {1f})
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
@@ -175,12 +190,12 @@ fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, dropd
         modifier = modifier
             .padding(vertical = 5.dp, horizontal = 5.dp)
             .alpha(imageAlpha)
-            .clickable { onEvent(HabitEvent.IncCompletion(displayHabit.habitJoin)) },
+            .clickable { onEvent(HabitEvent.IncCompletion(displayHabit.habit)) },
         colors = CardDefaults.cardColors(Color.Gray)
     ) {
         Row {
             BasicText(
-                text = displayHabit.habitJoin.habit.name,
+                text = displayHabit.habit.name,
                 maxLines = 4,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
@@ -243,15 +258,12 @@ fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, dropd
                         .background(Color.Green)
                         .animateContentSize(finishedListener = { x, y ->
                             run {
-                                println("BBBBBBBBBBB " + displayHabit.habitJoin.habit.name)
-                                println(x)
-                                println(y)
-                                onEvent(HabitEvent.CheckCompleion(displayHabit.habitJoin))
+                                onEvent(HabitEvent.CheckCompleion(displayHabit.habit))
                             }
                         }
                         )
                         .size(
-                            maxWidth * (displayHabit.habitJoin.completion.completion.toFloat() / displayHabit.habitJoin.habit.frequency),
+                            maxWidth * (displayHabit.habit.completion.toFloat() / displayHabit.habit.frequency),
                             maxHeight
                         )
                 )
@@ -268,7 +280,7 @@ fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, dropd
                                 radius = 60f
                             )
                         },
-                    text = displayHabit.habitJoin.habit.frequency.toString()
+                    text = displayHabit.habit.frequency.toString()
                 )
             }
         }
@@ -334,7 +346,7 @@ fun EditMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, state: H
             }
         }
         // chose days
-        if (displayHabit.habitJoin.completion.occurrence.contains("0")) {
+        if (displayHabit.habit.occurrence.contains("0")) {
             DaysSelection(onEvent, state)
         }
     }
@@ -423,4 +435,28 @@ fun MoodSection(state: HabitState, modifier: Modifier, event : (HabitEvent)-> Un
             )
         }
     }
+}
+
+@Composable
+fun NotificationBox(visable : Boolean, action: () -> Unit, text: String){
+    AnimatedVisibility(visible = visable,
+        enter = slideInHorizontally { fullWidth: Int ->  -fullWidth},
+        exit = fadeOut()) {
+        ElevatedCard(
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 6.dp
+            ),
+            modifier = Modifier
+                .padding(vertical = 5.dp, horizontal = 5.dp),
+            colors = CardDefaults.cardColors(Color.Gray)
+        ){
+            Box(modifier = Modifier.padding(5.dp)) {
+                Text(text = text)
+            }
+    }
+}
+    if (visable){
+        action()
+    }
+
 }

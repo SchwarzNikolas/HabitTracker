@@ -88,7 +88,7 @@ class MainActivity : ComponentActivity() {
         }
 
         val notification = NotificationService(applicationContext)
-        notification.scheduleDailyNotification(19, 21)
+        notification.showNotification()
     }
 
     private fun createNotificationChannel() {

@@ -51,6 +51,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.habittracker.rootreflect.habit.NotificationBox
 
 @Composable
 fun CustomScreen(
@@ -63,6 +64,7 @@ fun CustomScreen(
             focusManager.clearFocus()
         }
     }){
+
         Column (
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
@@ -107,6 +109,7 @@ fun CustomScreen(
 
             HabitPreview(state = state)
         }
+        NotificationBox(visable = state.notificationVisibility, action = { onEvent(CustomHabitEvent.ToggleNotificationVisibility) }, text = state.notificationText)
     }
 }
 

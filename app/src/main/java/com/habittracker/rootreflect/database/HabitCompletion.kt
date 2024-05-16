@@ -6,15 +6,15 @@ import androidx.room.PrimaryKey
 
 
 @Entity(foreignKeys = [ForeignKey(entity = Habit::class,
-    parentColumns = arrayOf("habitId"),
-    childColumns = arrayOf("habitID"),
+    parentColumns = arrayOf("name"),
+    childColumns = arrayOf("habitName"),
     onDelete = 5
         )
     ]
 )
 data class HabitCompletion (
-    @PrimaryKey(autoGenerate = true)
-    val habitID: Int = 0,
+    @PrimaryKey
+    val habitName: String = "",
     val completion: Int = 0,
     val done: Boolean = false,
     val occurrence: String = "1111111"

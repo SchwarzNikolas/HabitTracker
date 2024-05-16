@@ -114,7 +114,7 @@ class HabitDaoTest {
     fun insertHabitRecordTest() = runBlocking {
         // create habitRecord and insert it into the database
         val habitRecord = HabitRecord(0, "Testing", 1, LocalDate.now())
-        dao.insertRecord(habitRecord)
+        dao.upsertRecord(habitRecord)
         // fetch records and check if the inserted one is in the list
         dao.fetchHabitRecords().test {
             habitRecords = awaitItem()
@@ -127,9 +127,9 @@ class HabitDaoTest {
     fun deleteHabitRecordTest() = runBlocking {
         // create habitRecord and insert it into the database
         var habitRecord = HabitRecord(0, "Testing", 1, LocalDate.now())
-        dao.insertRecord(habitRecord)
+        dao.upsertRecord(habitRecord)
         habitRecord = HabitRecord(0, "Testing2", 1, LocalDate.now())
-        dao.insertRecord(habitRecord)
+        dao.upsertRecord(habitRecord)
         // fetch records and check if the inserted one is in the list
         dao.fetchHabitRecords().test {
             habitRecords = awaitItem()
