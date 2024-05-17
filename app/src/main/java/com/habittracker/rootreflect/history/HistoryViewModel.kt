@@ -1,6 +1,7 @@
 package com.habittracker.rootreflect.history
 
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.habittracker.rootreflect.database.HabitDao
@@ -21,6 +22,36 @@ class HistoryViewModel(
     val state = _state
 
     init {
+        /*
+        start of debugging section
+        insert fake mood data
+         */
+//        viewModelScope.launch {
+//            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2023, 11, 2), MoodType.GOOD))
+//            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2023, 11, 3), MoodType.BAD))
+//            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2023, 11, 4), MoodType.ALRIGHT))
+//            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2023, 12, 24), MoodType.SO_SO))
+//            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2024, 5, 1), MoodType.OK))
+//            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2024, 5, 2), MoodType.GOOD))
+//            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2024, 5, 3), MoodType.ALRIGHT))
+//            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2024, 5, 4), MoodType.OK))
+//            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2024, 5, 5), MoodType.GOOD))
+//            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2024, 5, 6), MoodType.OK))
+//            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2024, 5, 7), MoodType.BAD))
+//            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2024, 5, 8), MoodType.GOOD))
+//            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2024, 5, 9), MoodType.SO_SO))
+//            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2024, 5, 10), MoodType.OK))
+//            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2024, 5, 11), MoodType.GOOD))
+//            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2024, 5, 12), MoodType.BAD))
+//            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2024, 5, 13), MoodType.ALRIGHT))
+//            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2024, 5, 14), MoodType.OK))
+//            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2024, 5, 15), MoodType.GOOD))
+//            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2024, 5, 16), MoodType.GOOD))
+//            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2024, 5, 17), MoodType.OK))
+//        }
+        /*
+        leaving the debugging section
+         */
         viewModelScope.launch {
             dao.fetchDates().collect { dates ->
                 run {
@@ -108,7 +139,6 @@ class HistoryViewModel(
                             for (record in habitRecords){
                                 records.add(record)
                             }
-                            println("test")
                             _state.update {
                                 it.copy(
                                     habitList = records,
@@ -147,7 +177,7 @@ class HistoryViewModel(
                 )
                 // get the mood of the current date out of the database
                 val mood = dao.getMoodRecByDate(date.toString())?.mood
-                val colour = mood?.moodColor ?: state.value.dayPassiveColour
+                val colour = mood?.moodColor?.let { Color(it) } ?: state.value.dayPassiveColour
                 val moodName = mood?.name ?: "No mood"
                 // add it to the list
                 days.add(

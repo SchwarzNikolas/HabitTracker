@@ -1,5 +1,7 @@
 package com.habittracker.rootreflect.history
 
+import androidx.compose.ui.graphics.Color
+import com.habittracker.rootreflect.ui.theme.ForestShadow
 import java.time.LocalDate
 
 data class DayOfMonth(
@@ -8,6 +10,6 @@ data class DayOfMonth(
     Will be displayed in the calendar and bottom sheet
      */
     val mood: String,
-    val colour: Long = 0xFF000000,
+    val colour: Color = ForestShadow,
     val date: LocalDate,
 )

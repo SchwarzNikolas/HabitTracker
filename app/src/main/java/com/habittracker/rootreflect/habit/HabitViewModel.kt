@@ -212,9 +212,11 @@ class HabitViewModel (
                         selectedMood = event.moodType
                     )
                 }
+                //val dateTest = LocalDate.now()
                 viewModelScope.launch {
                         dao.upsertMoodRec(
                             moodRec = MoodRecord(
+                                //moodDate = dateTest,
                                 moodDate = date,
                                 mood = event.moodType
                             )

@@ -191,7 +191,7 @@ fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, dropd
             .padding(vertical = 5.dp, horizontal = 5.dp)
             .alpha(imageAlpha)
             .clickable { onEvent(HabitEvent.IncCompletion(displayHabit.habit)) },
-        colors = CardDefaults.cardColors(Color.Gray)
+        //colors = CardDefaults.cardColors(Color.Gray)
     ) {
         Row {
             BasicText(
@@ -259,6 +259,7 @@ fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, dropd
                         .animateContentSize(finishedListener = { x, y ->
                             run {
                                 onEvent(HabitEvent.CheckCompleion(displayHabit.habit))
+
                             }
                         }
                         )
@@ -270,17 +271,11 @@ fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, dropd
             }
             Box(modifier = Modifier
                 .padding(start = 10.dp, end = 5.dp)
-                .weight(1f),
-                contentAlignment = Alignment.Center) {
-                Text(
-                    modifier = Modifier
-                        .drawBehind {
-                            drawCircle(
-                                color = Color.Transparent,
-                                radius = 60f
-                            )
-                        },
-                    text = displayHabit.habit.frequency.toString()
+               .clip(RoundedCornerShape(10.dp))
+                .weight(1f).background(Color.Red),
+                contentAlignment = Alignment.Center,) {
+                Text(modifier = Modifier.padding(bottom = 2.dp),
+                    text = displayHabit.habitJoin.habit.frequency.toString()
                 )
             }
         }
@@ -331,16 +326,12 @@ fun EditMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, state: H
                     .height(50.dp)
                     .padding(start = 5.dp)
             )
-            Box(modifier = Modifier.weight(1f),
-                contentAlignment = Alignment.Center) {
-                Text(
-                    modifier = Modifier
-                        .drawBehind {
-                            drawCircle(
-                                color = Color.Transparent,
-                                radius = 60f
-                            )
-                        },
+            Box(modifier = Modifier
+                .padding(start = 10.dp, end = 5.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .weight(1f).background(Color.Red),
+                contentAlignment = Alignment.Center,) {
+                Text(modifier = Modifier.padding(bottom = 2.dp),
                     text = state.editFreq.toString()
                 )
             }
