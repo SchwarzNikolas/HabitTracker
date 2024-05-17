@@ -23,15 +23,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -41,11 +36,8 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import com.habittracker.rootreflect.database.HabitRecord
@@ -158,9 +150,9 @@ fun InfoSheet(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
                 Column {
                     if (state.selectedMood != "No mood") {
                         Text(
-                            text = "On the " + state.selectedDate?.dayOfMonth.toString() + " of "
-                                    + state.selectedDate?.month?.name?.substring(0, 1)
-                                    + state.selectedDate?.month?.name?.substring(1)?.lowercase()
+                            text = "On the " + state.selectedDate.dayOfMonth.toString() + " of "
+                                    + state.selectedDate.month?.name?.substring(0, 1)
+                                    + state.selectedDate.month?.name?.substring(1)?.lowercase()
                                     + " " + state.selectedYear.toString()
                                     + " you felt " + state.selectedMood.lowercase() + ".",
                             textAlign = TextAlign.Center,
@@ -169,9 +161,9 @@ fun InfoSheet(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
                     }
                     else {
                         Text(
-                            text = "On the " + state.selectedDate?.dayOfMonth.toString() + " of "
-                                + state.selectedDate?.month?.name?.substring(0, 1)
-                                + state.selectedDate?.month?.name?.substring(1)?.lowercase()
+                            text = "On the " + state.selectedDate.dayOfMonth.toString() + " of "
+                                + state.selectedDate.month?.name?.substring(0, 1)
+                                + state.selectedDate.month?.name?.substring(1)?.lowercase()
                                 + " " + state.selectedYear.toString()
                                 + " you logged no mood.",
                             textAlign = TextAlign.Center,
@@ -266,7 +258,7 @@ fun DailyBox(onEvent: (HistoryEvent) -> Unit, dayOfMonth: DayOfMonth, state: His
         modifier = Modifier
             .size(width = 25.dp, height = 25.dp),
         shape = RoundedCornerShape(5.dp),
-        colors = ButtonDefaults.buttonColors(Color(dayOfMonth.colour)),
+        colors = ButtonDefaults.buttonColors(dayOfMonth.colour),
         onClick = {
             onEvent(HistoryEvent.EnableBottomSheet)
             onEvent(HistoryEvent.ChangeSelectedDay(dayOfMonth.date, dayOfMonth.mood))},
