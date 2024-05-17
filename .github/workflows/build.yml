@@ -6,7 +6,10 @@ jobs:
     steps:
       - name: Checkout the code
         uses: actions/checkout@v2
-      - name: Download java 17 jdk
-        run: sudo apt-get install -y openjdk-17-jdk
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: '17'
       - name: build the app
         run: ./gradlew build
