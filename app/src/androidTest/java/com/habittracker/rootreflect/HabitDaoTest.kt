@@ -34,6 +34,7 @@ class HabitDaoTest {
     private var habitCompletion: List<HabitCompletion> = listOf()
     private var habitJoin: List<HabitJoin> = listOf()
     private lateinit var fetchMood: List<MoodRecord>
+    private var fetchDates: List<LocalDate> = listOf()
 
     @Before
     fun setUp(){
@@ -231,7 +232,7 @@ class HabitDaoTest {
     }
 
     @Test
-    fun insertMoodRecTest() = runBlocking{
+    fun upsertMoodRecTest() = runBlocking{
         val moodRecord = MoodRecord(LocalDate.now())
         dao.upsertMoodRec(moodRecord)
         dao.fetchMoodRecords().test {
@@ -241,7 +242,7 @@ class HabitDaoTest {
         assertThat(fetchMood[0].mood).isEqualTo(MoodType.OK)
     }
 
-    /*@Test
+    @Test
     fun getMoodRecByDateTest() = runBlocking{
         val moodRecord = MoodRecord(LocalDate.now())
         dao.upsertMoodRec(moodRecord)
@@ -249,30 +250,13 @@ class HabitDaoTest {
         val moodDate: MoodRecord? = dao.getMoodRecByDate(LocalDate.now().toString())
         assertThat(moodDate).isNotNull()
     }
-
     @Test
-    fun updateMoodRecTest() = runBlocking {
-        val moodRecord = MoodRecord()
-        dao.upsertMoodRec(moodRecord)
-        dao.updateMoodRec("2025-05-05", MoodType.GOOD)
-        dao.fetchMoodRecords().test {
-            fetchMood = awaitItem()
+    fun fetchDatesTest() = runBlocking {
+        dao.upsertMoodRec(moodRec = MoodRecord(LocalDate.now()))
+        dao.fetchDates().test {
+            fetchDates = awaitItem()
             cancelAndIgnoreRemainingEvents()
         }
-        assertThat(fetchMood[0].mood.moodColor).isEqualTo(0xFF008000)
+        assertThat(fetchDates[0]).isEqualTo(LocalDate.now())
     }
-
-    @Test
-    fun deleteMoodRecordTest() = runBlocking {
-        var moodRecord = MoodRecord(1, "2024-05-05", MoodType.GOOD)
-        dao.upsertMoodRec(moodRecord)
-        moodRecord = MoodRecord(2, "2025-05-05", MoodType.BAD)
-        dao.upsertMoodRec(moodRecord)
-        dao.deleteMoodRecord("2025-05-05")
-        dao.fetchMoodRecords().test {
-            fetchMood = awaitItem()
-            cancelAndIgnoreRemainingEvents()
-        }
-        assertThat(fetchMood.size).isEqualTo(1)
-    }*/
 }

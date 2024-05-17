@@ -15,7 +15,12 @@ data class CustomState(
     // state for keyboard focus
     val keyboardFocus: Boolean = false,
 
+
     val notificationText: String = "",
 
-    val notificationVisibility: Boolean = false
+    val notificationVisibility: Boolean = false,
+
+    // state for save dialog
+    val showDialog: Boolean = false
+
 )

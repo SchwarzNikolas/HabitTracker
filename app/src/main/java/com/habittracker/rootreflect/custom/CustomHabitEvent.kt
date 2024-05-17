@@ -14,6 +14,8 @@ sealed interface CustomHabitEvent {
     data object SaveEdit: CustomHabitEvent
     // change keyboard focus event
     data class KeyboardFocus(val isFocused: Boolean): CustomHabitEvent
+    // toggle save Dialog
+    data object ToggleDialog: CustomHabitEvent
 
     data object ToggleNotificationVisibility : CustomHabitEvent
 

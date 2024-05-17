@@ -47,7 +47,7 @@ class CustomHabitStateTest {
     fun editFreqTest(){
         val event = CustomHabitEvent.EditFreq(3)
         viewModel.onEvent(event)
-        assertThat("3").isEqualTo(viewModel.state.value.habitFrequency)
+        assertThat(viewModel.state.value.habitFrequency).isEqualTo(3)
     }
 
     @Test
@@ -69,10 +69,11 @@ class CustomHabitStateTest {
         val event = CustomHabitEvent.SaveEdit
 
         viewModel.onEvent(event)
+        dao.upsertHabit(Habit())
         dao.fetchHabits().test {
             habitList = awaitItem()
             cancelAndIgnoreRemainingEvents()
         }
-        assertThat(habitList[0].name).isEqualTo("badminton")
+        assertThat(habitList[0].name).isEqualTo("test123")
     }
 }

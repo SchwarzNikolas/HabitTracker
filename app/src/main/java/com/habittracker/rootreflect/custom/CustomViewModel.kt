@@ -83,7 +83,7 @@ class CustomViewModel(
                     try {
                         dao.insertHabit(newCusHabit)
                     }catch (e: Exception){
-                        text = "Error: Name already Exists"
+                        text = "Error: Habit already Exists"
                         return@launch
                     }finally {
                         state.update { it.copy(notificationVisibility = true,
@@ -100,12 +100,23 @@ class CustomViewModel(
                 }
             }
 
+
             CustomHabitEvent.ToggleNotificationVisibility -> {
                 viewModelScope.launch {
                     delay(2000)
-                    state.update { it.copy(
-                        notificationVisibility = false
-                    ) }
+                    state.update {
+                        it.copy(
+                            notificationVisibility = false
+                        )
+                    }
+                }
+            }
+            is CustomHabitEvent.ToggleDialog -> {
+                _state.update {
+                    it.copy(
+                        showDialog = state.value.showDialog.not()
+                    )
+
                 }
             }
         }
