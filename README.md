@@ -82,6 +82,7 @@ If you have any feedback, issues, or feature requests, please file an [file an i
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/StackedFrog"><img src="https://avatars.githubusercontent.com/u/147399576?v=4?s=100" width="100px;" alt="StackedFrog"/><br /><sub><b>StackedFrog</b></sub></a><br /><a href="https://github.com/SchwarzNikolas/RootReflect/commits?author=StackedFrog" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/martamoroni"><img src="https://avatars.githubusercontent.com/u/158204474?v=4?s=100" width="100px;" alt="martamoroni"/><br /><sub><b>martamoroni</b></sub></a><br /><a href="https://github.com/SchwarzNikolas/RootReflect/commits?author=martamoroni" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/peishh"><img src="https://avatars.githubusercontent.com/u/159452498?v=4?s=100" width="100px;" alt="PeiShan Lu"/><br /><sub><b>PeiShan Lu</b></sub></a><br /><a href="https://github.com/SchwarzNikolas/RootReflect/commits?author=peishh" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Sven-Lindstroem"><img src="https://avatars.githubusercontent.com/u/117860880?v=4?s=100" width="100px;" alt="Sven-Lindstroem"/><br /><sub><b>Sven-Lindstroem</b></sub></a><br /><a href="https://github.com/SchwarzNikolas/RootReflect/commits?author=Sven-Lindstroem" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
