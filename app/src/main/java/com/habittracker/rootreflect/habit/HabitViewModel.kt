@@ -224,11 +224,11 @@ class HabitViewModel (
                 }
             }
 
-            is HabitEvent.CheckCompleion -> {
+            is HabitEvent.CheckCompletion -> {
                 checkHabitCompletion(event.habit)
             }
 
-            HabitEvent.ToggleVisability -> {
+            HabitEvent.ToggleNotificationVisibility -> {
                 viewModelScope.launch {
                 delay(2000)
                 state.update { it.copy(showNotification = false) }
@@ -334,7 +334,7 @@ class HabitViewModel (
         }
     }
 
-    // tem
+
     private fun getDate(): LocalDate {
         return LocalDate.now()
     }
@@ -342,7 +342,6 @@ class HabitViewModel (
     private fun modifyHabit(event: HabitEvent.ModifyHabit, habit: Habit) {
 
         viewModelScope.launch {
-            //dao.updateHabit(habit)
             try {
                 dao.upsertHabit(habit)
                 if (state.value.editString != event.displayHabit.habit.name) {
@@ -357,8 +356,6 @@ class HabitViewModel (
             }finally {
                 event.displayHabit.beingEdited.value = false
             }
-
-            //updateCompletion(habitCompletion)
         }
     }
 }

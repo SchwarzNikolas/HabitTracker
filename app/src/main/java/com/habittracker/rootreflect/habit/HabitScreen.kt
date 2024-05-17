@@ -52,7 +52,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.ImeAction
@@ -103,10 +102,11 @@ fun MainScreen (
         // Mood part of the screen
         Box {
             MoodSection(state, Modifier, onEvent)
-            NotificationBox(visable = state.showNotification,
-                {onEvent(HabitEvent.ToggleVisability)} , state.editString)
+            NotificationBox(visible = state.showNotification,
+                action =  {onEvent(HabitEvent.ToggleNotificationVisibility)},
+                text =  state.editString)
         }
-            Divider(
+        Divider(
             modifier = Modifier
                 .fillMaxWidth()
                 .width(4.dp)
@@ -258,7 +258,7 @@ fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, dropd
                         .background(Color.Green)
                         .animateContentSize(finishedListener = { x, y ->
                             run {
-                                onEvent(HabitEvent.CheckCompleion(displayHabit.habit))
+                                onEvent(HabitEvent.CheckCompletion(displayHabit.habit))
 
                             }
                         }
@@ -275,7 +275,7 @@ fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, dropd
                 .weight(1f).background(Color.Red),
                 contentAlignment = Alignment.Center,) {
                 Text(modifier = Modifier.padding(bottom = 2.dp),
-                    text = displayHabit.habitJoin.habit.frequency.toString()
+                    text = displayHabit.habit.frequency.toString()
                 )
             }
         }
@@ -429,8 +429,8 @@ fun MoodSection(state: HabitState, modifier: Modifier, event : (HabitEvent)-> Un
 }
 
 @Composable
-fun NotificationBox(visable : Boolean, action: () -> Unit, text: String){
-    AnimatedVisibility(visible = visable,
+fun NotificationBox(visible : Boolean, action: () -> Unit, text: String){
+    AnimatedVisibility(visible = visible,
         enter = slideInHorizontally { fullWidth: Int ->  -fullWidth},
         exit = fadeOut()) {
         ElevatedCard(
@@ -446,7 +446,7 @@ fun NotificationBox(visable : Boolean, action: () -> Unit, text: String){
             }
     }
 }
-    if (visable){
+    if (visible){
         action()
     }
 

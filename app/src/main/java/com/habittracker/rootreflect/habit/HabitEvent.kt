@@ -22,6 +22,6 @@ sealed interface HabitEvent {
     data object ResetCompletion: HabitEvent
     data class MoodSelected(val moodType: MoodType): HabitEvent
 
-    data class CheckCompleion (val habit: Habit):HabitEvent
-    data object ToggleVisability: HabitEvent
+    data class CheckCompletion (val habit: Habit):HabitEvent
+    data object ToggleNotificationVisibility: HabitEvent
 }

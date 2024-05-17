@@ -117,7 +117,9 @@ fun CustomScreen(
                 Save_Dialog(onEvent)
             }
         }
-        NotificationBox(visable = state.notificationVisibility, action = { onEvent(CustomHabitEvent.ToggleNotificationVisibility) }, text = state.notificationText)
+        NotificationBox(visible = state.notificationVisibility,
+            action = { onEvent(CustomHabitEvent.ToggleNotificationVisibility) },
+            text = state.notificationText)
     }
 }
 
