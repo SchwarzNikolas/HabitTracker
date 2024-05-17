@@ -7,6 +7,15 @@
   "commitType": "docs",
   "commitConvention": "angular",
   "contributors": [
+    {
+      "login": "StackedFrog",
+      "name": "StackedFrog",
+      "avatar_url": "https://avatars.githubusercontent.com/u/147399576?v=4",
+      "profile": "https://github.com/StackedFrog",
+      "contributions": [
+        "code"
+      ]
+    }
   ],
   "contributorsPerLine": 7,
   "skipCi": true,
