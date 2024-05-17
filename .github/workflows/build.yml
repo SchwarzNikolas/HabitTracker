@@ -5,6 +5,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the code
-        uses: SchwarzNikolas/RootReflect@main
+        uses: actions/checkout@v2
       - name: Build the app
         run: ./gradlew build
