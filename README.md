@@ -63,7 +63,7 @@ If you have any feedback, issues, or feature requests, please file an [file an i
 
 ## Build the app
 
-- This app has been developed in[Android Studio](https://developer.android.com/studio) and is written in Kotlin with the [Jetpack Compose Toolkit](https://developer.android.com/develop/ui/compose)
+- This app has been developed in [Android Studio](https://developer.android.com/studio) and is written in Kotlin with the [Jetpack Compose Toolkit](https://developer.android.com/develop/ui/compose)
 - Clone or download the repo
 - to simply build the app run `./gradlew`
 - otherwise open the project in Android Studio
