@@ -7,6 +7,6 @@ jobs:
       - name: Checkout the code
         uses: actions/checkout@v2
       - name: Download java 17 jdk
-        run: apt install openjdk-17-jdk
+        run: sudo apt-get install -y openjdk-17-jdk
       - name: build the app
         run: ./gradlew build
