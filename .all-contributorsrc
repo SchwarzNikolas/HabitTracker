@@ -7,6 +7,15 @@
   "commitType": "docs",
   "commitConvention": "angular",
   "contributors": [
+    {
+      "login": "martamoroni",
+      "name": "martamoroni",
+      "avatar_url": "https://avatars.githubusercontent.com/u/158204474?v=4",
+      "profile": "https://github.com/martamoroni",
+      "contributions": [
+        "code"
+      ]
+    }
   ],
   "contributorsPerLine": 7,
   "skipCi": true,
