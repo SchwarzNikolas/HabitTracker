@@ -7,6 +7,15 @@
   "commitType": "docs",
   "commitConvention": "angular",
   "contributors": [
+    {
+      "login": "SchwarzNikolas",
+      "name": "Nikolas",
+      "avatar_url": "https://avatars.githubusercontent.com/u/71844580?v=4",
+      "profile": "https://github.com/SchwarzNikolas",
+      "contributions": [
+        "code"
+      ]
+    }
   ],
   "contributorsPerLine": 7,
   "skipCi": true,
