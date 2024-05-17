@@ -3,6 +3,7 @@ package com.habittracker.rootreflect.database
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
@@ -61,7 +62,9 @@ interface HabitDao{
     @Query("select moodDate from MoodRecord")
     fun fetchDates():Flow<List<LocalDate>>
 
-
+    // dor debugging
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertMoodRecordDebug(entity: MoodRecord)
 
     // for testing
     @Query("SELECT * FROM Habit")
