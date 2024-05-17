@@ -139,7 +139,6 @@ class HistoryViewModel(
                             for (record in habitRecords){
                                 records.add(record)
                             }
-                            println("test")
                             _state.update {
                                 it.copy(
                                     habitList = records,
