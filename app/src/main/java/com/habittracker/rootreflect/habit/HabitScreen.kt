@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
@@ -52,6 +53,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.ImeAction
@@ -111,31 +113,30 @@ fun MainScreen (
                 .fillMaxWidth()
                 .width(4.dp)
         )
+        val listState = rememberLazyListState()
 
-        LazyColumn(modifier = Modifier) {
-            items(
+        LazyColumn(state = listState, modifier = Modifier) {
+            if (state.fixScroll.value) {
+                listState.requestScrollToItem(listState.firstVisibleItemIndex, listState.firstVisibleItemScrollOffset)
+                onEvent(HabitEvent.ToggleScroll)
+            }
+
+                items(
                 count = state.displayHabits.size,
                 contentType = { index -> state.displayHabits[index] },
-                key = { index -> state.displayHabits[index].habit.name },
+                key = { index -> state.displayHabits[index].habit.habitId },
 
                 ) {
                 HabitDisplay(
                     onEvent, state, state.displayHabits[it], dropdownItems,
                     Modifier.animateItem(
-                        fadeInSpec = spring(
-                            stiffness = Spring.StiffnessMediumLow,
-                            visibilityThreshold = 0.5f
-                        ),
-                        fadeOutSpec = spring(
-                            stiffness = Spring.StiffnessMediumLow,
-                            visibilityThreshold = 0.5f
-                        ),
                         placementSpec = spring(
                             stiffness = Spring.StiffnessMediumLow,
                         )
                     )
                 )
             }
+
         }
     }
 }
@@ -190,7 +191,11 @@ fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, dropd
         modifier = modifier
             .padding(vertical = 5.dp, horizontal = 5.dp)
             .alpha(imageAlpha)
-            .clickable { onEvent(HabitEvent.IncCompletion(displayHabit.habit)) },
+            .clickable {
+
+                onEvent(HabitEvent.IncCompletion(displayHabit.habit))
+            }
+            .focusProperties { canFocus = false },
         //colors = CardDefaults.cardColors(Color.Gray)
     ) {
         Row {
@@ -271,8 +276,9 @@ fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, dropd
             }
             Box(modifier = Modifier
                 .padding(start = 10.dp, end = 5.dp)
-               .clip(RoundedCornerShape(10.dp))
-                .weight(1f).background(Color.Red),
+                .clip(RoundedCornerShape(10.dp))
+                .weight(1f)
+                .background(Color.Red),
                 contentAlignment = Alignment.Center,) {
                 Text(modifier = Modifier.padding(bottom = 2.dp),
                     text = displayHabit.habit.frequency.toString()
@@ -329,7 +335,8 @@ fun EditMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, state: H
             Box(modifier = Modifier
                 .padding(start = 10.dp, end = 5.dp)
                 .clip(RoundedCornerShape(10.dp))
-                .weight(1f).background(Color.Red),
+                .weight(1f)
+                .background(Color.Red),
                 contentAlignment = Alignment.Center,) {
                 Text(modifier = Modifier.padding(bottom = 2.dp),
                     text = state.editFreq.toString()

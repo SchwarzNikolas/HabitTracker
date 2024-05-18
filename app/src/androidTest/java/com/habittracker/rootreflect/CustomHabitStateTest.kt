@@ -69,7 +69,7 @@ class CustomHabitStateTest {
         val event = CustomHabitEvent.SaveEdit
 
         viewModel.onEvent(event)
-        dao.upsertHabit(Habit())
+        dao.upsertHabit(Habit(name = "test123"))
         dao.fetchHabits().test {
             habitList = awaitItem()
             cancelAndIgnoreRemainingEvents()

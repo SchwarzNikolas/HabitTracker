@@ -24,4 +24,6 @@ sealed interface HabitEvent {
 
     data class CheckCompletion (val habit: Habit):HabitEvent
     data object ToggleNotificationVisibility: HabitEvent
+
+    data object ToggleScroll: HabitEvent
 }

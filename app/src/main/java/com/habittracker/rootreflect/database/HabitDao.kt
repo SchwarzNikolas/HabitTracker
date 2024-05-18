@@ -21,7 +21,7 @@ interface HabitDao{
     @Upsert()
     suspend fun upsertDate(dateRecord: DateRecord)
     // defines sql query to be executed on the database
-    @Query("SELECT * FROM Habit WHERE occurrence LIKE :day")
+    @Query("SELECT * FROM Habit WHERE occurrence LIKE :day ORDER by done")
     fun fetchHabitByDay(day: String): Flow<List<Habit>>
 
     @Upsert
@@ -73,8 +73,8 @@ interface HabitDao{
     @Query("SELECT * FROM Habit")
     fun fetchHabits(): Flow<List<Habit>>
 
-    @Query("SELECT * FROM HabitCompletion")
-    fun getHabit(): Flow<List<HabitCompletion>>
+    @Query("SELECT * FROM Habit")
+    fun getHabit(): Flow<List<Habit>>
 
     @Upsert
     fun updateHabit(habit: Habit)

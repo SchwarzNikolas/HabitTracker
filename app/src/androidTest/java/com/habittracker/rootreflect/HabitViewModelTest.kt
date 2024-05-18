@@ -13,6 +13,7 @@ import com.habittracker.rootreflect.habit.DisplayHabit
 import com.habittracker.rootreflect.habit.HabitEvent
 import com.habittracker.rootreflect.habit.HabitViewModel
 import com.habittracker.rootreflect.habit.MoodType
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.*
@@ -39,7 +40,6 @@ class HabitViewModelTest {
             context, HabitDatabase::class.java).build()
         dao = db.dao
         viewModel = HabitViewModel(dao)
-
     }
 
     @After
@@ -56,10 +56,16 @@ class HabitViewModelTest {
     }
 
     @Test
-    fun updateEditFreq(){
+    fun updateEditFreqOutOfRange(){
         val event = HabitEvent.UpDateEditFreq(10)
         viewModel.onEvent(event)
-        assertEquals(10, viewModel.state.value.editFreq)
+        assertNotEquals(10, viewModel.state.value.editFreq)
+    }
+    @Test
+    fun updateEditFreq(){
+        val event = HabitEvent.UpDateEditFreq(5)
+        viewModel.onEvent(event)
+        assertEquals(5, viewModel.state.value.editFreq)
     }
 //    @Test
 //    fun cancelEdit(){
@@ -82,15 +88,15 @@ class HabitViewModelTest {
     // Uncomment the lines 206 & 210 in HabitViewModel when running the test
     @Test
     fun moodSelectedTest() = runBlocking {
+        delay(500)
         val event = HabitEvent.MoodSelected(MoodType.GOOD)
         viewModel.onEvent(event)
         Truth.assertThat(viewModel.state.value.selectedMood).isEqualTo(MoodType.GOOD)
+
         dao.fetchMoodRecords().test {
             moodRecs = awaitItem()
             cancelAndIgnoreRemainingEvents()
         }
         Truth.assertThat(moodRecs.size).isEqualTo(1)
     }
-
-
 }
