@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.KeyboardActions
@@ -31,6 +30,7 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -40,7 +40,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
@@ -49,6 +48,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -151,7 +151,18 @@ fun EditWindow(onEvent: (CustomHabitEvent) -> Unit, state: CustomState, manager:
             valueRange = 1f..9f,
             steps = 7,
             modifier = Modifier
-                .fillMaxWidth(0.8f)
+                .fillMaxWidth(0.8f),
+            colors = SliderDefaults.colors(
+                thumbColor = MaterialTheme.colorScheme.onPrimary,
+                activeTrackColor = if (state.isDaily) {
+                    MaterialTheme.colorScheme.onSecondaryContainer
+                } else {
+                    MaterialTheme.colorScheme.onTertiaryContainer
+                },
+                inactiveTrackColor = MaterialTheme.colorScheme.secondaryContainer,
+                activeTickColor = MaterialTheme.colorScheme.onPrimary,
+                inactiveTickColor = MaterialTheme.colorScheme.tertiary
+            )
         )
 
         if (!state.isDaily)
@@ -216,7 +227,7 @@ fun DayButton(
     clicked: Boolean,
     onEvent: (CustomHabitEvent) -> Unit,
     dayIndex: Int,
-    manager: FocusManager
+    manager: FocusManager,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -231,7 +242,12 @@ fun DayButton(
                 .size(width = 40.dp, height = 40.dp),
             border = BorderStroke(1.dp, Color.Black),
             colors = ButtonDefaults.outlinedButtonColors(
-                containerColor = if (clicked) MaterialTheme.colorScheme.primary else Color.Transparent,
+                containerColor =
+                if (clicked){
+                    MaterialTheme.colorScheme.onTertiaryContainer
+                } else {
+                    Color.Transparent
+                },
             )
         ) {}
     }
@@ -251,7 +267,13 @@ fun CustomTextField(
         value = value,
         onValueChange = { onchange(it) },
         label = { Text(label) },
-        colors = TextFieldDefaults.colors(focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
+            focusedTextColor = MaterialTheme.colorScheme.onPrimary,
+            focusedLabelColor = MaterialTheme.colorScheme.onPrimary,
+            focusedIndicatorColor = MaterialTheme.colorScheme.onPrimary
+        ),
         keyboardOptions = KeyboardOptions.Default.copy(
             autoCorrectEnabled = true,
             imeAction = ImeAction.Done,
@@ -270,7 +292,6 @@ fun CustomTextField(
                 onEvent(CustomHabitEvent.KeyboardFocus(it.isFocused))
             }
             .fillMaxWidth(0.5f),
-        shape = CircleShape
     )
 }
 
@@ -282,7 +303,7 @@ fun HabitPreview(state: CustomState){
         ),
         modifier = Modifier
             .padding(vertical = 5.dp, horizontal = 5.dp),
-        colors = CardDefaults.cardColors(Color.Gray)
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primary),
     ) {
         Row {
             BasicText(
@@ -292,7 +313,9 @@ fun HabitPreview(state: CustomState){
                 modifier = Modifier
                     .padding(start = 10.dp)
                     .weight(17f),
-                style = LocalTextStyle.current.copy(fontSize = 30.sp)
+                style = LocalTextStyle.current.copy(
+                    fontSize = 30.sp,
+                    color = MaterialTheme.colorScheme.onPrimary)
             )
             IconButton(
                 onClick = { },
@@ -313,25 +336,25 @@ fun HabitPreview(state: CustomState){
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(10.dp))
-                        .background(Color.Black)
+                        .background(
+                            if (state.isDaily) {
+                                MaterialTheme.colorScheme.onSecondaryContainer
+                            } else {
+                                MaterialTheme.colorScheme.onTertiaryContainer
+                            }
+                        )
                         .size(width = maxWidth, height = maxHeight)
-                ){
-                    Text(text = "")
-                }
+                )
             }
             Box(modifier = Modifier
                 .padding(start = 10.dp, end = 5.dp)
-                .weight(1f),
-                contentAlignment = Alignment.Center) {
-                Text(
-                    modifier = Modifier
-                        .drawBehind {
-                            drawCircle(
-                                color = Color.Transparent,
-                                radius = 60f
-                            )
-                        },
-                    text = state.habitFrequency.toString()
+                .clip(RoundedCornerShape(10.dp))
+                .weight(1f)
+                .background(MaterialTheme.colorScheme.background),
+                contentAlignment = Alignment.Center,) {
+                Text(modifier = Modifier.padding(bottom = 2.dp),
+                    text = state.habitFrequency.toString(),
+                    color = MaterialTheme.colorScheme.tertiary
                 )
             }
         }
@@ -347,17 +370,24 @@ fun Save_Dialog(onEvent: (CustomHabitEvent) -> Unit){
     AlertDialog(
         onDismissRequest = { onEvent(CustomHabitEvent.ToggleDialog) },
         title = {
-            Text(text = "Habit has been saved")
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "Habit has been saved", textAlign = TextAlign.Center)
+            }
         },
         confirmButton = {
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                Button(onClick = { onEvent(CustomHabitEvent.ToggleDialog) }) {
+                Button(
+                    onClick = { onEvent(CustomHabitEvent.ToggleDialog) },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.background)) {
                     Text("OK")
                 }
             }
-        }
+        },
     )
 }

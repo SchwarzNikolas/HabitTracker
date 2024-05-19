@@ -1,0 +1,62 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "commitType": "docs",
+  "commitConvention": "angular",
+  "contributors": [
+    {
+      "login": "StackedFrog",
+      "name": "StackedFrog",
+      "avatar_url": "https://avatars.githubusercontent.com/u/147399576?v=4",
+      "profile": "https://github.com/StackedFrog",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "martamoroni",
+      "name": "martamoroni",
+      "avatar_url": "https://avatars.githubusercontent.com/u/158204474?v=4",
+      "profile": "https://github.com/martamoroni",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "peishh",
+      "name": "PeiShan Lu",
+      "avatar_url": "https://avatars.githubusercontent.com/u/159452498?v=4",
+      "profile": "https://github.com/peishh",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Sven-Lindstroem",
+      "name": "Sven-Lindstroem",
+      "avatar_url": "https://avatars.githubusercontent.com/u/117860880?v=4",
+      "profile": "https://github.com/Sven-Lindstroem",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "SchwarzNikolas",
+      "name": "Nikolas",
+      "avatar_url": "https://avatars.githubusercontent.com/u/71844580?v=4",
+      "profile": "https://github.com/SchwarzNikolas",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "skipCi": true,
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "projectName": "RootReflect",
+  "projectOwner": "SchwarzNikolas"
+}

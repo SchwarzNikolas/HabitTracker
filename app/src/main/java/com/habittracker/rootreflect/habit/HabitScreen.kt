@@ -42,10 +42,12 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -53,7 +55,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+<<<<<<< HEAD
 import androidx.compose.ui.focus.focusProperties
+=======
+>>>>>>> ea9c95543c5ab83d255bd33960c6ef7d04f7d36d
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.ImeAction
@@ -192,10 +197,10 @@ fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, dropd
             .padding(vertical = 5.dp, horizontal = 5.dp)
             .alpha(imageAlpha)
             .clickable {
-
                 onEvent(HabitEvent.IncCompletion(displayHabit.habit))
-            }
-            .focusProperties { canFocus = false },
+            },
+            colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primary)
+
     ) {
         Row {
             BasicText(
@@ -205,8 +210,11 @@ fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, dropd
                 modifier = Modifier
                     .padding(start = 10.dp)
                     .weight(17f),
-                style = LocalTextStyle.current.copy(fontSize = 30.sp,
-                    lineHeight = 30.sp)
+                style = LocalTextStyle.current.copy(
+                    fontSize = 30.sp,
+                    lineHeight = 30.sp,
+                    color = MaterialTheme.colorScheme.onPrimary
+                ),
             )
             IconButton(
                 onClick = { onEvent(HabitEvent.ContextMenuVisibility(displayHabit)) },
@@ -253,13 +261,18 @@ fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, dropd
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(10.dp))
-                        .background(Color.Black)
+                        .background(MaterialTheme.colorScheme.secondaryContainer)
                         .size(width = maxWidth, height = maxHeight)
                 )
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(10.dp))
-                        .background(Color.Green)
+                        .background(
+                            if(displayHabit.habit.occurrence == "1111111"){
+                                MaterialTheme.colorScheme.onSecondaryContainer
+                            } else {
+                                MaterialTheme.colorScheme.onTertiaryContainer
+                            })
                         .animateContentSize(finishedListener = { x, y ->
                             run {
                                 onEvent(HabitEvent.CheckCompletion(displayHabit.habit))
@@ -277,10 +290,11 @@ fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, dropd
                 .padding(start = 10.dp, end = 5.dp)
                 .clip(RoundedCornerShape(10.dp))
                 .weight(1f)
-                .background(Color.Red),
+                .background(MaterialTheme.colorScheme.background),
                 contentAlignment = Alignment.Center,) {
                 Text(modifier = Modifier.padding(bottom = 2.dp),
-                    text = displayHabit.habit.frequency.toString()
+                    text = displayHabit.habit.frequency.toString(),
+                    color = MaterialTheme.colorScheme.tertiary
                 )
             }
         }
@@ -296,7 +310,7 @@ fun EditMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, state: H
         ),
         modifier = modifier
             .padding(vertical = 5.dp, horizontal = 5.dp),
-        colors = CardDefaults.cardColors(Color.Gray)
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primary)
     ) {
         Row {
             BasicTextField(
@@ -313,7 +327,8 @@ fun EditMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, state: H
                 textStyle = LocalTextStyle.current.copy(
                     fontSize = 30.sp,
                     textDecoration = TextDecoration.Underline,
-                    lineHeight = 30.sp
+                    lineHeight = 30.sp,
+                    color = MaterialTheme.colorScheme.onPrimary
                 ),
                 modifier = modifier.padding(start = 10.dp),
             )
@@ -329,16 +344,28 @@ fun EditMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, state: H
                 modifier = Modifier
                     .weight(6f)
                     .height(50.dp)
-                    .padding(start = 5.dp)
+                    .padding(start = 5.dp),
+                colors = SliderDefaults.colors(
+                    thumbColor = MaterialTheme.colorScheme.onPrimary,
+                    activeTrackColor = if (displayHabit.habit.occurrence == "1111111") {
+                            MaterialTheme.colorScheme.onSecondaryContainer
+                        } else {
+                            MaterialTheme.colorScheme.onTertiaryContainer
+                        },
+                    inactiveTrackColor = MaterialTheme.colorScheme.secondaryContainer,
+                    activeTickColor = MaterialTheme.colorScheme.onPrimary,
+                    inactiveTickColor = MaterialTheme.colorScheme.tertiary
+                )
             )
             Box(modifier = Modifier
                 .padding(start = 10.dp, end = 5.dp)
                 .clip(RoundedCornerShape(10.dp))
                 .weight(1f)
-                .background(Color.Red),
+                .background(MaterialTheme.colorScheme.background),
                 contentAlignment = Alignment.Center,) {
                 Text(modifier = Modifier.padding(bottom = 2.dp),
-                    text = state.editFreq.toString()
+                    text = state.editFreq.toString(),
+                    color = MaterialTheme.colorScheme.tertiary
                 )
             }
         }
