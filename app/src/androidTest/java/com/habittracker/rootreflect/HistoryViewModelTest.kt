@@ -58,7 +58,7 @@ class HistoryViewModelTest {
 
     @Test
     fun enableBottomSheetTest() = runBlocking {
-        val event = HistoryEvent.EnableBottomSheet
+        val event = HistoryEvent.ShowSummary
         viewModel.onEvent(event)
         assertThat(viewModel.state.value.bottomSheetActive).isEqualTo(true)
     }

@@ -6,8 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.habittracker.rootreflect.database.HabitDao
 import com.habittracker.rootreflect.database.HabitRecord
-import com.habittracker.rootreflect.database.MoodRecord
-import com.habittracker.rootreflect.habit.MoodType
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -85,6 +83,29 @@ class HistoryViewModel(
                 updateDays()
             }
         }
+        viewModelScope.launch {
+            dao.fetchHabitRecordsByDate(state.value.selectedDate).collect {
+                    habitRecords ->
+                run {
+                    val records: MutableList<HabitRecord> = mutableStateListOf()
+                    for (record in habitRecords){
+                        records.add(record)
+                    }
+                    _state.update {
+                        it.copy(
+                            habitList = records,
+                            selectedDate = state.value.selectedDate,
+                            selectedMood = state.value.selectedMood,
+                            habitInfo = false,
+                            // filter the habits by their frequency into three separate lists
+                            habitListF1 = records.filter {record -> record.habitFrequency == 1 }.toList().toMutableList(),
+                            habitListF2 = records.filter {record -> record.habitFrequency == 2 }.toList().toMutableList(),
+                            habitListF3Above = records.filter {record -> record.habitFrequency >= 3 }.toList().toMutableList(),
+                        )
+                    }
+                }
+            }
+        }
     }
 
     fun onEvent(event: HistoryEvent) {
@@ -98,10 +119,11 @@ class HistoryViewModel(
                     )
                 }
             }
-            is HistoryEvent.EnableBottomSheet -> {
+            is HistoryEvent.ShowSummary -> {
                 // enables the bottom sheet (is invoked when the user clicks on anything that contains additional information)
                 _state.update {
                     it.copy(
+                        habitInfo = false,
                         bottomSheetActive = true
                     )
                 }

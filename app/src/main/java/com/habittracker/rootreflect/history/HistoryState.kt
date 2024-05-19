@@ -2,8 +2,6 @@ package com.habittracker.rootreflect.history
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.unit.dp
 import com.habittracker.rootreflect.database.HabitRecord
 import com.habittracker.rootreflect.ui.theme.AnalogousCool
 import java.time.LocalDate
@@ -33,20 +31,12 @@ data class HistoryState(
     val habitInfo: Boolean = false,
     // list of habits of the selected day
     val habitList: MutableList<HabitRecord> = mutableStateListOf(),
-
-
-    val nameTagActive: Boolean = false,
-
-    val offset: DpOffset = DpOffset(0.dp,0.dp),
-    val name  : String = "",
-
     // list for habits (frequency 1)
     val habitListF1: MutableList<HabitRecord> = mutableStateListOf(),
     // list for habits (frequency 2)
     val habitListF2: MutableList<HabitRecord> = mutableStateListOf(),
     // list for habits (frequency 3+)
     val habitListF3Above: MutableList<HabitRecord> = mutableStateListOf(),
-
     // store selected habit
     val habitStored: HabitRecord? = null
 

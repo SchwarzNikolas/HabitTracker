@@ -73,6 +73,7 @@ fun HistoryScreen(
                 {BushClick(onEvent = onEvent, state = state, bush = "images/bush3.png", offsetX = 260.dp, offsetY = 220.dp, habitRecord = it)})
 
             Background()
+            SunMary(onEvent = onEvent)
 
             for(i in flowerFrequency.indices) {
                  if (state.habitListF1.size > i){
@@ -262,7 +263,6 @@ fun DailyBox(onEvent: (HistoryEvent) -> Unit, dayOfMonth: DayOfMonth, state: His
         shape = RoundedCornerShape(5.dp),
         colors = ButtonDefaults.buttonColors(dayOfMonth.colour),
         onClick = {
-            onEvent(HistoryEvent.EnableBottomSheet)
             onEvent(HistoryEvent.ChangeSelectedDay(dayOfMonth.date, dayOfMonth.mood))},
         border = if (dayOfMonth.date == state.selectedDate) {BorderStroke(1.dp, Color.Yellow)} else {null}
 
@@ -285,6 +285,28 @@ fun Background(){
             .height(height = 400.dp) // to alter image height
         )
     }
+}
+
+@Composable
+fun SunMary(onEvent: (HistoryEvent) -> Unit){
+    val drawable = loadImageFromAssets(LocalContext.current, "images/sun.png")
+    val bitmap = drawable!!.toBitmap()
+    Image(
+        painter = BitmapPainter(bitmap.asImageBitmap()),
+        contentDescription = null,
+        alignment = Alignment.Center,
+        contentScale = ContentScale.Crop,
+        modifier = Modifier
+            .height(height = 80.dp)
+            .offset(265.dp, 15.dp)
+            .pointerInput(Unit) {
+                detectTapGestures {
+                    // calcs offset scale due to height setting
+                    if (clickPixel(65.dp.toPx(), it, bitmap))
+                        onEvent(HistoryEvent.ShowSummary)
+                }
+            }
+    )
 }
 
 @Composable
