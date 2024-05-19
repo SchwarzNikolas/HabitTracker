@@ -2,6 +2,8 @@ package com.habittracker.rootreflect.history
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.habittracker.rootreflect.database.HabitRecord
 import com.habittracker.rootreflect.ui.theme.AnalogousCool
 import java.time.LocalDate
@@ -38,6 +40,8 @@ data class HistoryState(
     // list for habits (frequency 3+)
     val habitListF3Above: MutableList<HabitRecord> = mutableStateListOf(),
     // store selected habit
-    val habitStored: HabitRecord? = null
-
-)
+    val habitStored: HabitRecord? = null,
+    // height of the bottom sheet
+    val infoCardHeight: Dp = 100.dp
+) {
+}

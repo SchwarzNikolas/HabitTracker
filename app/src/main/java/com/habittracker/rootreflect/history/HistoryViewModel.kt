@@ -2,6 +2,7 @@ package com.habittracker.rootreflect.history
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.habittracker.rootreflect.database.HabitDao
@@ -115,7 +116,8 @@ class HistoryViewModel(
                     it.copy(
                         bottomSheetActive = true,
                         habitInfo = true,
-                        habitStored = event.recordedHabit
+                        habitStored = event.recordedHabit,
+                        infoCardHeight = 100.dp
                     )
                 }
             }
@@ -124,7 +126,8 @@ class HistoryViewModel(
                 _state.update {
                     it.copy(
                         habitInfo = false,
-                        bottomSheetActive = true
+                        bottomSheetActive = true,
+                        infoCardHeight = 300.dp
                     )
                 }
             }

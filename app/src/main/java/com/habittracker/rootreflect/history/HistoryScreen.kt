@@ -138,7 +138,7 @@ fun InfoSheet(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
         },
     ) {
         Box(modifier = Modifier
-            .height(300.dp)
+            .height(state.infoCardHeight)
             .align(Alignment.CenterHorizontally)
             .padding(10.dp)){
             if (state.habitInfo) {
@@ -188,10 +188,12 @@ fun InfoSheet(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
                         Text(text = "You have completed the following habits:",
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth())
-                        for (habit in state.habitList){
-                            Text(text = "• " + habit.habitName,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth())
+                        LazyVerticalGrid(columns = GridCells.Fixed(1)) {
+                            items(state.habitList.size){
+                                Text(text = "• " + state.habitList[it].habitName,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth())
+                            }
                         }
                     }
                 }
@@ -302,7 +304,7 @@ fun SunMary(onEvent: (HistoryEvent) -> Unit){
             .pointerInput(Unit) {
                 detectTapGestures {
                     // calcs offset scale due to height setting
-                    if (clickPixel(65.dp.toPx(), it, bitmap))
+                    if (clickPixel(80.dp.toPx(), it, bitmap))
                         onEvent(HistoryEvent.ShowSummary)
                 }
             }
