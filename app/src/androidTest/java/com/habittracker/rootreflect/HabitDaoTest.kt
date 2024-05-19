@@ -144,60 +144,6 @@ class HabitDaoTest {
         assertThat(habitRecords.size).isEqualTo(1)
     }
 
-//    @Test
-//    fun insertCompletionTest() = runBlocking {
-//        // create habitCompletion and insert it into the database
-//        val completedHabit = HabitCompletion(1, 0, false, "1111111")
-//        dao.upsertHabit(Habit())
-//        dao.upsertCompletion(completedHabit)
-//        // fetch completed habits from the database and compare it with created object
-//        dao.getHabit().test {
-//            habitCompletion = awaitItem()
-//            cancelAndIgnoreRemainingEvents()
-//        }
-//        assertThat(habitCompletion[0].completion).isEqualTo(0)
-//    }
-
-//    @Test
-//    fun deleteCompletionTest() = runBlocking {
-//        // create habitCompletion and insert them into the database
-//        val completedHabit = HabitCompletion(1, 0, false, "1111111")
-//        dao.upsertHabit(Habit())
-//        dao.upsertCompletion(completedHabit)
-//        // fetch completed habits from the database and check size
-//        dao.getHabit().test {
-//            habitCompletion = awaitItem()
-//            cancelAndIgnoreRemainingEvents()
-//        }
-//        assertThat(habitCompletion.size).isEqualTo(1)
-//        // delete completion from database
-//        dao.deleteCompletion(completedHabit)
-//        // fetch completed habits from the database and check size
-//        dao.getHabit().test {
-//            habitCompletion = awaitItem()
-//            cancelAndIgnoreRemainingEvents()
-//        }
-//        assertThat(habitCompletion.size).isEqualTo(0)
-//    }
-
-//    @Test
-//    fun updateCompletionTest() = runBlocking {
-//        // create habitCompletion and insert them into the database
-//        var completedHabit = HabitCompletion(1, 0, false, "1111111")
-//        dao.upsertHabit(Habit())
-//        dao.upsertCompletion(completedHabit)
-//        // update HabitCompletion and fetch the results
-//        completedHabit = HabitCompletion(1, 1, true, "1111111")
-//        dao.upsertCompletion(completedHabit)
-//        dao.getHabit().test {
-//            habitCompletion = awaitItem()
-//            cancelAndIgnoreRemainingEvents()
-//        }
-//        // check that data got updated
-//        assertThat(habitCompletion[0].done).isEqualTo(true)
-//        assertThat(habitCompletion[0].completion).isEqualTo(1)
-//    }
-
     @Test
     fun resetCompletionTest() = runBlocking {
         // create habitCompletion and insert them into the database
