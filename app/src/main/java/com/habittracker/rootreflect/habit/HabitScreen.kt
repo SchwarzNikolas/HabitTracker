@@ -108,7 +108,7 @@ fun MainScreen (
             NotificationBox(visible = state.showNotification,
                 action =  {onEvent(HabitEvent.ToggleNotificationVisibility)},
                 text =  state.errorMessage,
-                color = Color(0xFFd14053),
+                color = MaterialTheme.colorScheme.onError,
             )
         }
         Divider(
@@ -274,7 +274,6 @@ fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, dropd
                         .animateContentSize(finishedListener = { x, y ->
                             run {
                                 onEvent(HabitEvent.CheckCompletion(displayHabit.habit))
-
                             }
                         }
                         )
@@ -465,7 +464,7 @@ fun MoodSection(state: HabitState, modifier: Modifier, event : (HabitEvent)-> Un
 }
 
 @Composable
-fun NotificationBox(visible : Boolean, action: () -> Unit, text: String, color: Color = Color.Gray){
+fun NotificationBox(visible : Boolean, action: () -> Unit, text: String, color: Color){
     AnimatedVisibility(visible = visible,
         enter = slideInHorizontally { fullWidth: Int ->  -fullWidth},
         exit = fadeOut()) {
@@ -475,11 +474,11 @@ fun NotificationBox(visible : Boolean, action: () -> Unit, text: String, color: 
             ),
             modifier = Modifier
                 .padding(vertical = 5.dp, horizontal = 5.dp),
-            colors = CardDefaults.cardColors(color)
+            colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primary)
         ){
             Box(modifier = Modifier.padding(5.dp)) {
                 Text(text = text,
-                    color = Color(0xFF0E1514) )
+                    color = color)
             }
     }
 }

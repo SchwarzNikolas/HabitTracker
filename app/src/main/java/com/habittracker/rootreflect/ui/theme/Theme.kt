@@ -26,7 +26,8 @@ private val DarkColorScheme = darkColorScheme(
     onTertiaryContainer = SaffronMango,
     background = Mirage,
     onBackground = SoftPeach,
-    surface = GunMetal
+    surface = GunMetal,
+    onError = FadedRed
 )
 
 private val LightColorScheme = lightColorScheme(
