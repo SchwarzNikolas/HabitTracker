@@ -26,5 +26,8 @@ data class HabitState(
 
     val selectedMood: MoodType? = null,
 
-    val showNotification: Boolean = false
+    val showNotification: Boolean = false,
+
+    val errorMessage: String = ""
+
     )

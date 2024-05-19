@@ -304,12 +304,12 @@ class HabitViewModel (
                     insertRecord(HabitRecord(state.value.editString, state.value.editFreq, date))
                 }
                 checkHabitCompletion(habit)
-            }catch (e: Exception){
-                state.update { it.copy(editString = "Error: Name Already exists",
-                    showNotification = true) }
-                return@launch
-            }finally {
                 event.displayHabit.beingEdited.value = false
+            }catch (e: Exception){
+                state.update { it.copy(errorMessage = "Error: Name Already exists",
+                    showNotification = true,
+                    ) }
+                return@launch
             }
         }
     }

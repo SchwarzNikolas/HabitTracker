@@ -55,10 +55,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-<<<<<<< HEAD
-import androidx.compose.ui.focus.focusProperties
-=======
->>>>>>> ea9c95543c5ab83d255bd33960c6ef7d04f7d36d
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.ImeAction
@@ -111,7 +107,9 @@ fun MainScreen (
             MoodSection(state, Modifier, onEvent)
             NotificationBox(visible = state.showNotification,
                 action =  {onEvent(HabitEvent.ToggleNotificationVisibility)},
-                text =  state.editString)
+                text =  state.errorMessage,
+                color = Color(0xFFd14053),
+            )
         }
         Divider(
             modifier = Modifier
@@ -462,7 +460,7 @@ fun MoodSection(state: HabitState, modifier: Modifier, event : (HabitEvent)-> Un
 }
 
 @Composable
-fun NotificationBox(visible : Boolean, action: () -> Unit, text: String){
+fun NotificationBox(visible : Boolean, action: () -> Unit, text: String, color: Color = Color.Gray){
     AnimatedVisibility(visible = visible,
         enter = slideInHorizontally { fullWidth: Int ->  -fullWidth},
         exit = fadeOut()) {
@@ -472,10 +470,11 @@ fun NotificationBox(visible : Boolean, action: () -> Unit, text: String){
             ),
             modifier = Modifier
                 .padding(vertical = 5.dp, horizontal = 5.dp),
-            colors = CardDefaults.cardColors(Color.Gray)
+            colors = CardDefaults.cardColors(color)
         ){
             Box(modifier = Modifier.padding(5.dp)) {
-                Text(text = text)
+                Text(text = text,
+                    color = Color(0xFF0E1514) )
             }
     }
 }
