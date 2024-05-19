@@ -196,7 +196,6 @@ fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, dropd
                 onEvent(HabitEvent.IncCompletion(displayHabit.habit))
             }
             .focusProperties { canFocus = false },
-        //colors = CardDefaults.cardColors(Color.Gray)
     ) {
         Row {
             BasicText(

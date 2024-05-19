@@ -176,7 +176,7 @@ class HistoryViewModel(
                     i
                 )
                 // get the mood of the current date out of the database
-                val mood = dao.getMoodRecByDate(date.toString())?.mood
+                val mood = dao.getMoodRecByDate(date)?.mood
                 val colour = mood?.moodColor?.let { Color(it) } ?: state.value.dayPassiveColour
                 val moodName = mood?.name ?: "No mood"
                 // add it to the list

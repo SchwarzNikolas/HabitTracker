@@ -40,7 +40,7 @@ class HabitViewModel (
             }else{
                 date = dateRecord.date
             }
-            val mood  = dao.getMoodRecByDate(date.toString())
+            val mood  = dao.getMoodRecByDate(date)
             if (mood != null){
                 state.update { it.copy(selectedMood = mood.mood) }
             }
@@ -179,22 +179,6 @@ class HabitViewModel (
                 }
             }
 
-            // Deprecated
-            HabitEvent.ResetCompletion -> {
-                resetCompletion()
-            }
-
-            /*is HabitEvent.MoodChange -> {
-                _state.update {
-                    it.copy(
-                        selectedMood = event.moodType
-                    )
-                }
-                viewModelScope.launch {
-                    dao.upsertMoodRec(MoodRecord(date, event.moodType))
-                }
-            }*/
-
             is HabitEvent.MoodSelected -> {
                 _state.update {
                     it.copy(
@@ -202,11 +186,9 @@ class HabitViewModel (
                     )
                 }
                 val moodRecord =  MoodRecord(
-                    //moodDate = dateTest,
                     moodDate = date,
                     mood = event.moodType
                 )
-                //val dateTest = LocalDate.now()
                 viewModelScope.launch {
                         dao.upsertMoodRec(moodRecord)
                 }
@@ -254,16 +236,10 @@ class HabitViewModel (
     // removes record from the database using the dao (database access object)
     private fun removeHabit(habit: Habit){
         viewModelScope.launch {
-            //dao.deleteCompletion(habitJoin.completion)
             dao.deleteHabit(habit)
         }
     }
 
-//    private fun updateCompletion(completion: HabitCompletion){
-//        viewModelScope.launch {
-//            dao.upsertCompletion(completion)
-//        }
-//    }
 
     private fun removeRecord(record: HabitRecord) {
         viewModelScope.launch {
@@ -320,7 +296,6 @@ class HabitViewModel (
     }
 
     private fun modifyHabit(event: HabitEvent.ModifyHabit, habit: Habit) {
-
         viewModelScope.launch {
             try {
                 dao.upsertHabit(habit)

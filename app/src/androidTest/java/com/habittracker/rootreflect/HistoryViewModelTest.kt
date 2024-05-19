@@ -80,12 +80,12 @@ class HistoryViewModelTest {
     @Test
     fun changeSelectedDayTest() = runBlocking {
         val event = HistoryEvent.ChangeSelectedDay(date, MoodType.OK.toString())
-        val habitRec1 = HabitRecord("test2",2,date)
-        val habitRec2 = HabitRecord("test3",3,date)
+        val habitRec1 = HabitRecord("test2",2, date)
+        val habitRec2 = HabitRecord("test3",3, date)
         dao.upsertRecord(habitRec1)
         dao.upsertRecord(habitRec2)
         viewModel.onEvent(event)
-        dao.fetchHabitRecords().test {
+        dao.fetchHabitRecordsByDate(date).test {
             habitRecords = awaitItem()
             cancelAndIgnoreRemainingEvents()
         }

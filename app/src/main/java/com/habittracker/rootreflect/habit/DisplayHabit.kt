@@ -11,8 +11,6 @@ data class DisplayHabit (
 
     val beingEdited : MutableState<Boolean> = mutableStateOf(false),
 
-    //val habitJoin: HabitJoin = HabitJoin(Habit(), HabitCompletion()),
-
     val habit: Habit = Habit()
 
 ) {

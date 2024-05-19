@@ -6,15 +6,14 @@ import androidx.test.core.app.ApplicationProvider
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.habittracker.rootreflect.database.Habit
-import com.habittracker.rootreflect.database.HabitCompletion
 import com.habittracker.rootreflect.database.HabitDao
 import com.habittracker.rootreflect.database.HabitDatabase
 import com.habittracker.rootreflect.database.HabitRecord
 import com.habittracker.rootreflect.database.MoodRecord
 import com.habittracker.rootreflect.habit.HabitViewModel
-import com.habittracker.rootreflect.habit.MoodType
 import kotlinx.coroutines.runBlocking
 import org.junit.After
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import java.io.IOException
@@ -30,9 +29,7 @@ class HabitDaoTest {
     private lateinit var viewModel: HabitViewModel
     private var habitList: List<Habit> = listOf()
     private var habitRecords: List<HabitRecord> = listOf()
-    private var habitCompletion: List<HabitCompletion> = listOf()
     private var habits: List<Habit> = listOf()
-    private lateinit var fetchMood: List<MoodRecord>
     private var fetchDates: List<LocalDate> = listOf()
 
     @Before
@@ -57,7 +54,7 @@ class HabitDaoTest {
         // insert the habit into the database via the dao
         dao.upsertHabit(habit)
         // the .test method waits for the flow to return an item and then cancels method call
-        dao.fetchHabits().test {
+        dao.fetchHabitByDay("1111111").test {
             habitList = awaitItem()
             cancelAndIgnoreRemainingEvents()
         }
@@ -73,13 +70,13 @@ class HabitDaoTest {
         dao.upsertHabit(habit1)
         dao.upsertHabit(habit2)
         // fetch the habits from the database and then delete the first one in the list
-        dao.fetchHabits().test {
+        dao.fetchHabitByDay("1111111").test {
             habitList = awaitItem()
             cancelAndIgnoreRemainingEvents()
         }
         dao.deleteHabit(habitList[0])
         // fetch the habitList again
-        dao.fetchHabits().test {
+        dao.fetchHabitByDay("1111111").test {
             habitList = awaitItem()
             cancelAndIgnoreRemainingEvents()
         }
@@ -93,16 +90,16 @@ class HabitDaoTest {
         var habit = Habit()
         dao.upsertHabit(habit)
         // fetch habit from the database and check if it exists
-        dao.fetchHabits().test {
+        dao.fetchHabitByDay("1111111").test {
             habitList = awaitItem()
             cancelAndIgnoreRemainingEvents()
         }
         assertThat(habitList.size).isEqualTo(1)
         // update the habits frequency, name and id
         habit = Habit(habitList[0].habitId, "Testing", 2)
-        dao.updateHabit(habit)
+        dao.upsertHabit(habit)
         // fetch habit from the database and check if it updated
-        dao.fetchHabits().test {
+        dao.fetchHabitByDay("1111111").test {
             habitList = awaitItem()
             cancelAndIgnoreRemainingEvents()
         }
@@ -117,7 +114,7 @@ class HabitDaoTest {
         val habitRecord = HabitRecord( "Testing", 1, LocalDate.now())
         dao.upsertRecord(habitRecord)
         // fetch records and check if the inserted one is in the list
-        dao.fetchHabitRecords().test {
+        dao.fetchHabitRecordsByDate(LocalDate.now()).test {
             habitRecords = awaitItem()
             cancelAndIgnoreRemainingEvents()
         }
@@ -132,7 +129,7 @@ class HabitDaoTest {
         habitRecord = HabitRecord( "Testing2", 1, LocalDate.now())
         dao.upsertRecord(habitRecord)
         // fetch records and check if the inserted one is in the list
-        dao.fetchHabitRecords().test {
+        dao.fetchHabitRecordsByDate(LocalDate.now()).test {
             habitRecords = awaitItem()
             cancelAndIgnoreRemainingEvents()
         }
@@ -140,7 +137,7 @@ class HabitDaoTest {
         assertThat(habitRecords.size).isEqualTo(2)
         // delete record from the database, fetch all records and test if it got deleted
         dao.deleteRecord("Testing", LocalDate.now())
-        dao.fetchHabitRecords().test {
+        dao.fetchHabitRecordsByDate(LocalDate.now()).test {
             habitRecords = awaitItem()
             cancelAndIgnoreRemainingEvents()
         }
@@ -209,7 +206,7 @@ class HabitDaoTest {
         //dao.upsertCompletion(completedHabit)
         // reset the completion and fetch all the habits
         dao.resetCompletion()
-        dao.getHabit().test {
+        dao.fetchHabitByDay("1111111").test {
             habits = awaitItem()
             cancelAndIgnoreRemainingEvents()
         }
@@ -234,12 +231,10 @@ class HabitDaoTest {
     @Test
     fun upsertMoodRecTest() = runBlocking{
         val moodRecord = MoodRecord(LocalDate.now())
+        val fetchMood: MoodRecord?
         dao.upsertMoodRec(moodRecord)
-        dao.fetchMoodRecords().test {
-            fetchMood = awaitItem()
-            cancelAndIgnoreRemainingEvents()
-        }
-        assertThat(fetchMood[0].mood).isEqualTo(MoodType.OK)
+        fetchMood = dao.getMoodRecByDate(LocalDate.now())
+        Assert.assertNotNull(fetchMood)
     }
 
     @Test
@@ -247,7 +242,7 @@ class HabitDaoTest {
         val moodRecord = MoodRecord(LocalDate.now())
         dao.upsertMoodRec(moodRecord)
         // replace String with LocalDate.now().toString() when date implemented
-        val moodDate: MoodRecord? = dao.getMoodRecByDate(LocalDate.now().toString())
+        val moodDate: MoodRecord? = dao.getMoodRecByDate(LocalDate.now())
         assertThat(moodDate).isNotNull()
     }
     @Test

@@ -21,11 +21,8 @@ data class HabitState(
     // list of all the habits that will be displayed
 
     val displayHabits: MutableList<DisplayHabit> = mutableStateListOf(),
-    
-    val fixScroll: MutableState <Boolean> = mutableStateOf(false),
 
-    //val date2: LocalDate = LocalDate.now().plusDays(1),
-    // temp
+    val fixScroll: MutableState <Boolean> = mutableStateOf(false),
 
     val selectedMood: MoodType? = null,
 

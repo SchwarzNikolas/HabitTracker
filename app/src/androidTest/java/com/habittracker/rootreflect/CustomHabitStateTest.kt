@@ -70,7 +70,7 @@ class CustomHabitStateTest {
 
         viewModel.onEvent(event)
         dao.upsertHabit(Habit(name = "test123"))
-        dao.fetchHabits().test {
+        dao.fetchHabitByDay("1111111").test {
             habitList = awaitItem()
             cancelAndIgnoreRemainingEvents()
         }

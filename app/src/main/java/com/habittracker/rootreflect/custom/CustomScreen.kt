@@ -154,12 +154,9 @@ fun EditWindow(onEvent: (CustomHabitEvent) -> Unit, state: CustomState, manager:
                 .fillMaxWidth(0.8f)
         )
 
-        // Spacer(modifier = Modifier.height(16.dp))
-
         if (!state.isDaily)
             WeeklyFields(state, onEvent, manager)
 
-        // Spacer(modifier = Modifier.height(8.dp))
 
         Button(
             onClick = {
@@ -173,9 +170,6 @@ fun EditWindow(onEvent: (CustomHabitEvent) -> Unit, state: CustomState, manager:
             )
         }
         Spacer(modifier = Modifier.weight(1f))
-//        if (state.habitName.isNotBlank()){
-//            HabitPreview(state = state)
-//        }
     }
 }
 
@@ -266,7 +260,6 @@ fun CustomTextField(
             keyboardType = KeyboardType.Text
         ),
         keyboardActions = KeyboardActions(onDone = {
-            //manager.moveFocus(FocusDirection.Down)
             manager.clearFocus()}),
         singleLine = true,
         modifier = Modifier

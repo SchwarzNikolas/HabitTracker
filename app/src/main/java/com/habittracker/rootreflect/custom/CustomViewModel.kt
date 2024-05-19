@@ -89,7 +89,6 @@ class CustomViewModel(
                         state.update { it.copy(notificationVisibility = true,
                             notificationText = text) }
                     }
-                    //dao.upsertCompletion(HabitCompletion(habitName = habitName ,occurrence = habitOccurrence))
                 }
             }
             is CustomHabitEvent.KeyboardFocus -> {
