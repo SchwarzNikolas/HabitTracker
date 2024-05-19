@@ -3,8 +3,8 @@ package com.habittracker.rootreflect.custom
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.habittracker.rootreflect.database.Habit
-import com.habittracker.rootreflect.database.HabitCompletion
 import com.habittracker.rootreflect.database.HabitDao
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -76,10 +76,19 @@ class CustomViewModel(
                 val newCusHabit = Habit(
                     name = habitName,
                     frequency = habitFrequency,
+                    occurrence = habitOccurrence
                 )
+                var text = "Habit successfully added "
                 viewModelScope.launch {
-                    dao.upsertHabit(newCusHabit)
-                    dao.upsertCompletion(HabitCompletion(occurrence = habitOccurrence))
+                    try {
+                        dao.insertHabit(newCusHabit)
+                    }catch (e: Exception){
+                        text = "Error: Habit already Exists"
+                        return@launch
+                    }finally {
+                        state.update { it.copy(notificationVisibility = true,
+                            notificationText = text) }
+                    }
                 }
             }
             is CustomHabitEvent.KeyboardFocus -> {
@@ -89,11 +98,24 @@ class CustomViewModel(
                     )
                 }
             }
+
+
+            CustomHabitEvent.ToggleNotificationVisibility -> {
+                viewModelScope.launch {
+                    delay(2000)
+                    state.update {
+                        it.copy(
+                            notificationVisibility = false
+                        )
+                    }
+                }
+            }
             is CustomHabitEvent.ToggleDialog -> {
                 _state.update {
                     it.copy(
                         showDialog = state.value.showDialog.not()
                     )
+
                 }
             }
         }

@@ -14,6 +14,13 @@ data class CustomState(
     val completion: MutableList<MutableState<Boolean>> = MutableList(size = 7){ mutableStateOf(false) },
     // state for keyboard focus
     val keyboardFocus: Boolean = false,
+
+
+    val notificationText: String = "",
+
+    val notificationVisibility: Boolean = false,
+
     // state for save dialog
     val showDialog: Boolean = false
+
 )

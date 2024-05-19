@@ -1,9 +1,12 @@
 package com.habittracker.rootreflect.habit
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,6 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
@@ -82,49 +86,64 @@ fun MainScreen (
     val dropdownItems: List<Item> = listOf(
         Item(
             name = "Edit",
-            onClick = { habit: DisplayHabit -> onEvent(HabitEvent.EditHabit(habit)) },
+            onClick = { displayHabit: DisplayHabit -> onEvent(HabitEvent.EditHabit(displayHabit)) },
             Icons.Default.Edit
         ),
         Item(
             name = "Undo",
-            onClick = { habit: DisplayHabit -> onEvent(HabitEvent.DecCompletion(habit.habitJoin)) },
+            onClick = { displayHabit: DisplayHabit -> onEvent(HabitEvent.DecCompletion(displayHabit.habit)) },
             Icons.Default.ArrowBack
         ),
         Item(
             name = "Delete",
-            onClick = { habit: DisplayHabit -> onEvent(HabitEvent.DeleteHabit(habit.habitJoin)) },
+            onClick = { displayHabit: DisplayHabit -> onEvent(HabitEvent.DeleteHabit(displayHabit.habit)) },
             Icons.Default.Delete
         )
     )
+
     Column {
         // Mood part of the screen
-        MoodSection(state, Modifier, onEvent)
+        Box {
+            MoodSection(state, Modifier, onEvent)
+            NotificationBox(visible = state.showNotification,
+                action =  {onEvent(HabitEvent.ToggleNotificationVisibility)},
+                text =  state.errorMessage,
+                color = Color(0xFFd14053),
+            )
+        }
         Divider(
             modifier = Modifier
                 .fillMaxWidth()
                 .width(4.dp)
         )
+        val listState = rememberLazyListState()
 
-        LazyColumn (modifier = Modifier){
-            items(
+        LazyColumn(state = listState, modifier = Modifier) {
+            if (state.fixScroll.value) {
+                listState.requestScrollToItem(listState.firstVisibleItemIndex, listState.firstVisibleItemScrollOffset)
+                onEvent(HabitEvent.ToggleScroll)
+            }
+
+                items(
                 count = state.displayHabits.size,
-                contentType = {index -> state.displayHabits[index]},
-                key = { index -> state.displayHabits[index].habitJoin.habit.habitId },
+                contentType = { index -> state.displayHabits[index] },
+                key = { index -> state.displayHabits[index].habit.habitId },
 
-            ){
-                HabitDisplay(onEvent, state, state.displayHabits[it], dropdownItems,
+                ) {
+                HabitDisplay(
+                    onEvent, state, state.displayHabits[it], dropdownItems,
                     Modifier.animateItem(
-                        fadeInSpec = spring(stiffness = Spring.StiffnessMediumLow, visibilityThreshold = 0.5f),
-                        fadeOutSpec = spring(stiffness = Spring.StiffnessMediumLow, visibilityThreshold = 0.5f),
                         placementSpec = spring(
                             stiffness = Spring.StiffnessMediumLow,
                         )
                     )
                 )
             }
-        }
+
         }
     }
+}
+
 
 
 @Composable
@@ -133,7 +152,7 @@ fun HabitDisplay(onEvent: (HabitEvent) -> Unit, state: HabitState, displayHabit:
     if (displayHabit.beingEdited.value) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(modifier = mod.weight(1f),
-                onClick = { onEvent(HabitEvent.ModifyHabit(displayHabit.habitJoin)) }
+                onClick = { onEvent(HabitEvent.ModifyHabit(displayHabit)) }
             ) {
                 Icon(
                     imageVector = Icons.Default.Check,
@@ -167,8 +186,7 @@ fun HabitDisplay(onEvent: (HabitEvent) -> Unit, state: HabitState, displayHabit:
 
 @Composable
 fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, dropdownItems: List<Item> , modifier: Modifier = Modifier){
-    println(displayHabit.habitJoin.habit.name)
-    val imageAlpha : Float by animateFloatAsState(targetValue = if(displayHabit.habitJoin.completion.done ){0.5f} else {1f})
+    val imageAlpha : Float by animateFloatAsState(targetValue = if(displayHabit.habit.done ){0.5f} else {1f})
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
@@ -176,12 +194,15 @@ fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, dropd
         modifier = modifier
             .padding(vertical = 5.dp, horizontal = 5.dp)
             .alpha(imageAlpha)
-            .clickable { onEvent(HabitEvent.IncCompletion(displayHabit.habitJoin)) },
+            .clickable {
+                onEvent(HabitEvent.IncCompletion(displayHabit.habit))
+            },
             colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primary)
+
     ) {
         Row {
             BasicText(
-                text = displayHabit.habitJoin.habit.name,
+                text = displayHabit.habit.name,
                 maxLines = 4,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
@@ -245,20 +266,20 @@ fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, dropd
                     modifier = Modifier
                         .clip(RoundedCornerShape(10.dp))
                         .background(
-                            if(displayHabit.habitJoin.completion.occurrence == "1111111"){
+                            if(displayHabit.habit.occurrence == "1111111"){
                                 MaterialTheme.colorScheme.onSecondaryContainer
                             } else {
                                 MaterialTheme.colorScheme.onTertiaryContainer
                             })
                         .animateContentSize(finishedListener = { x, y ->
                             run {
+                                onEvent(HabitEvent.CheckCompletion(displayHabit.habit))
 
-                                onEvent(HabitEvent.CheckCompleion(displayHabit.habitJoin))
                             }
                         }
                         )
                         .size(
-                            maxWidth * (displayHabit.habitJoin.completion.completion.toFloat() / displayHabit.habitJoin.habit.frequency),
+                            maxWidth * (displayHabit.habit.completion.toFloat() / displayHabit.habit.frequency),
                             maxHeight
                         )
                 )
@@ -266,10 +287,11 @@ fun DisplayMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, dropd
             Box(modifier = Modifier
                 .padding(start = 10.dp, end = 5.dp)
                 .clip(RoundedCornerShape(10.dp))
-                .weight(1f).background(MaterialTheme.colorScheme.background),
+                .weight(1f)
+                .background(MaterialTheme.colorScheme.background),
                 contentAlignment = Alignment.Center,) {
                 Text(modifier = Modifier.padding(bottom = 2.dp),
-                    text = displayHabit.habitJoin.habit.frequency.toString(),
+                    text = displayHabit.habit.frequency.toString(),
                     color = MaterialTheme.colorScheme.tertiary
                 )
             }
@@ -323,7 +345,7 @@ fun EditMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, state: H
                     .padding(start = 5.dp),
                 colors = SliderDefaults.colors(
                     thumbColor = MaterialTheme.colorScheme.onPrimary,
-                    activeTrackColor = if (displayHabit.habitJoin.completion.occurrence == "1111111") {
+                    activeTrackColor = if (displayHabit.habit.occurrence == "1111111") {
                             MaterialTheme.colorScheme.onSecondaryContainer
                         } else {
                             MaterialTheme.colorScheme.onTertiaryContainer
@@ -336,7 +358,8 @@ fun EditMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, state: H
             Box(modifier = Modifier
                 .padding(start = 10.dp, end = 5.dp)
                 .clip(RoundedCornerShape(10.dp))
-                .weight(1f).background(MaterialTheme.colorScheme.background),
+                .weight(1f)
+                .background(MaterialTheme.colorScheme.background),
                 contentAlignment = Alignment.Center,) {
                 Text(modifier = Modifier.padding(bottom = 2.dp),
                     text = state.editFreq.toString(),
@@ -345,7 +368,7 @@ fun EditMode(onEvent: (HabitEvent) -> Unit, displayHabit: DisplayHabit, state: H
             }
         }
         // chose days
-        if (displayHabit.habitJoin.completion.occurrence.contains("0")) {
+        if (displayHabit.habit.occurrence.contains("0")) {
             DaysSelection(onEvent, state)
         }
     }
@@ -439,4 +462,29 @@ fun MoodSection(state: HabitState, modifier: Modifier, event : (HabitEvent)-> Un
             )
         }
     }
+}
+
+@Composable
+fun NotificationBox(visible : Boolean, action: () -> Unit, text: String, color: Color = Color.Gray){
+    AnimatedVisibility(visible = visible,
+        enter = slideInHorizontally { fullWidth: Int ->  -fullWidth},
+        exit = fadeOut()) {
+        ElevatedCard(
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 6.dp
+            ),
+            modifier = Modifier
+                .padding(vertical = 5.dp, horizontal = 5.dp),
+            colors = CardDefaults.cardColors(color)
+        ){
+            Box(modifier = Modifier.padding(5.dp)) {
+                Text(text = text,
+                    color = Color(0xFF0E1514) )
+            }
+    }
+}
+    if (visible){
+        action()
+    }
+
 }

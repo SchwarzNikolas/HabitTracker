@@ -17,4 +17,6 @@ sealed interface CustomHabitEvent {
     // toggle save Dialog
     data object ToggleDialog: CustomHabitEvent
 
+    data object ToggleNotificationVisibility : CustomHabitEvent
+
 }

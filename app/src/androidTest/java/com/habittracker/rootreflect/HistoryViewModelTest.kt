@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.habittracker.rootreflect.database.HabitDao
 import com.habittracker.rootreflect.database.HabitDatabase
@@ -47,7 +48,7 @@ class HistoryViewModelTest {
 
     @Test
     fun selectPlantTest() = runBlocking {
-        val habitRec = HabitRecord(1,"test",4,date)
+        val habitRec = HabitRecord("test",4,date)
         val event = HistoryEvent.SelectPlant(habitRec)
         viewModel.onEvent(event)
         assertThat(viewModel.state.value.bottomSheetActive).isTrue()
@@ -78,16 +79,16 @@ class HistoryViewModelTest {
 
     @Test
     fun changeSelectedDayTest() = runBlocking {
-        val event = HistoryEvent.ChangeSelectedDay(date,MoodType.OK.toString())
-        val habitRec1 = HabitRecord(1,"test",2,date)
-        val habitRec2 = HabitRecord(2,"test2",3,date)
-        dao.insertRecord(habitRec1)
-        dao.insertRecord(habitRec2)
-        //dao.fetchHabitRecords().test {
-        //    habitRecords = awaitItem()
-        //    cancelAndIgnoreRemainingEvents()
-        //}
+        val event = HistoryEvent.ChangeSelectedDay(date, MoodType.OK.toString())
+        val habitRec1 = HabitRecord("test2",2, date)
+        val habitRec2 = HabitRecord("test3",3, date)
+        dao.upsertRecord(habitRec1)
+        dao.upsertRecord(habitRec2)
         viewModel.onEvent(event)
+        dao.fetchHabitRecordsByDate(date).test {
+            habitRecords = awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
         //assertThat(viewModel.state.value.habitList[0]).isEqualTo(habitRec1)
         assertThat(viewModel.state.value.selectedDate).isEqualTo(date)
         assertThat(viewModel.state.value.selectedMood).isEqualTo("OK")

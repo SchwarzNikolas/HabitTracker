@@ -52,7 +52,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+
+import com.habittracker.rootreflect.habit.NotificationBox
+
 import kotlinx.coroutines.delay
+
 
 @Composable
 fun CustomScreen(
@@ -65,6 +69,7 @@ fun CustomScreen(
             focusManager.clearFocus()
         }
     }){
+
         Column (
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
@@ -112,6 +117,9 @@ fun CustomScreen(
                 Save_Dialog(onEvent)
             }
         }
+        NotificationBox(visible = state.notificationVisibility,
+            action = { onEvent(CustomHabitEvent.ToggleNotificationVisibility) },
+            text = state.notificationText)
     }
 }
 
@@ -168,12 +176,9 @@ fun EditWindow(onEvent: (CustomHabitEvent) -> Unit, state: CustomState, manager:
             Text("10")
         }
 
-        // Spacer(modifier = Modifier.height(16.dp))
-
         if (!state.isDaily)
             WeeklyFields(state, onEvent, manager)
 
-        // Spacer(modifier = Modifier.height(8.dp))
 
         Button(
             onClick = {
@@ -187,9 +192,6 @@ fun EditWindow(onEvent: (CustomHabitEvent) -> Unit, state: CustomState, manager:
             )
         }
         Spacer(modifier = Modifier.weight(1f))
-//        if (state.habitName.isNotBlank()){
-//            HabitPreview(state = state)
-//        }
     }
 }
 

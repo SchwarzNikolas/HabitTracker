@@ -1,12 +1,11 @@
 package com.habittracker.rootreflect.habit
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.habittracker.rootreflect.database.DateRecord
 import com.habittracker.rootreflect.database.Habit
-import com.habittracker.rootreflect.database.HabitCompletion
 import com.habittracker.rootreflect.database.HabitDao
-import com.habittracker.rootreflect.database.HabitJoin
 import com.habittracker.rootreflect.database.HabitRecord
 import com.habittracker.rootreflect.database.MoodRecord
 import kotlinx.coroutines.Job
@@ -27,7 +26,7 @@ class HabitViewModel (
 ): ViewModel() {
     private val _state = MutableStateFlow(HabitState())
     val state = _state
-    private lateinit var date:LocalDate
+    private lateinit var date: LocalDate
     private lateinit var job: Job
     private val maxHabitNameLength = 50
     private val maxHabitFrequency = 9
@@ -39,17 +38,16 @@ class HabitViewModel (
                 dao.upsertDate(DateRecord(key = 1, date = LocalDate.now()))
                 date = LocalDate.now()
             }else{
-               date = dateRecord.date
+                date = dateRecord.date
             }
-            val mood  = dao.getMoodRecByDate(date.toString())
+            val mood  = dao.getMoodRecByDate(date)
             if (mood != null){
                 state.update { it.copy(selectedMood = mood.mood) }
             }
-
             job = viewModelScope.launch { dataSupRoutine() }
             while (true) {
-                if (getDate() != date) {
-                    date = getDate()
+                if (LocalDate.now() != date) {
+                    date = LocalDate.now()
                     dao.upsertDate(DateRecord(key = 1, date = LocalDate.now()))
                     resetCompletion()
                     job.cancel()
@@ -87,19 +85,23 @@ class HabitViewModel (
         when (event) {
             // handles ModifyHabit event
             is HabitEvent.ModifyHabit -> {
-                val habitCompletion: HabitCompletion = if (state.value.editFreq <= event.joinHabit.completion.completion){
-                    event.joinHabit.completion.copy(completion = state.value.editFreq,occurrence = state.value.editDays)
-                }else{
-                    event.joinHabit.completion.copy(occurrence = state.value.editDays)
-                }
-                val habit = event.joinHabit.habit.copy(
-                    frequency = state.value.editFreq,
-                    name = state.value.editString
-                )
-                updateHabit(habit)
-                updateCompletion(habitCompletion)
 
-                checkHabitCompletion(habit, habitCompletion)
+                val habit: Habit = if (state.value.editFreq <= event.displayHabit.habit.completion){
+                    event.displayHabit.habit.copy(
+                        frequency = state.value.editFreq,
+                        name = state.value.editString,
+                        completion = state.value.editFreq,
+                        occurrence = state.value.editDays,
+                        done = false
+                    )
+                }else{
+                    event.displayHabit.habit.copy(
+                        frequency = state.value.editFreq,
+                        name = state.value.editString,
+                        occurrence = state.value.editDays
+                    )
+                }
+                modifyHabit(event, habit)
             }
 
             is HabitEvent.EditHabit -> {
@@ -107,9 +109,9 @@ class HabitViewModel (
                 event.displayHabit.beingEdited.value = event.displayHabit.beingEdited.value.not()
                 state.update {
                     it.copy(
-                        editString = event.displayHabit.habitJoin.habit.name,
-                        editFreq = event.displayHabit.habitJoin.habit.frequency,
-                        editDays = event.displayHabit.habitJoin.completion.occurrence,
+                        editString = event.displayHabit.habit.name,
+                        editFreq = event.displayHabit.habit.frequency,
+                        editDays = event.displayHabit.habit.occurrence,
                         editDisplayHabit = event.displayHabit
                     )
                 }
@@ -152,7 +154,7 @@ class HabitViewModel (
 
             // deletes habit from database (is also automatically removed from UI)(gone forever)
             is HabitEvent.DeleteHabit -> {
-                removeHabit(event.habitJoin)
+                removeHabit(event.habit)
             }
 
             is HabitEvent.ContextMenuVisibility -> {
@@ -160,42 +162,22 @@ class HabitViewModel (
             }
 
             is HabitEvent.IncCompletion -> {
-                if (event.habitJoin.completion.completion < event.habitJoin.habit.frequency) {
+                if (event.habit.completion < event.habit.frequency) {
                     viewModelScope.launch {
-                        val habitCompletion = event.habitJoin.completion.copy(completion = event.habitJoin.completion.completion.inc())
-                        updateCompletion(habitCompletion)
-                        //delay(500)
-                        //checkHabitCompletion(event.habitJoin.habit, habitCompletion)
+                        val habit = event.habit.copy(completion = event.habit.completion.inc())
+                        updateHabit(habit)
                     }
                 }
             }
 
             is HabitEvent.DecCompletion -> {
-                if(event.habitJoin.completion.completion > 0){
+                if(event.habit.completion > 0){
                     viewModelScope.launch {
-                        val habitCompletion = event.habitJoin.completion.copy(completion = event.habitJoin.completion.completion.dec())
-                        updateCompletion(habitCompletion)
-                        //delay(500)
-                        //checkHabitCompletion(event.habitJoin.habit, habitCompletion)
+                        val habit = event.habit.copy(completion = event.habit.completion.dec())
+                        updateHabit(habit)
                     }
                 }
             }
-
-            // Deprecated
-            HabitEvent.ResetCompletion -> {
-                resetCompletion()
-            }
-
-            /*is HabitEvent.MoodChange -> {
-                _state.update {
-                    it.copy(
-                        selectedMood = event.moodType
-                    )
-                }
-                viewModelScope.launch {
-                    dao.upsertMoodRec(MoodRecord(date, event.moodType))
-                }
-            }*/
 
             is HabitEvent.MoodSelected -> {
                 _state.update {
@@ -203,20 +185,29 @@ class HabitViewModel (
                         selectedMood = event.moodType
                     )
                 }
-                //val dateTest = LocalDate.now()
+                val moodRecord =  MoodRecord(
+                    moodDate = date,
+                    mood = event.moodType
+                )
                 viewModelScope.launch {
-                        dao.upsertMoodRec(
-                            moodRec = MoodRecord(
-                                //moodDate = dateTest,
-                                moodDate = date,
-                                mood = event.moodType
-                            )
-                        )
+                        dao.upsertMoodRec(moodRecord)
                 }
             }
 
-            is HabitEvent.CheckCompleion -> {
-                checkHabitCompletion(event.habit.habit, event.habit.completion)
+            is HabitEvent.CheckCompletion -> {
+                checkHabitCompletion(event.habit)
+            }
+
+            HabitEvent.ToggleNotificationVisibility -> {
+                viewModelScope.launch {
+                delay(2000)
+                state.update { it.copy(showNotification = false) }
+            }
+            }
+
+            HabitEvent.ToggleScroll -> {
+                state.update {
+                    it.copy(fixScroll = mutableStateOf(false)) }
             }
         }
     }
@@ -224,38 +215,31 @@ class HabitViewModel (
 
 
     // logic for habit completion, components are explained individually below
-    private fun checkHabitCompletion(join: Habit, completion: HabitCompletion) {
+    private fun checkHabitCompletion(habit: Habit) {
         val habitRecord = HabitRecord(
-            habitName = join.name,
-            habitFrequency = join.frequency,
+            habitName = habit.name,
+            habitFrequency = habit.frequency,
             date = date
         )
 
-        var comp: HabitCompletion = completion
-        if (join.frequency == completion.completion && !completion.done){
-            comp = completion.copy(done = true)
+        if (habit.frequency == habit.completion){
+            val  comp = habit.copy(done = true)
             insertRecord(habitRecord)
-            updateCompletion(comp)
-        }else if(completion.done && join.frequency != completion.completion){
-            comp = completion.copy(done = false)
+            updateHabit(comp)
+        }else if(habit.done){
+            val comp = habit.copy(done = false)
             removeRecord(habitRecord)
-            updateCompletion(comp)
+            updateHabit(comp)
         }
     }
 
     // removes record from the database using the dao (database access object)
-    private fun removeHabit(habitJoin: HabitJoin){
+    private fun removeHabit(habit: Habit){
         viewModelScope.launch {
-            //dao.deleteCompletion(habitJoin.completion)
-            dao.deleteHabit(habitJoin.habit)
+            dao.deleteHabit(habit)
         }
     }
 
-    private fun updateCompletion(completion: HabitCompletion){
-        viewModelScope.launch {
-            dao.upsertCompletion(completion)
-        }
-    }
 
     private fun removeRecord(record: HabitRecord) {
         viewModelScope.launch {
@@ -266,31 +250,31 @@ class HabitViewModel (
     // insert record into the database using the dao (database access object)
     private fun insertRecord(record: HabitRecord) {
         viewModelScope.launch {
-            dao.insertRecord(record)
+            dao.upsertRecord(record)
         }
     }
 
     private fun updateHabit(habit: Habit){
         viewModelScope.launch {
-            dao.upsertHabit(habit)
+            try {
+                dao.upsertHabit(habit)
+            } catch (e: Exception) {
+                return@launch
+            }
         }
     }
 
      private suspend fun dataSupRoutine(){
-         dao.fetchHabitByDay(dayToString(date.dayOfWeek.value-1)).collect{habitJoin -> run{
+         dao.fetchHabitByDay(dayToString(date.dayOfWeek.value-1)).collect{habits -> run{
+
              val displayHabitRecordList: MutableList<DisplayHabit> = mutableListOf()
-             val finishedDisplayHabitRecordList: MutableList<DisplayHabit> = mutableListOf()
-             for (habit in habitJoin){
-                 if (habit.completion.done){
-                     finishedDisplayHabitRecordList.add(DisplayHabit(habitJoin = habit))
-                 }
-                else {
-                    displayHabitRecordList.add(DisplayHabit(habitJoin = habit))
-                }
+
+             for (habit in habits){
+                 displayHabitRecordList.add(DisplayHabit(habit = habit))
              }
                 _state.update { it.copy(
-                    displayHabits = (displayHabitRecordList + finishedDisplayHabitRecordList).toMutableList(),
-                    //finishedDisplayHabits = finishedDisplayHabitRecordList
+                    displayHabits = displayHabitRecordList,
+                    fixScroll = mutableStateOf(true)
                 )
                 }
          }
@@ -311,10 +295,23 @@ class HabitViewModel (
         }
     }
 
-    // tem
-    private fun getDate(): LocalDate {
-        return LocalDate.now()
+    private fun modifyHabit(event: HabitEvent.ModifyHabit, habit: Habit) {
+        viewModelScope.launch {
+            try {
+                dao.upsertHabit(habit)
+                if (state.value.editString != event.displayHabit.habit.name) {
+                    removeRecord(HabitRecord(event.displayHabit.habit.name, event.displayHabit.habit.frequency, date))
+                    insertRecord(HabitRecord(state.value.editString, state.value.editFreq, date))
+                }
+                checkHabitCompletion(habit)
+                event.displayHabit.beingEdited.value = false
+            }catch (e: Exception){
+                state.update { it.copy(errorMessage = "Error: Name Already exists",
+                    showNotification = true,
+                    ) }
+                return@launch
+            }
+        }
     }
-
 }
 
