@@ -408,7 +408,12 @@ fun DayButton(
                 .size(width = 16.dp, height = 16.dp),
             border = BorderStroke(1.dp, Color.Black),
             colors = ButtonDefaults.outlinedButtonColors(
-                containerColor = if (clicked) Color.Black else Color.White,
+                containerColor =
+                if (clicked){
+                    MaterialTheme.colorScheme.onTertiaryContainer
+                } else {
+                    Color.Transparent
+                },
             )
         ){}
     }

@@ -52,9 +52,11 @@ fun HistoryScreen(
     onEvent: (HistoryEvent) -> Unit
 ) {
     Column {
+        Spacer(modifier = Modifier.height(5.dp))
         Text(text = "Select a Plant to display a Habit",
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(8.dp))
         Box {
             val flowerFrequency: List<@Composable (HabitRecord) -> Unit> = listOf(
                 {FlowerClick(onEvent = onEvent, state = state, flower = "images/blueflower.png", offsetX = 255.dp, offsetY = 295.dp, habitRecord = it)},
@@ -270,7 +272,7 @@ fun DailyBox(onEvent: (HistoryEvent) -> Unit, dayOfMonth: DayOfMonth, state: His
 
 @Composable
 fun Background(){
-    val drawable = loadImageFromAssets(LocalContext.current, "images/backgroundboardered.png")
+    val drawable = loadImageFromAssets(LocalContext.current, "images/boarderedbackground.png")
     val bitmap = drawable?.toBitmap()?.asImageBitmap()
     bitmap?.let { BitmapPainter(it) }?.let {
     Image(

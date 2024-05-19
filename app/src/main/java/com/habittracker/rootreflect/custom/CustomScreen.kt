@@ -142,28 +142,39 @@ fun EditWindow(onEvent: (CustomHabitEvent) -> Unit, state: CustomState, manager:
 
         Text("Frequency")
 
-        Slider(
-            value = state.habitFrequency.toFloat(),
-            onValueChange = {
-                onEvent(CustomHabitEvent.EditFreq(it.toInt()))
-                manager.clearFocus()
-            },
-            valueRange = 1f..9f,
-            steps = 7,
+        Row (
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .fillMaxWidth(0.8f),
-            colors = SliderDefaults.colors(
-                thumbColor = MaterialTheme.colorScheme.onPrimary,
-                activeTrackColor = if (state.isDaily) {
-                    MaterialTheme.colorScheme.onSecondaryContainer
-                } else {
-                    MaterialTheme.colorScheme.onTertiaryContainer
+                .fillMaxWidth(0.9f)
+                .padding(10.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text("1 ")
+
+            Slider(
+                value = state.habitFrequency.toFloat(),
+                onValueChange = {
+                    onEvent(CustomHabitEvent.EditFreq(it.toInt()))
+                    manager.clearFocus()
                 },
-                inactiveTrackColor = MaterialTheme.colorScheme.secondaryContainer,
-                activeTickColor = MaterialTheme.colorScheme.onPrimary,
-                inactiveTickColor = MaterialTheme.colorScheme.tertiary
+                valueRange = 1f..10f,
+                steps = 8,
+                modifier = Modifier
+                    .fillMaxWidth(0.9f),
+                colors = SliderDefaults.colors(
+                    thumbColor = MaterialTheme.colorScheme.onPrimary,
+                    activeTrackColor = if (state.isDaily) {
+                        MaterialTheme.colorScheme.onSecondaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.onTertiaryContainer
+                    },
+                    inactiveTrackColor = MaterialTheme.colorScheme.secondaryContainer,
+                    activeTickColor = MaterialTheme.colorScheme.onPrimary,
+                    inactiveTickColor = MaterialTheme.colorScheme.tertiary
+                )
             )
-        )
+            Text("10")
+        }
 
         if (!state.isDaily)
             WeeklyFields(state, onEvent, manager)
@@ -266,7 +277,16 @@ fun CustomTextField(
     TextField(
         value = value,
         onValueChange = { onchange(it) },
-        label = { Text(label) },
+        label = {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = label,
+                    textAlign = TextAlign.Center
+                )
+            } },
         colors = TextFieldDefaults.colors(
             focusedContainerColor = Color.Transparent,
             unfocusedContainerColor = Color.Transparent,
