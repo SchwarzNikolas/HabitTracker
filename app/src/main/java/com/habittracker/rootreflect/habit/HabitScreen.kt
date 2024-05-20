@@ -474,11 +474,10 @@ fun NotificationBox(visible : Boolean, action: () -> Unit, text: String, color: 
             ),
             modifier = Modifier
                 .padding(vertical = 5.dp, horizontal = 5.dp),
-            colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primary)
+            colors = CardDefaults.cardColors(color)
         ){
             Box(modifier = Modifier.padding(5.dp)) {
-                Text(text = text,
-                    color = color)
+                Text(text = text,)
             }
     }
 }

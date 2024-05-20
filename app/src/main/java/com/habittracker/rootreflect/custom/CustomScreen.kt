@@ -114,7 +114,7 @@ fun CustomScreen(
             color = if (state.notificationText == "Error: Habit already Exists") {
                 MaterialTheme.colorScheme.onError
             } else{
-                MaterialTheme.colorScheme.onPrimary
+                MaterialTheme.colorScheme.primary
             }
         )
     }
