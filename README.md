@@ -52,13 +52,9 @@ How you can use RootReflect:
 * Gain an insight how your habits affect your mood
 * Review your habit history
 
-<!--p align="center">
-  <img src = "imagelink" width=700>
-</p>
-
 <p align="center">
-  <img src = "imagelink" width=700>
-</p-->
+  <img src = "https://github.com/SchwarzNikolas/RootReflect/blob/main/doc/RootReflect_screens.png?raw=true" width=700>
+</p>
 
 ## Feedback
 
