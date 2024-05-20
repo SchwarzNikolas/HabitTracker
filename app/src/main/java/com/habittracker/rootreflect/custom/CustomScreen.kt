@@ -247,7 +247,7 @@ fun DayButton(
                 manager.clearFocus()},
             modifier = Modifier
                 .size(width = 40.dp, height = 40.dp),
-            border = BorderStroke(1.dp, Color.Black),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground),
             colors = ButtonDefaults.outlinedButtonColors(
                 containerColor =
                 if (clicked){
@@ -255,6 +255,7 @@ fun DayButton(
                 } else {
                     Color.Transparent
                 },
+
             )
         ) {}
     }
