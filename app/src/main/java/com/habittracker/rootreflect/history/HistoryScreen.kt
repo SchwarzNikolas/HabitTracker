@@ -330,18 +330,19 @@ fun FlowerClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, flower: St
             .offset(offsetX, offsetY)
             .pointerInput(Unit) {
                 detectTapGestures {
-                    if (clickPixel(65.dp.toPx(), it, bitmap))
+                    //if (clickPixel(65.dp.toPx(), it, bitmap)) {
                         //onEvent(HistoryEvent.NameTagToggle)
                         onEvent(
                             HistoryEvent.SetOffSet(
                                 DpOffset(
-                                with(density) { (it.x).toDp() } + offsetX,
-                                with(density) { (it.y).toDp() } + offsetY
-                            ),
-                            habitRecord
+                                    with(density) { (it.x).toDp() } + offsetX,
+                                    with(density) { (it.y).toDp() } + offsetY
+                                ),
+                                habitRecord
+                            )
                         )
-                    )
-                }
+                    }
+                //}
             }
     )
 }
