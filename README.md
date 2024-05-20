@@ -30,8 +30,11 @@
 [![Build Status](https://img.shields.io/github/actions/workflow/status/SchwarzNikolas/RootReflect/build.yml
 )](https://github.com/SchwarzNikolas/RootReflect/actions/workflows/build.yml)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+[![All Contributors](https://img.shields.io/github/all-contributors/SchwarzNikolas/RootReflect
+)](#contributors)
 [![Licence](https://img.shields.io/github/license/SchwarzNikolas/RootReflect
 )](https://github.com/SchwarzNikolas/RootReflect/blob/main/LICENCE)
+
 
 RootReflect is an opensource habit tracker that allows users to seamlessly add and monitor their habits, it helps users correlate their daily routines with their emotional well-being.
 
@@ -97,3 +100,4 @@ If you have any feedback, issues, or feature requests, please file an [file an i
 ## Licence
 
 The GPL-3.0 licence 2024 - Schwarz Nikolas. Please look at [LICENCE](https://github.com/SchwarzNikolas/RootReflect/blob/main/LICENCE) for more information.
+For the artwork refer to the [licence](https://github.com/SchwarzNikolas/RootReflect/blob/717a18f4e30bf7df5ffbfd6fd07ee73030e4d9dd/app/src/main/assets/images/LICENCE.md) in the images folder.
