@@ -3,6 +3,7 @@ package com.habittracker.rootreflect.history
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.habittracker.rootreflect.database.HabitRecord
 import com.habittracker.rootreflect.ui.theme.AnalogousCool
@@ -42,6 +43,11 @@ data class HistoryState(
     // store selected habit
     val habitStored: HabitRecord? = null,
     // height of the bottom sheet
-    val infoCardHeight: Dp = 100.dp
+    val infoCardHeight: Dp = 100.dp,
+
+    val nameTagActive: Boolean = false,
+
+    val offset: DpOffset = DpOffset(0.dp,0.dp)
+
 ) {
 }

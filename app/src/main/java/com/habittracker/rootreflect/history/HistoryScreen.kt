@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,7 +24,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,6 +41,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import com.habittracker.rootreflect.database.HabitRecord
@@ -88,6 +92,7 @@ fun HistoryScreen(
             if (state.habitListF3Above.isNotEmpty()){
                 TreeClick(onEvent = onEvent, state = state, habitRecord = state.habitListF3Above[0])
             }
+            NameTag(show = state.nameTagActive, showe = state.offset, onEvent, state)
 
         }
         Spacer(modifier = Modifier.height(10.dp))
@@ -312,7 +317,6 @@ fun SunMary(onEvent: (HistoryEvent) -> Unit){
 }
 
 @Composable
-
 fun FlowerClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, flower: String, offsetX: Dp, offsetY: Dp, habitRecord: HabitRecord) {
     val drawable = loadImageFromAssets(LocalContext.current, flower)
     val bitmap = drawable!!.toBitmap()
@@ -327,7 +331,16 @@ fun FlowerClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, flower: St
             .pointerInput(Unit) {
                 detectTapGestures {
                     if (clickPixel(65.dp.toPx(), it, bitmap))
-                        onEvent(HistoryEvent.SelectPlant(habitRecord))
+                        //onEvent(HistoryEvent.NameTagToggle)
+                        onEvent(
+                            HistoryEvent.SetOffSet(
+                                DpOffset(
+                                with(density) { (it.x).toDp() } + offsetX,
+                                with(density) { (it.y).toDp() } + offsetY
+                            ),
+                            habitRecord
+                        )
+                    )
                 }
             }
     )
@@ -348,8 +361,20 @@ fun BushClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, bush: String
             .pointerInput(Unit) {
                 detectTapGestures {
                     // calcs offset scale due to height setting
-                    if (clickPixel(65.dp.toPx(), it, bitmap))
-                        onEvent(HistoryEvent.SelectPlant(habitRecord))
+
+                    if (clickPixel(65.dp.toPx(), it, bitmap)) {
+                        //onEvent(HistoryEvent.NameTagToggle)
+                        onEvent(
+                            HistoryEvent.SetOffSet(
+                                DpOffset(
+                                    with(density) { (it.x).toDp() } + offsetX,
+                                    with(density) { (it.y).toDp() } + offsetY
+                                ),
+                                habitRecord
+                            )
+                        )
+                        //onEvent(HistoryEvent.SelectPlant(habitRecord))
+                    }
                 }
             }
     )
@@ -374,8 +399,17 @@ fun TreeClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, habitRecord:
                     // calcs offset scale due to height setting
                     // check pixel is not transparent
                     if (clickPixel(225.dp.toPx(), it, bitmap))
-                        onEvent(HistoryEvent.SelectPlant(habitRecord))
-
+                        //onEvent(HistoryEvent.NameTagToggle)
+                        onEvent(
+                            HistoryEvent.SetOffSet(
+                            DpOffset(
+                                with(density) { (it.x).toDp() } + 100.dp,
+                                with(density) { (it.y).toDp() } + 15.dp
+                            ),
+                            habitRecord
+                        )
+                    )
+                        //onEvent(HistoryEvent.SelectPlant(habitRecord))
                 }
             }
     )
@@ -404,4 +438,19 @@ fun loadImageFromAssets(context: Context, filename: String): Drawable? {
         e.printStackTrace()
     }
     return null
+}
+
+@Composable
+fun NameTag(show: Boolean, showe: DpOffset, onEvent: (HistoryEvent) -> Unit, state: HistoryState ){
+    DropdownMenu(
+        expanded = show,
+        onDismissRequest = {
+            onEvent(HistoryEvent.NameTagToggle)
+        },
+        // add click off set to the sprite offset, y negative since it needs to go up
+        offset = DpOffset(showe.x, (-400).dp + showe.y),
+        modifier = Modifier.padding(horizontal = 10.dp).background(MaterialTheme.colorScheme.primary)
+    ) {
+        Text(text = state.habitStored!!.habitName)
+    }
 }

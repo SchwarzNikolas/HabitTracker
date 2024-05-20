@@ -2,6 +2,7 @@ package com.habittracker.rootreflect.history
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -121,6 +122,7 @@ class HistoryViewModel(
                     )
                 }
             }
+
             is HistoryEvent.ShowSummary -> {
                 // enables the bottom sheet (is invoked when the user clicks on anything that contains additional information)
                 _state.update {
@@ -131,6 +133,7 @@ class HistoryViewModel(
                     )
                 }
             }
+
             is HistoryEvent.DisableBottomSheet -> {
                 // disable the bottom sheet
                 _state.update {
@@ -139,31 +142,32 @@ class HistoryViewModel(
                     )
                 }
             }
+
             is HistoryEvent.ChangeCurrentMonth -> {
                 // change selected month and year and update the calendar accordingly
                 _state.update {
                     it.copy(
-                        selectedMonth = Month.of(event.date%100),
-                        selectedYear = (event.date - event.date%100) / 100
+                        selectedMonth = Month.of(event.date % 100),
+                        selectedYear = (event.date - event.date % 100) / 100
                     )
                 }
                 updateDays()
             }
+
             is HistoryEvent.ChangeSelectedDay -> {
                 /*
                 change selected date (is invoked when user selects a day in the calendar)
                 additionally this event changes the selected mood and will change what the bottom
                 sheet should display. It also fetches the completed habits from the selected day.
                  */
-                if (job != null){
+                if (job != null) {
                     job!!.cancel()
                 }
                 job = viewModelScope.launch {
-                    dao.fetchHabitRecordsByDate(event.day).collect {
-                    habitRecords ->
+                    dao.fetchHabitRecordsByDate(event.day).collect { habitRecords ->
                         run {
                             val records: MutableList<HabitRecord> = mutableStateListOf()
-                            for (record in habitRecords){
+                            for (record in habitRecords) {
                                 records.add(record)
                             }
                             _state.update {
@@ -173,13 +177,34 @@ class HistoryViewModel(
                                     selectedMood = event.moodName,
                                     habitInfo = false,
                                     // filter the habits by their frequency into three separate lists
-                                    habitListF1 = records.filter {record -> record.habitFrequency == 1 }.toList().toMutableList(),
-                                    habitListF2 = records.filter {record -> record.habitFrequency == 2 }.toList().toMutableList(),
-                                    habitListF3Above = records.filter {record -> record.habitFrequency >= 3 }.toList().toMutableList(),
+                                    habitListF1 = records.filter { record -> record.habitFrequency == 1 }
+                                        .toList().toMutableList(),
+                                    habitListF2 = records.filter { record -> record.habitFrequency == 2 }
+                                        .toList().toMutableList(),
+                                    habitListF3Above = records.filter { record -> record.habitFrequency >= 3 }
+                                        .toList().toMutableList(),
                                 )
                             }
                         }
                     }
+                }
+            }
+
+            HistoryEvent.NameTagToggle -> {
+                state.update {
+                    it.copy(
+                        nameTagActive = state.value.nameTagActive.not()
+                    )
+                }
+            }
+
+            is HistoryEvent.SetOffSet -> {
+                state.update {
+                    it.copy(
+                        nameTagActive = state.value.nameTagActive.not(),
+                        offset = event.offSet,
+                        habitStored = event.habitRecord
+                    )
                 }
             }
         }

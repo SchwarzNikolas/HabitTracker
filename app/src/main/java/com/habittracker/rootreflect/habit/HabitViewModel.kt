@@ -37,6 +37,8 @@ class HabitViewModel (
             if (dateRecord == null){
                 dao.upsertDate(DateRecord(key = 1, date = LocalDate.now()))
                 date = LocalDate.now()
+
+
             }else{
                 date = dateRecord.date
             }
@@ -212,8 +214,6 @@ class HabitViewModel (
         }
     }
 
-
-
     // logic for habit completion, components are explained individually below
     private fun checkHabitCompletion(habit: Habit) {
         val habitRecord = HabitRecord(
@@ -268,7 +268,6 @@ class HabitViewModel (
          dao.fetchHabitByDay(dayToString(date.dayOfWeek.value-1)).collect{habits -> run{
 
              val displayHabitRecordList: MutableList<DisplayHabit> = mutableListOf()
-
              for (habit in habits){
                  displayHabitRecordList.add(DisplayHabit(habit = habit))
              }
