@@ -2,7 +2,7 @@
 <h1 align="center"> RootReflect </h1> <br>
 <p align="center">
   <a href="https://github.com/SchwarzNikolas/RootReflect">
-    <img alt="GitPoint" title="GitPoint" src="https://github.com/SchwarzNikolas/RootReflect/raw/GOOD-11_Sprint5/app/src/main/res/mipmap-xxxhdpi/logo_round.webp" width="250">
+    <img alt="RootReflect" title="RootReflect" src="https://github.com/SchwarzNikolas/RootReflect/raw/GOOD-11_Sprint5/app/src/main/res/mipmap-xxxhdpi/logo_round.webp" width="250">
   </a>
 </p>
 
