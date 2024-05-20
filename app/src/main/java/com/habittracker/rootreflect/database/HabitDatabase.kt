@@ -10,7 +10,6 @@ import androidx.room.TypeConverters
     entities = [
         Habit::class,
         HabitRecord::class,
-        HabitCompletion::class,
         MoodRecord::class,
         DateRecord::class],
     version = 1

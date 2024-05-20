@@ -2,8 +2,10 @@ package com.habittracker.rootreflect.navigation
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -59,6 +61,13 @@ fun AppNavigation(
                                    contentDescription = null
                                )
                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                            selectedTextColor = MaterialTheme.colorScheme.onPrimary,
+                            unselectedIconColor = MaterialTheme.colorScheme.tertiary,
+                            unselectedTextColor = MaterialTheme.colorScheme.tertiary,
+                            indicatorColor = MaterialTheme.colorScheme.background
+                        )
                     )
                 }
             }

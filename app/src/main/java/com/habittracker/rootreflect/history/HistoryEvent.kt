@@ -6,7 +6,7 @@ import java.time.LocalDate
 
 sealed interface HistoryEvent {
     // event to enable bottom sheet
-    data object EnableBottomSheet: HistoryEvent
+    data object ShowSummary: HistoryEvent
     // event to disable bottom sheet
     data object DisableBottomSheet: HistoryEvent
     // event to change selected month

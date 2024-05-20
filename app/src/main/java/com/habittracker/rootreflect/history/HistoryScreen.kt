@@ -52,9 +52,11 @@ fun HistoryScreen(
     onEvent: (HistoryEvent) -> Unit
 ) {
     Column {
+        Spacer(modifier = Modifier.height(5.dp))
         Text(text = "Select a Plant to display a Habit",
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(8.dp))
         Box {
             val flowerFrequency: List<@Composable (HabitRecord) -> Unit> = listOf(
                 {FlowerClick(onEvent = onEvent, state = state, flower = "images/blueflower.png", offsetX = 255.dp, offsetY = 295.dp, habitRecord = it)},
@@ -71,6 +73,7 @@ fun HistoryScreen(
                 {BushClick(onEvent = onEvent, state = state, bush = "images/bush3.png", offsetX = 260.dp, offsetY = 220.dp, habitRecord = it)})
 
             Background()
+            SunMary(onEvent = onEvent)
 
             for(i in flowerFrequency.indices) {
                  if (state.habitListF1.size > i){
@@ -135,7 +138,7 @@ fun InfoSheet(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
         },
     ) {
         Box(modifier = Modifier
-            .height(300.dp)
+            .height(state.infoCardHeight)
             .align(Alignment.CenterHorizontally)
             .padding(10.dp)){
             if (state.habitInfo) {
@@ -185,10 +188,12 @@ fun InfoSheet(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
                         Text(text = "You have completed the following habits:",
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth())
-                        for (habit in state.habitList){
-                            Text(text = "• " + habit.habitName,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth())
+                        LazyVerticalGrid(columns = GridCells.Fixed(1)) {
+                            items(state.habitList.size){
+                                Text(text = "• " + state.habitList[it].habitName,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth())
+                            }
                         }
                     }
                 }
@@ -260,7 +265,6 @@ fun DailyBox(onEvent: (HistoryEvent) -> Unit, dayOfMonth: DayOfMonth, state: His
         shape = RoundedCornerShape(5.dp),
         colors = ButtonDefaults.buttonColors(dayOfMonth.colour),
         onClick = {
-            onEvent(HistoryEvent.EnableBottomSheet)
             onEvent(HistoryEvent.ChangeSelectedDay(dayOfMonth.date, dayOfMonth.mood))},
         border = if (dayOfMonth.date == state.selectedDate) {BorderStroke(1.dp, Color.Yellow)} else {null}
 
@@ -270,7 +274,7 @@ fun DailyBox(onEvent: (HistoryEvent) -> Unit, dayOfMonth: DayOfMonth, state: His
 
 @Composable
 fun Background(){
-    val drawable = loadImageFromAssets(LocalContext.current, "images/backgroundboardered.png")
+    val drawable = loadImageFromAssets(LocalContext.current, "images/boarderedbackground.png")
     val bitmap = drawable?.toBitmap()?.asImageBitmap()
     bitmap?.let { BitmapPainter(it) }?.let {
     Image(
@@ -283,6 +287,28 @@ fun Background(){
             .height(height = 400.dp) // to alter image height
         )
     }
+}
+
+@Composable
+fun SunMary(onEvent: (HistoryEvent) -> Unit){
+    val drawable = loadImageFromAssets(LocalContext.current, "images/sun.png")
+    val bitmap = drawable!!.toBitmap()
+    Image(
+        painter = BitmapPainter(bitmap.asImageBitmap()),
+        contentDescription = null,
+        alignment = Alignment.Center,
+        contentScale = ContentScale.Crop,
+        modifier = Modifier
+            .height(height = 80.dp)
+            .offset(265.dp, 15.dp)
+            .pointerInput(Unit) {
+                detectTapGestures {
+                    // calcs offset scale due to height setting
+                    if (clickPixel(80.dp.toPx(), it, bitmap))
+                        onEvent(HistoryEvent.ShowSummary)
+                }
+            }
+    )
 }
 
 @Composable

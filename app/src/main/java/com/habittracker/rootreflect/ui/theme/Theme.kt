@@ -18,11 +18,16 @@ import androidx.core.view.WindowCompat
 
 
 private val DarkColorScheme = darkColorScheme(
-    primary = GreenLight,
-    secondary = GreenDark,
-    tertiary = Boarder,
-    background = GreyDarkMode
-
+    primary = GunMetal,
+    onPrimary = SoftPeach,
+    secondaryContainer = AnalogousWarm,
+    onSecondaryContainer = MediumSpringGreen,
+    tertiary = Venus,
+    onTertiaryContainer = SaffronMango,
+    background = Mirage,
+    onBackground = SoftPeach,
+    surface = GunMetal,
+    onError = FadedRed
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -44,7 +49,7 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun HabitTrackerTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = false,//isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
@@ -56,7 +61,7 @@ fun HabitTrackerTheme(
         }
 
         darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+        else -> DarkColorScheme // tmp fix to make the statusbar display light coloured text (was LightColorScheme before)
     }
     val view = LocalView.current
     if (!view.isInEditMode) {
