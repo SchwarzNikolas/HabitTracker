@@ -45,7 +45,6 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import java.io.IOException
-import java.time.LocalDate
 import java.time.Month
 
 
@@ -218,10 +217,6 @@ fun MonthlyHistory(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
 ) {
-        val offsetDays = LocalDate.of(state.selectedYear, state.selectedMonth, 1).dayOfWeek.value - 1
-        items(offsetDays){
-            DisabledDay()
-        }
         items(state.dayList.size){
             DailyBox(onEvent, state.dayList[it], state)
         }
@@ -246,18 +241,6 @@ fun MonthSelector(onEvent: (HistoryEvent) -> Unit, state: HistoryState){
 }
 
 @Composable
-fun DisabledDay(){
-    /*
-    Button which represents a day of the previous month in the calendar
-     */
-    Button(onClick = { /*This button does nothing ;)*/ },
-        modifier = Modifier.size(width = 25.dp, height = 25.dp),
-        shape = RoundedCornerShape(5.dp),
-        enabled = false) {
-    }
-}
-
-@Composable
 fun DailyBox(onEvent: (HistoryEvent) -> Unit, dayOfMonth: DayOfMonth, state: HistoryState){
     /*
     Button which acts as a day in the calendar, will show information about the day if clicked
@@ -269,8 +252,12 @@ fun DailyBox(onEvent: (HistoryEvent) -> Unit, dayOfMonth: DayOfMonth, state: His
         colors = ButtonDefaults.buttonColors(dayOfMonth.colour),
         onClick = {
             onEvent(HistoryEvent.ChangeSelectedDay(dayOfMonth.date, dayOfMonth.mood))},
-        border = if (dayOfMonth.date == state.selectedDate) {BorderStroke(1.dp, Color.Yellow)} else {null}
-
+        border = if (dayOfMonth.date == state.selectedDate) {
+            BorderStroke(1.dp, Color.Yellow)
+        } else {
+            null
+        },
+        enabled = dayOfMonth.enabled
     ) {
     }
 }

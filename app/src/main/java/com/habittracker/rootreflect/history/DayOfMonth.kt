@@ -12,4 +12,5 @@ data class DayOfMonth(
     val mood: String,
     val colour: Color = AnalogousCool,
     val date: LocalDate,
+    val enabled: Boolean
 )
