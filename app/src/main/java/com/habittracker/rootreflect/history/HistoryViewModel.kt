@@ -200,7 +200,20 @@ class HistoryViewModel(
         val amountDays: Int = year.lengthOfMonth()
         val days: MutableList<DayOfMonth> = mutableListOf()
 
+
+
         viewModelScope.launch {
+            val offsetDays = LocalDate.of(state.value.selectedYear, state.value.selectedMonth, 1).dayOfWeek.value - 1
+            for (i in 1 .. offsetDays){
+                days.add(
+                    DayOfMonth(
+                        colour = state.value.dayPassiveColour,
+                        date = LocalDate.of(1970, 1, 1),
+                        mood = "No mood",
+                        enabled = false
+                    )
+                )
+            }
             for (i in 1..amountDays) {
                 // loop trough every day in selected month
                 val date = LocalDate.of(
@@ -217,7 +230,8 @@ class HistoryViewModel(
                     DayOfMonth(
                         colour = colour,
                         date = date,
-                        mood = moodName
+                        mood = moodName,
+                        enabled = true
                     )
                 )
             }
