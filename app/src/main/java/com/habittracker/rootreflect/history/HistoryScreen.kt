@@ -62,18 +62,18 @@ fun HistoryScreen(
         Spacer(modifier = Modifier.height(8.dp))
         Box {
             val flowerFrequency: List<@Composable (String) -> Unit> = listOf(
-                {FlowerClick(onEvent = onEvent, state = state, flower = "images/blueflower.png", offsetX = 255.dp, offsetY = 295.dp, habitRecord = it)},
-                {FlowerClick(onEvent = onEvent, state = state, flower = "images/orangeflower.png", offsetX = 100.dp, offsetY = 275.dp, habitRecord = it)},
-                {FlowerClick(onEvent = onEvent, state = state, flower = "images/pinkflower.png", offsetX = 135.dp, offsetY = 300.dp, habitRecord = it)},
-                {FlowerClick(onEvent = onEvent, state = state, flower = "images/yelloworangeflower.png", offsetX = 320.dp, offsetY = 310.dp, habitRecord = it)},
-                {FlowerClick(onEvent = onEvent, state = state, flower = "images/blueflower.png", offsetX = 80.dp, offsetY = 320.dp, habitRecord = it)},
-                {FlowerClick(onEvent = onEvent, state = state, flower = "images/yelloworangeflower.png", offsetX = 190.dp, offsetY = 315.dp, habitRecord = it)})
+                {FlowerClick(onEvent = onEvent, flower = "images/blueflower.png", offsetX = 255.dp, offsetY = 295.dp, habitRecord = it)},
+                {FlowerClick(onEvent = onEvent, flower = "images/orangeflower.png", offsetX = 100.dp, offsetY = 275.dp, habitRecord = it)},
+                {FlowerClick(onEvent = onEvent, flower = "images/pinkflower.png", offsetX = 135.dp, offsetY = 300.dp, habitRecord = it)},
+                {FlowerClick(onEvent = onEvent, flower = "images/yelloworangeflower.png", offsetX = 320.dp, offsetY = 310.dp, habitRecord = it)},
+                {FlowerClick(onEvent = onEvent, flower = "images/blueflower.png", offsetX = 80.dp, offsetY = 320.dp, habitRecord = it)},
+                {FlowerClick(onEvent = onEvent, flower = "images/yelloworangeflower.png", offsetX = 190.dp, offsetY = 315.dp, habitRecord = it)})
 
 
             val bushFrequency: List<@Composable (String) -> Unit> = listOf(
-                {BushClick(onEvent = onEvent, state = state, bush = "images/bush1.png", offsetX = 50.dp, offsetY = 200.dp, habitRecord = it)}, // do again with bush random return val
-                {BushClick(onEvent = onEvent, state = state, bush = "images/bush2.png", offsetX = 160.dp, offsetY = 250.dp, habitRecord = it)},
-                {BushClick(onEvent = onEvent, state = state, bush = "images/bush3.png", offsetX = 260.dp, offsetY = 220.dp, habitRecord = it)})
+                {BushClick(onEvent = onEvent, bush = "images/bush1.png", offsetX = 50.dp, offsetY = 200.dp, habitRecord = it)}, // do again with bush random return val
+                {BushClick(onEvent = onEvent, bush = "images/bush2.png", offsetX = 160.dp, offsetY = 250.dp, habitRecord = it)},
+                {BushClick(onEvent = onEvent, bush = "images/bush3.png", offsetX = 260.dp, offsetY = 220.dp, habitRecord = it)})
 
             Background()
             SunMary(onEvent = onEvent)
@@ -88,7 +88,7 @@ fun HistoryScreen(
                 }
             }
             if (state.habitListF3Above.isNotEmpty()){
-                TreeClick(onEvent = onEvent, state = state, habitRecord = state.habitListF3Above[0].habitName)
+                TreeClick(onEvent = onEvent, habitRecord = state.habitListF3Above[0].habitName)
             }
             NameTag(show = state.nameTagActive, showe = state.offset, onEvent, state)
 
@@ -315,7 +315,7 @@ fun SunMary(onEvent: (HistoryEvent) -> Unit){
 }
 
 @Composable
-fun FlowerClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, flower: String, offsetX: Dp, offsetY: Dp, habitRecord: String) {
+fun FlowerClick(onEvent: (HistoryEvent) -> Unit, flower: String, offsetX: Dp, offsetY: Dp, habitRecord: String) {
     val drawable = loadImageFromAssets(LocalContext.current, flower)
     val bitmap = drawable!!.toBitmap()
     Image(
@@ -326,7 +326,7 @@ fun FlowerClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, flower: St
         modifier = Modifier
             .height(height = 65.dp)
             .offset(offsetX, offsetY)
-            .pointerInput(Unit) {
+            .pointerInput(habitRecord) {
                 detectTapGestures {
                     //if (clickPixel(65.dp.toPx(), it, bitmap)) {
                         //onEvent(HistoryEvent.NameTagToggle)
@@ -346,7 +346,7 @@ fun FlowerClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, flower: St
 }
 
 @Composable
-fun BushClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, bush: String, offsetX: Dp, offsetY: Dp, habitRecord: String){
+fun BushClick(onEvent: (HistoryEvent) -> Unit, bush: String, offsetX: Dp, offsetY: Dp, habitRecord: String){
     val drawable = loadImageFromAssets(LocalContext.current, bush)
     val bitmap = drawable!!.toBitmap()
     Image(
@@ -357,7 +357,7 @@ fun BushClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, bush: String
         modifier = Modifier
             .height(height = 65.dp)
             .offset(offsetX, offsetY)
-            .pointerInput(Unit) {
+            .pointerInput(habitRecord) {
                 detectTapGestures {
                     // calcs offset scale due to height setting
 
@@ -380,7 +380,7 @@ fun BushClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, bush: String
 }
 
 @Composable
-fun TreeClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, habitRecord: String){
+fun TreeClick(onEvent: (HistoryEvent) -> Unit, habitRecord: String){
     val drawable = loadImageFromAssets(LocalContext.current, "images/tree.png")
     val bitmap = drawable!!.toBitmap()
 
@@ -393,7 +393,7 @@ fun TreeClick(onEvent: (HistoryEvent) -> Unit, state: HistoryState, habitRecord:
         modifier = Modifier
             .height(height = 225.dp)
             .offset(100.dp, 15.dp)
-            .pointerInput(Unit) {
+            .pointerInput(habitRecord) {
                 detectTapGestures {
                     // calcs offset scale due to height setting
                     // check pixel is not transparent
