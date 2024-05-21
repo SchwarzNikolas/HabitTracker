@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.habittracker.rootreflect.database.HabitDao
 import com.habittracker.rootreflect.database.HabitRecord
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -155,13 +154,6 @@ class HistoryViewModel(
                             for (record in habitRecords) {
                                 records.add(record)
                             }
-
-                            state.update { it.copy(
-                                habitListF1 = mutableListOf(),
-                                habitListF2 = mutableListOf(),
-                                habitListF3Above = mutableListOf(),
-                            ) }
-                            delay(10)
                             _state.update {
                                 it.copy(
                                     habitList = records,
@@ -170,10 +162,8 @@ class HistoryViewModel(
                                     habitInfo = false,
                                     // filter the habits by their frequency into three separate lists
                                     habitListF1 = records.filter { record -> record.habitFrequency == 1 }.toMutableList(),
-                                    habitListF2 = records.filter { record -> record.habitFrequency == 2 }
-                                        .toMutableList(),
-                                    habitListF3Above = records.filter { record -> record.habitFrequency >= 3 }
-                                        .toList().toMutableList(),
+                                    habitListF2 = records.filter { record -> record.habitFrequency == 2 }.toMutableList(),
+                                    habitListF3Above = records.filter { record -> record.habitFrequency >= 3 }.toMutableList(),
                                 )
                             }
                         }
