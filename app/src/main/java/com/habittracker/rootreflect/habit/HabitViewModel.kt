@@ -66,19 +66,31 @@ class HabitViewModel (
 //            dao.insertHabit(Habit(name = "test1", frequency = 5))
 //            dao.insertCompletion(HabitCompletion())
 //            dao.insertHabit(Habit(name = "test1", frequency = 3,))
-//            dao.insertCompletion(HabitCompletion(occurrence = "1000000"))
 //            dao.insertHabit(Habit(name = "test2", frequency = 4,))
-//            dao.insertCompletion(HabitCompletion(occurrence = "0100000"))
 //            dao.insertHabit(Habit(name = "test3", frequency = 4,))
-//            dao.insertCompletion(HabitCompletion(occurrence = "0010000"))
 //            dao.insertHabit(Habit(name = "test4", frequency = 4,))
-//            dao.insertCompletion(HabitCompletion(occurrence = "0001000"))
 //            dao.insertHabit(Habit(name = "test5", frequency = 4,))
-//            dao.insertCompletion(HabitCompletion(occurrence = "0000100"))
 //            dao.insertHabit(Habit(name = "test6", frequency = 4,))
-//            dao.insertCompletion(HabitCompletion(occurrence = "0000010"))
 //            dao.insertHabit(Habit(name = "test7", frequency = 4,))
-//            dao.insertCompletion(HabitCompletion(occurrence = "0000001"))
+
+//            for (i in 1..20){
+//                dao.upsertRecord(HabitRecord("Brush teeth", 2, LocalDate.of(2024, 5, i)))
+//                dao.upsertRecord(HabitRecord("Shower", 1, LocalDate.of(2024, 5, i)))
+//            }
+//            dao.upsertRecord(HabitRecord("Laundry", 1, LocalDate.of(2024, 5, 5)))
+//            dao.upsertRecord(HabitRecord("Laundry", 1, LocalDate.of(2024, 5, 12)))
+//            dao.upsertRecord(HabitRecord("Laundry", 1, LocalDate.of(2024, 5, 19)))
+//            dao.upsertRecord(HabitRecord("Read", 1, LocalDate.of(2024, 5, 2)))
+//            dao.upsertRecord(HabitRecord("Read", 1, LocalDate.of(2024, 5, 5)))
+//            dao.upsertRecord(HabitRecord("Read", 1, LocalDate.of(2024, 5, 8)))
+//            dao.upsertRecord(HabitRecord("Read", 1, LocalDate.of(2024, 5, 11)))
+//            dao.upsertRecord(HabitRecord("Read", 1, LocalDate.of(2024, 5, 15)))
+//            dao.upsertRecord(HabitRecord("Read", 1, LocalDate.of(2024, 5, 16)))
+//            dao.upsertRecord(HabitRecord("Read", 1, LocalDate.of(2024, 5, 20)))
+//            dao.upsertRecord(HabitRecord("Call parents", 1, LocalDate.of(2023, 12, 24)))
+//            dao.upsertRecord(HabitRecord("Bouldering", 1, LocalDate.of(2023, 11, 2)))
+//            dao.upsertRecord(HabitRecord("Bouldering", 1, LocalDate.of(2024, 5, 2)))
+//            dao.upsertRecord(HabitRecord("Bouldering", 1, LocalDate.of(2024, 5, 9)))
         }
     }
 
@@ -298,7 +310,7 @@ class HabitViewModel (
         viewModelScope.launch {
             try {
                 dao.upsertHabit(habit)
-                if (state.value.editString != event.displayHabit.habit.name) {
+                if (state.value.editString != event.displayHabit.habit.name && event.displayHabit.habit.done) {
                     removeRecord(HabitRecord(event.displayHabit.habit.name, event.displayHabit.habit.frequency, date))
                     insertRecord(HabitRecord(state.value.editString, state.value.editFreq, date))
                 }

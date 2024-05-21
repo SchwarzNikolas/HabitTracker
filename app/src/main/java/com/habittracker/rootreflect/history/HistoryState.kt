@@ -42,6 +42,7 @@ data class HistoryState(
     val habitListF3Above: MutableList<HabitRecord> = mutableStateListOf(),
     // store selected habit
     val habitStored: HabitRecord? = null,
+    val habName: String = "",
     // height of the bottom sheet
     val infoCardHeight: Dp = 100.dp,
 

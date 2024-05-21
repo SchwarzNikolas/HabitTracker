@@ -2,13 +2,13 @@ package com.habittracker.rootreflect.history
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.habittracker.rootreflect.database.HabitDao
 import com.habittracker.rootreflect.database.HabitRecord
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -20,7 +20,7 @@ class HistoryViewModel(
       private val dao: HabitDao
 ): ViewModel() {
     private val _state = MutableStateFlow(HistoryState())
-    private var job:Job? = null
+    private var job: Job
     val state = _state
 
     init {
@@ -28,7 +28,7 @@ class HistoryViewModel(
         start of debugging section
         insert fake mood data
          */
-//        viewModelScope.launch {
+        viewModelScope.launch {
 //            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2023, 11, 2), MoodType.GOOD))
 //            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2023, 11, 3), MoodType.BAD))
 //            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2023, 11, 4), MoodType.ALRIGHT))
@@ -49,8 +49,13 @@ class HistoryViewModel(
 //            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2024, 5, 14), MoodType.OK))
 //            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2024, 5, 15), MoodType.GOOD))
 //            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2024, 5, 16), MoodType.GOOD))
-//            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2024, 5, 17), MoodType.OK))
-//        }
+//            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2024, 5, 18), MoodType.BAD))
+//            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2024, 5, 19), MoodType.OK))
+//            dao.insertMoodRecordDebug(MoodRecord(LocalDate.of(2024, 5, 20), MoodType.GOOD))
+//            dao.upsertMoodRec(MoodRecord(LocalDate.of(2024, 5, 9), MoodType.GOOD))
+//            dao.upsertMoodRec(MoodRecord(LocalDate.of(2024, 5, 16), MoodType.SO_SO))
+
+        }
         /*
         leaving the debugging section
          */
@@ -85,28 +90,8 @@ class HistoryViewModel(
                 updateDays()
             }
         }
-        viewModelScope.launch {
-            dao.fetchHabitRecordsByDate(state.value.selectedDate).collect {
-                    habitRecords ->
-                run {
-                    val records: MutableList<HabitRecord> = mutableStateListOf()
-                    for (record in habitRecords){
-                        records.add(record)
-                    }
-                    _state.update {
-                        it.copy(
-                            habitList = records,
-                            selectedDate = state.value.selectedDate,
-                            selectedMood = state.value.selectedMood,
-                            habitInfo = false,
-                            // filter the habits by their frequency into three separate lists
-                            habitListF1 = records.filter {record -> record.habitFrequency == 1 }.toList().toMutableList(),
-                            habitListF2 = records.filter {record -> record.habitFrequency == 2 }.toList().toMutableList(),
-                            habitListF3Above = records.filter {record -> record.habitFrequency >= 3 }.toList().toMutableList(),
-                        )
-                    }
-                }
-            }
+        job = viewModelScope.launch {
+            dataSupRoutine()
         }
     }
 
@@ -160,9 +145,9 @@ class HistoryViewModel(
                 additionally this event changes the selected mood and will change what the bottom
                 sheet should display. It also fetches the completed habits from the selected day.
                  */
-                if (job != null) {
-                    job!!.cancel()
-                }
+
+                job.cancel()
+
                 job = viewModelScope.launch {
                     dao.fetchHabitRecordsByDate(event.day).collect { habitRecords ->
                         run {
@@ -170,6 +155,13 @@ class HistoryViewModel(
                             for (record in habitRecords) {
                                 records.add(record)
                             }
+
+                            state.update { it.copy(
+                                habitListF1 = mutableListOf(),
+                                habitListF2 = mutableListOf(),
+                                habitListF3Above = mutableListOf(),
+                            ) }
+                            delay(10)
                             _state.update {
                                 it.copy(
                                     habitList = records,
@@ -177,10 +169,9 @@ class HistoryViewModel(
                                     selectedMood = event.moodName,
                                     habitInfo = false,
                                     // filter the habits by their frequency into three separate lists
-                                    habitListF1 = records.filter { record -> record.habitFrequency == 1 }
-                                        .toList().toMutableList(),
+                                    habitListF1 = records.filter { record -> record.habitFrequency == 1 }.toMutableList(),
                                     habitListF2 = records.filter { record -> record.habitFrequency == 2 }
-                                        .toList().toMutableList(),
+                                        .toMutableList(),
                                     habitListF3Above = records.filter { record -> record.habitFrequency >= 3 }
                                         .toList().toMutableList(),
                                 )
@@ -203,7 +194,7 @@ class HistoryViewModel(
                     it.copy(
                         nameTagActive = state.value.nameTagActive.not(),
                         offset = event.offSet,
-                        habitStored = event.habitRecord
+                        habName = event.habitRecord
                     )
                 }
             }
@@ -248,4 +239,29 @@ class HistoryViewModel(
             }
         }
     }
+    private suspend fun dataSupRoutine(){
+        dao.fetchHabitRecordsByDate(state.value.selectedDate).collect {
+                habitRecords ->
+            run {
+                val records: MutableList<HabitRecord> = mutableStateListOf()
+                for (record in habitRecords){
+                    records.add(record)
+                }
+                _state.update {
+                    it.copy(
+                        habitList = records,
+                        selectedDate = state.value.selectedDate,
+                        selectedMood = state.value.selectedMood,
+                        habitInfo = false,
+                        // filter the habits by their frequency into three separate lists
+                        habitListF1 = records.filter {record -> record.habitFrequency == 1 }.toMutableList(),
+                        habitListF2 = records.filter {record -> record.habitFrequency == 2 }.toList().toMutableList(),
+                        habitListF3Above = records.filter {record -> record.habitFrequency >= 3 }.toList().toMutableList(),
+                    )
+                }
+            }
+        }
+    }
 }
+
+
